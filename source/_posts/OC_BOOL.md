@@ -21,7 +21,7 @@ typedef signed char BOOL;
 可见，在32位（准确的说，应该是非64位）机器上，OC中的 `BOOL` 其实并不是我们熟悉的C语言中的 `bool` ，而是 `signed char` 类型，所以OC中的 `BOOL` 所能存储的数值不止是 0 和 1 ，是 -128~127。
 
 > C99提供了\_Bool类型，\_Bool依然仍是整数类型，但只能赋值为 0 或 1，非 0 值都会被存储为 1 。  
-> C99还提供了<stdbool.h>，其中定义了 bool 代表\_Bool，并且定义了 true 和 false，true 代表 1，false 代表 0。
+> C99还提供了`<stdbool.h>`，其中定义了 bool 代表\_Bool，并且定义了 true 和 false，true 代表 1，false 代表 0。
 
 （所以发明 Objective－C 语言那会儿，C也还没有 bool 类型呢）  
 同时，OC 中还有 `YES` 和 `NO` 两个宏，也是在 `<objc.h>` 中定义，其中 `YES` 代表 1，`NO` 代表 0。
