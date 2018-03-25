@@ -36,14 +36,14 @@ tags:
 // self.cellHeightDict = @{"identifier_0" : "height_0", "identifier_1" : "height_1"};
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-// 获取数据的identifer
-if (self.cellHeightDict[identifier]) {
-return self.cellHeightDict[identifier].CGFloatValue;
-} else {
-// calculate height
-self.cellHeightDict[identifier] = @(height);
-return height;
-}
+    // 获取数据的identifer
+    if (self.cellHeightDict[identifier]) {
+        return self.cellHeightDict[identifier].CGFloatValue;
+    } else {
+        // calculate height
+        self.cellHeightDict[identifier] = @(height);
+        return height;
+    }
 }
 ```
 
@@ -61,15 +61,15 @@ return height;
 // ---
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-// 获取数据（model）
-if (model.isHeightCalculated) {
-return model.calculatedHeight;
-} else {
-// calculate height
-model.isHeightCalculated = YES;
-model.calculatedHeight = height;
-return height;
-}
+    // 获取数据（model）
+    if (model.isHeightCalculated) {
+        return model.calculatedHeight;
+    } else {
+        // calculate height
+        model.isHeightCalculated = YES;
+        model.calculatedHeight = height;
+        return height;
+    }
 }
 ```
 
@@ -84,32 +84,32 @@ cell数据缓存方案不只局限于缓存cell的高度。cell及其subViews的
 
 // 计算高度时，需要计算每个label的高度
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-// 获取数据（model）
-if (model.isHeightCalculated) {
-return model.calculatedHeight;
-} else {
-CGSize size0 = [model.text0 sizeWithAttributes...];
-CGSize size1 = [model.text1 sizeWithAttributes...];
-CGFloat height = size0.height + size1.height;
-model.isHeightCalculated = YES;
-model.calculatedHeight = height;
-return height;
-}
+    // 获取数据（model）
+    if (model.isHeightCalculated) {
+        return model.calculatedHeight;
+    } else {
+        CGSize size0 = [model.text0 sizeWithAttributes...];
+        CGSize size1 = [model.text1 sizeWithAttributes...];
+        CGFloat height = size0.height + size1.height;
+        model.isHeightCalculated = YES;
+        model.calculatedHeight = height;
+        return height;
+    }
 }
 
 // 展示时，对label进行布局
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
-// ...
+    // ...
 
-CGSize size0 = [model.text0 sizeWithAttributes...];
-label0.text = model.text0;
-label0.frame = (CGRect){0, 0, size0.width, size0.height};
+    CGSize size0 = [model.text0 sizeWithAttributes...];
+    label0.text = model.text0;
+    label0.frame = (CGRect){0, 0, size0.width, size0.height};
 
-CGSize size1 = [model.text1 sizeWithAttributes...];
-label1.text = model.text1;
-label1.frame = (CGRect){0, CGRectGetMaxY(label0.frame), size0.width, size0.height};
+    CGSize size1 = [model.text1 sizeWithAttributes...];
+    label1.text = model.text1;
+    label1.frame = (CGRect){0, CGRectGetMaxY(label0.frame), size0.width, size0.height};
 
-// ...
+    // ...
 
 }
 
@@ -146,36 +146,36 @@ label1.frame = (CGRect){0, CGRectGetMaxY(label0.frame), size0.width, size0.heigh
 // self.viewModelDict = @{"identifier_0" : "viewModel_0", "identifier_1" : "viewModel_1"};
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-// 获取数据的identifer
-if (self.viewModelDict[identifier]) {
-ViewModel *vm = self.viewModelDict[identifier];
-return vm.heigth;
-} else {
-// calculate viewModel
-ViewModel *vm = [ViewModel new];
-// calculate cellHeight
-vm.height = height;
-// calculate label0's frame
-vm.label0Frame = label0Frame;
-// calculate label1's frame
-vm.label1Frame = label1Frame;
-self.viewModelDict[identifier] = vm;
+    // 获取数据的identifer
+    if (self.viewModelDict[identifier]) {
+        ViewModel *vm = self.viewModelDict[identifier];
+        return vm.heigth;
+    } else {
+        // calculate viewModel
+        ViewModel *vm = [ViewModel new];
+        // calculate cellHeight
+        vm.height = height;
+        // calculate label0's frame
+        vm.label0Frame = label0Frame;
+        // calculate label1's frame
+        vm.label1Frame = label1Frame;
+        self.viewModelDict[identifier] = vm;
 
-return height;
-}
+        return height;
+    }
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
-// 获取数据的identifer
-ViewModel *vm = self.viewModelDict[identifier];
+    // 获取数据的identifer
+    ViewModel *vm = self.viewModelDict[identifier];
 
-label0.text = model.text0;
-label0.frame = vm.label0.frame;
+    label0.text = model.text0;
+    label0.frame = vm.label0.frame;
 
-label1.text = model.text1;
-label1.frame = vm.label1.frame;
+    label1.text = model.text1;
+    label1.frame = vm.label1.frame;
 
-// ...
+    // ...
 
 }
 
