@@ -111,7 +111,7 @@
 <meta property="og:site_name" content="JerryChu&#39;s Blog">
 <meta property="og:description" content="iOS编程中，需要在主线程中进行操作时，我们经常会用到以下代码： dispatch_async(dispatch_get_main_queue(), ^{      // TODO 0:      }); 仔细观察这部分代码， dispatch_get_main_queue() 实际获取的是 主队列（Main Queue） 。我们看dispatch_get_main_queue() 的官方文档：">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-04-07T13:27:49.000Z">
+<meta property="og:updated_time" content="2018-04-07T13:42:46.819Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iOS中的主线程（Main Thread）与主队列（Main Queue）">
 <meta name="twitter:description" content="iOS编程中，需要在主线程中进行操作时，我们经常会用到以下代码： dispatch_async(dispatch_get_main_queue(), ^{      // TODO 0:      }); 仔细观察这部分代码， dispatch_get_main_queue() 实际获取的是 主队列（Main Queue） 。我们看dispatch_get_main_queue() 的官方文档：">
@@ -404,7 +404,7 @@ dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 <script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
 <script>
   var gitment = new Gitment({
-    id: 'location.href', // 可选。默认为 location.href
+    // id: '', // 可选。默认为 location.href
     owner: 'jerrychu', // 可以是你的GitHub用户名，也可以是github id
     repo: 'jerrychu.github.io',
     oauth: {
