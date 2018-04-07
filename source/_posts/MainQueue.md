@@ -86,3 +86,18 @@ iOS编程中，需要在主线程中进行操作时，我们经常会用到以�
 
 所以，主线程是可以执行主队列之外其他队列的任务的。即使_[NSThread mainThread]_ 判断当前线程是主线程，也不能保证当前执行的任务是主队列的任务（系统并没有为我们提供一个判断是不是在主队列的API）。
 
+<div id="container"></div>
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+  var gitment = new Gitment({
+    id: 'location.href', // 可选。默认为 location.href
+    owner: 'jerrychu', // 可以是你的GitHub用户名，也可以是github id
+    repo: 'jerrychu.github.io',
+    oauth: {
+      client_id: '2820df553658e8bf2ed9',
+      client_secret: 'c08951159957d795f7e1ec43cecc5b85fa954178',
+    },
+  })
+  gitment.render('container')
+</script>
