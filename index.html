@@ -368,21 +368,7 @@
 <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@protocol</span> <span class="title">ShareableText</span> &lt;<span class="title">NSObject</span>&gt;</span></span><br><span class="line">- (<span class="built_in">NSString</span> *)shareText;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@protocol</span> <span class="title">ShareableImage</span> &lt;<span class="title">NSObject</span>&gt;</span></span><br><span class="line">- (<span class="built_in">UIImage</span> *)shareImage;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
 <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ShareHelper</span> : <span class="title">NSObject</span></span></span><br><span class="line">+ (<span class="keyword">void</span>)shareTextToWeixin:(<span class="keyword">id</span>&lt;ShareableText&gt;)shareableModel;</span><br><span class="line">+ (<span class="keyword">void</span>)shareImageToWeixin:(<span class="keyword">id</span>&lt;ShareableImage&gt;)shareableModel;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
 <p>习惯了<code>面向对象编程</code>之后，我们经常会发现写出的代码不够通用、不好扩展，尤其是对于工具类的方法。如果能将<code>面向对象编程</code>和<code>面向协议编程</code>结合起来使用，扬长避短，经常可以达到事半功倍的效果。</p>
-<p><div id="container"></div></p>
-<p><link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css"></p>
-<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
-<script>
-  var gitment = new Gitment({
-    // id: '', // 可选。默认为 location.href
-    owner: 'jerrychu', // 可以是你的GitHub用户名，也可以是github id
-    repo: 'jerrychu.github.io',
-    oauth: {
-      client_id: '2820df553658e8bf2ed9',
-      client_secret: 'c08951159957d795f7e1ec43cecc5b85fa954178',
-    },
-  })
-  gitment.render('container')
-</script>
+
           
         
       
@@ -560,21 +546,7 @@ dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 <p>While doing some research for this post I found <a href="https://libdispatch.macosforge.org/trac/changeset/156" target="_blank" rel="noopener">a commit to libdispatch that ensures that blocks dispatched with dispatch_sync are always executed on the current thread</a>. This means if you use dispatch_sync to dispatch a block from the main queue to a concurrent background queue, the code executing on the background queue will actually be executed on the main thread. While this might not be entirely intuitive, it makes sense: since the main queue needs to wait until the dispatched block completed, the main thread will be available to process blocks from queues other than the main queue.</p>
 </blockquote>
 <p>所以，主线程是可以执行主队列之外其他队列的任务的。即使<em>[NSThread mainThread]</em> 判断当前线程是主线程，也不能保证当前执行的任务是主队列的任务（系统并没有为我们提供一个判断是不是在主队列的API）。</p>
-<p><div id="container"></div></p>
-<p><link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css"></p>
-<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
-<script>
-  var gitment = new Gitment({
-    // id: '', // 可选。默认为 location.href
-    owner: 'jerrychu', // 可以是你的GitHub用户名，也可以是github id
-    repo: 'jerrychu.github.io',
-    oauth: {
-      client_id: '2820df553658e8bf2ed9',
-      client_secret: 'c08951159957d795f7e1ec43cecc5b85fa954178',
-    },
-  })
-  gitment.render('container')
-</script>
+
           
         
       
@@ -738,21 +710,7 @@ dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// self.viewModelDict = @&#123;"identifier_0" : "viewModel_0", "identifier_1" : "viewModel_1"&#125;;</span></span><br><span class="line"></span><br><span class="line">- (<span class="built_in">CGFloat</span>)tableView:(<span class="built_in">UITableView</span> *)tableView heightForRowAtIndexPath:(<span class="built_in">NSIndexPath</span> *)indexPath &#123;</span><br><span class="line">    <span class="comment">// 获取数据的identifer</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">self</span>.viewModelDict[identifier]) &#123;</span><br><span class="line">        ViewModel *vm = <span class="keyword">self</span>.viewModelDict[identifier];</span><br><span class="line">        <span class="keyword">return</span> vm.heigth;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// calculate viewModel</span></span><br><span class="line">        ViewModel *vm = [ViewModel new];</span><br><span class="line">        <span class="comment">// calculate cellHeight</span></span><br><span class="line">        vm.height = height;</span><br><span class="line">        <span class="comment">// calculate label0's frame</span></span><br><span class="line">        vm.label0Frame = label0Frame;</span><br><span class="line">        <span class="comment">// calculate label1's frame</span></span><br><span class="line">        vm.label1Frame = label1Frame;</span><br><span class="line">        <span class="keyword">self</span>.viewModelDict[identifier] = vm;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> height;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)tableView:(<span class="built_in">UITableView</span> *)tableView willDisplayCell:(<span class="built_in">UITableViewCell</span> *)cell forRowAtIndexPath:(<span class="built_in">NSIndexPath</span> *)indexPath &#123;</span><br><span class="line">    <span class="comment">// 获取数据的identifer</span></span><br><span class="line">    ViewModel *vm = <span class="keyword">self</span>.viewModelDict[identifier];</span><br><span class="line"></span><br><span class="line">    label0.text = model.text0;</span><br><span class="line">    label0.frame = vm.label0.frame;</span><br><span class="line"></span><br><span class="line">    label1.text = model.text1;</span><br><span class="line">    label1.frame = vm.label1.frame;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>当然，上面的ViewModel中并不仅局限于存储height、frame等数据，还可以存储许多布局时需要的数据，比如label对应的text或attributedText等。</p>
 <p>总的来说，这种 <strong>Cell数据缓存 + MVVM</strong> 的方式能够避免很多不必要的重复计算带来的性能开销，很好地提升列表的滚动流畅性；同时将计算布局的代码和实际布局UI的代码拆分开，代码结构更加清晰，并且为之后的进一步优化打好了基础（比如将布局代码放到子线程计算）。</p>
-<p><div id="container"></div></p>
-<p><link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css"></p>
-<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
-<script>
-  var gitment = new Gitment({
-    // id: '', // 可选。默认为 location.href
-    owner: 'jerrychu', // 可以是你的GitHub用户名，也可以是github id
-    repo: 'jerrychu.github.io',
-    oauth: {
-      client_id: '2820df553658e8bf2ed9',
-      client_secret: 'c08951159957d795f7e1ec43cecc5b85fa954178',
-    },
-  })
-  gitment.render('container')
-</script>
+
           
         
       
@@ -896,21 +854,6 @@ dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 <li><a href="https://www.bignerdranch.com/blog/bools-sharp-corners/" target="_blank" rel="noopener">https://www.bignerdranch.com/blog/bools-sharp-corners/</a>  </li>
 <li><a href="https://en.wikipedia.org/wiki/List_of_iOS_devices" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/List_of_iOS_devices</a></li>
 </ul>
-<p><div id="container"></div></p>
-<p><link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css"></p>
-<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
-<script>
-  var gitment = new Gitment({
-    id: '', // 可选。默认为 location.href
-    owner: 'jerrychu', // 可以是你的GitHub用户名，也可以是github id
-    repo: 'jerrychu.github.io',
-    oauth: {
-      client_id: '2820df553658e8bf2ed9',
-      client_secret: 'c08951159957d795f7e1ec43cecc5b85fa954178',
-    },
-  })
-  gitment.render('container')
-</script>
 
           
         

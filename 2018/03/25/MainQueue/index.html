@@ -111,7 +111,7 @@
 <meta property="og:site_name" content="JerryChu&#39;s Blog">
 <meta property="og:description" content="iOS编程中，需要在主线程中进行操作时，我们经常会用到以下代码： dispatch_async(dispatch_get_main_queue(), ^{      // TODO 0:      }); 仔细观察这部分代码， dispatch_get_main_queue() 实际获取的是 主队列（Main Queue） 。我们看dispatch_get_main_queue() 的官方文档：">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-04-07T13:42:46.819Z">
+<meta property="og:updated_time" content="2018-04-07T13:46:35.800Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iOS中的主线程（Main Thread）与主队列（Main Queue）">
 <meta name="twitter:description" content="iOS编程中，需要在主线程中进行操作时，我们经常会用到以下代码： dispatch_async(dispatch_get_main_queue(), ^{      // TODO 0:      }); 仔细观察这部分代码， dispatch_get_main_queue() 实际获取的是 主队列（Main Queue） 。我们看dispatch_get_main_queue() 的官方文档：">
@@ -399,21 +399,7 @@ dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 <p>While doing some research for this post I found <a href="https://libdispatch.macosforge.org/trac/changeset/156" target="_blank" rel="noopener">a commit to libdispatch that ensures that blocks dispatched with dispatch_sync are always executed on the current thread</a>. This means if you use dispatch_sync to dispatch a block from the main queue to a concurrent background queue, the code executing on the background queue will actually be executed on the main thread. While this might not be entirely intuitive, it makes sense: since the main queue needs to wait until the dispatched block completed, the main thread will be available to process blocks from queues other than the main queue.</p>
 </blockquote>
 <p>所以，主线程是可以执行主队列之外其他队列的任务的。即使<em>[NSThread mainThread]</em> 判断当前线程是主线程，也不能保证当前执行的任务是主队列的任务（系统并没有为我们提供一个判断是不是在主队列的API）。</p>
-<p><div id="container"></div></p>
-<p><link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css"></p>
-<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
-<script>
-  var gitment = new Gitment({
-    // id: '', // 可选。默认为 location.href
-    owner: 'jerrychu', // 可以是你的GitHub用户名，也可以是github id
-    repo: 'jerrychu.github.io',
-    oauth: {
-      client_id: '2820df553658e8bf2ed9',
-      client_secret: 'c08951159957d795f7e1ec43cecc5b85fa954178',
-    },
-  })
-  gitment.render('container')
-</script>
+
       
     </div>
     
