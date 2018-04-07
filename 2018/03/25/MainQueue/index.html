@@ -111,7 +111,7 @@
 <meta property="og:site_name" content="JerryChu&#39;s Blog">
 <meta property="og:description" content="iOS编程中，需要在主线程中进行操作时，我们经常会用到以下代码： dispatch_async(dispatch_get_main_queue(), ^{      // TODO 0:      }); 仔细观察这部分代码， dispatch_get_main_queue() 实际获取的是 主队列（Main Queue） 。我们看dispatch_get_main_queue() 的官方文档：">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-03-25T11:13:38.286Z">
+<meta property="og:updated_time" content="2018-03-25T11:14:27.300Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iOS中的主线程（Main Thread）与主队列（Main Queue）">
 <meta name="twitter:description" content="iOS编程中，需要在主线程中进行操作时，我们经常会用到以下代码： dispatch_async(dispatch_get_main_queue(), ^{      // TODO 0:      }); 仔细观察这部分代码， dispatch_get_main_queue() 实际获取的是 主队列（Main Queue） 。我们看dispatch_get_main_queue() 的官方文档：">
@@ -429,6 +429,10 @@ dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/2018/04/07/OC-POP/" rel="prev" title="面向协议的第三方分享模块实现（OC）">
+                面向协议的第三方分享模块实现（OC） <i class="fa fa-chevron-right"></i>
+              </a>
+            
           </div>
         </div>
       
@@ -492,7 +496,7 @@ dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-count">4</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -505,7 +509,7 @@ dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 
                 <div class="site-state-item site-state-tags">
                   <a href="/tags/index.html">
-                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-count">3</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
