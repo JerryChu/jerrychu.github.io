@@ -65,17 +65,17 @@ tags:
 ```objc
 @implementation ShareHelper
 + (void)shareObjectToWeixin:(ShareModel *)model {
-WXWebpageObject *object = [WXWebpageObject object];
-object.webpageUrl = model.url;
-WXMediaMessage *message = [WXMediaMessage message];
-message.title = model.title;
-message.description = model.description;
-message.thumbData = model.thumbnailData;
-message.mediaObject = object;
-
-SendMessageToWXReq *req = [[SendMessageToWXReq alloc] init];
-req.message = message;
-[WXApi sendReq:req];
+	WXWebpageObject *object = [WXWebpageObject object];
+	object.webpageUrl = model.url;
+	WXMediaMessage *message = [WXMediaMessage message];
+	message.title = model.title;
+	message.description = model.description;
+	message.thumbData = model.thumbnailData;
+	message.mediaObject = object;
+	
+	SendMessageToWXReq *req = [[SendMessageToWXReq alloc] init];
+	req.message = message;
+	[WXApi sendReq:req];
 }
 @end
 ```
@@ -85,17 +85,17 @@ req.message = message;
 ```objc
 @implementation ShareHelper
 + (void)shareAnotherObjectToWeixin:(ShareModel *)model {
-WXWebpageObject *object = [WXWebpageObject object];
-object.webpageUrl = model.url;
-WXMediaMessage *message = [WXMediaMessage message];
-message.title = model.title;
-message.description = model.description;
-message.thumbData = model.thumbnailData;
-message.mediaObject = object;
-
-SendMessageToWXReq *req = [[SendMessageToWXReq alloc] init];
-req.message = message;
-[WXApi sendReq:req];
+	WXWebpageObject *object = [WXWebpageObject object];
+	object.webpageUrl = model.url;
+	WXMediaMessage *message = [WXMediaMessage message];
+	message.title = model.title;
+	message.description = model.description;
+	message.thumbData = model.thumbnailData;
+	message.mediaObject = object;
+	
+	SendMessageToWXReq *req = [[SendMessageToWXReq alloc] init];
+	req.message = message;
+	[WXApi sendReq:req];
 }
 @end
 ```
@@ -104,17 +104,17 @@ req.message = message;
 ```objc
 @implementation ShareHelper
 + (void)shareDictionaryToWeixin:(NSDictionay *)dict {
-WXWebpageObject *object = [WXWebpageObject object];
-object.webpageUrl = dict[@"url"];
-WXMediaMessage *message = [WXMediaMessage message];
-message.title = dict[@"title"];
-message.description = dict[@"description"];
-message.thumbData = dict[@"thumbnailData"];
-message.mediaObject = object;
-
-SendMessageToWXReq *req = [[SendMessageToWXReq alloc] init];
-req.message = message;
-[WXApi sendReq:req];
+	WXWebpageObject *object = [WXWebpageObject object];
+	object.webpageUrl = dict[@"url"];
+	WXMediaMessage *message = [WXMediaMessage message];
+	message.title = dict[@"title"];
+	message.description = dict[@"description"];
+	message.thumbData = dict[@"thumbnailData"];
+	message.mediaObject = object;
+	
+	SendMessageToWXReq *req = [[SendMessageToWXReq alloc] init];
+	req.message = message;
+	[WXApi sendReq:req];
 }
 @end
 ```
@@ -156,17 +156,17 @@ req.message = message;
 
 @implementation ShareHelper
 + (void)shareToWeixin:(id<Shareable>)shareableModel {
-WXWebpageObject *object = [WXWebpageObject object];
-object.webpageUrl = [shareableModel shareUrl];
-WXMediaMessage *message = [WXMediaMessage message];
-message.title = [shareableModel shareTitle];
-message.description = [shareableModel shareDescription];
-message.thumbData = [shareableModel shareThumbnailData];
-message.mediaObject = object;
-
-SendMessageToWXReq *req = [[SendMessageToWXReq alloc] init];
-req.message = message;
-[WXApi sendReq:req];
+	WXWebpageObject *object = [WXWebpageObject object];
+	object.webpageUrl = [shareableModel shareUrl];
+	WXMediaMessage *message = [WXMediaMessage message];
+	message.title = [shareableModel shareTitle];
+	message.description = [shareableModel shareDescription];
+	message.thumbData = [shareableModel shareThumbnailData];
+	message.mediaObject = object;
+	
+	SendMessageToWXReq *req = [[SendMessageToWXReq alloc] init];
+	req.message = message;
+	[WXApi sendReq:req];
 }
 @end
 ```
