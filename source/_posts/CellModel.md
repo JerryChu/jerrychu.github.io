@@ -185,3 +185,18 @@ cell数据缓存方案不只局限于缓存cell的高度。cell及其subViews的
 
 总的来说，这种 __Cell数据缓存 + MVVM__ 的方式能够避免很多不必要的重复计算带来的性能开销，很好地提升列表的滚动流畅性；同时将计算布局的代码和实际布局UI的代码拆分开，代码结构更加清晰，并且为之后的进一步优化打好了基础（比如将布局代码放到子线程计算）。
 
+<div id="container"></div>
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+  var gitment = new Gitment({
+    id: 'location.href', // 可选。默认为 location.href
+    owner: 'jerrychu', // 可以是你的GitHub用户名，也可以是github id
+    repo: 'jerrychu.github.io',
+    oauth: {
+      client_id: '2820df553658e8bf2ed9',
+      client_secret: 'c08951159957d795f7e1ec43cecc5b85fa954178',
+    },
+  })
+  gitment.render('container')
+</script>
