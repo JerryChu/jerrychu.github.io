@@ -193,20 +193,3 @@ tags:
 ```
 
 习惯了`面向对象编程`之后，我们经常会发现写出的代码不够通用、不好扩展，尤其是对于工具类的方法。如果能将`面向对象编程`和`面向协议编程`结合起来使用，扬长避短，经常可以达到事半功倍的效果。
-
-
-<div id="container"></div>
-<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
-<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
-<script>
-  var gitment = new Gitment({
-    id: 'location.href', // 可选。默认为 location.href
-    owner: 'jerrychu', // 可以是你的GitHub用户名，也可以是github id
-    repo: 'jerrychu.github.io',
-    oauth: {
-      client_id: '2820df553658e8bf2ed9',
-      client_secret: 'c08951159957d795f7e1ec43cecc5b85fa954178',
-    },
-  })
-  gitment.render('container')
-</script>
