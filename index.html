@@ -368,7 +368,21 @@
 <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@protocol</span> <span class="title">ShareableText</span> &lt;<span class="title">NSObject</span>&gt;</span></span><br><span class="line">- (<span class="built_in">NSString</span> *)shareText;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@protocol</span> <span class="title">ShareableImage</span> &lt;<span class="title">NSObject</span>&gt;</span></span><br><span class="line">- (<span class="built_in">UIImage</span> *)shareImage;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
 <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ShareHelper</span> : <span class="title">NSObject</span></span></span><br><span class="line">+ (<span class="keyword">void</span>)shareTextToWeixin:(<span class="keyword">id</span>&lt;ShareableText&gt;)shareableModel;</span><br><span class="line">+ (<span class="keyword">void</span>)shareImageToWeixin:(<span class="keyword">id</span>&lt;ShareableImage&gt;)shareableModel;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
 <p>习惯了<code>面向对象编程</code>之后，我们经常会发现写出的代码不够通用、不好扩展，尤其是对于工具类的方法。如果能将<code>面向对象编程</code>和<code>面向协议编程</code>结合起来使用，扬长避短，经常可以达到事半功倍的效果。</p>
-
+<p><div id="container"></div></p>
+<p><link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css"></p>
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+  var gitment = new Gitment({
+    id: 'location.href', // 可选。默认为 location.href
+    owner: 'jerrychu', // 可以是你的GitHub用户名，也可以是github id
+    repo: 'jerrychu.github.io',
+    oauth: {
+      client_id: '2820df553658e8bf2ed9',
+      client_secret: 'c08951159957d795f7e1ec43cecc5b85fa954178',
+    },
+  })
+  gitment.render('container')
+</script>
           
         
       
