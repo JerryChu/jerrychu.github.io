@@ -111,7 +111,7 @@
 <meta property="og:site_name" content="JerryChu&#39;s Blog">
 <meta property="og:description" content="通过对列表cell的数据，如cell的高度、subView的布局数据等进行缓存，可以避免不必要的重复计算带来的性能开销，从而实现对列表性能的深度优化。同时可以结合MVVM中ViewModel的概念，进行cell数据的存储，使得代码结构更加清晰。  在客户端开发中，最经常使用的就是各种列表了，列表性能的好坏，很大程度上决定了一个应用的使用体验如何。关于如何优化列表性能，大家基本都能说出来一些基本方">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-03-25T11:14:27.293Z">
+<meta property="og:updated_time" content="2018-04-07T13:21:25.054Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="列表性能优化之cell数据缓存">
 <meta name="twitter:description" content="通过对列表cell的数据，如cell的高度、subView的布局数据等进行缓存，可以避免不必要的重复计算带来的性能开销，从而实现对列表性能的深度优化。同时可以结合MVVM中ViewModel的概念，进行cell数据的存储，使得代码结构更加清晰。  在客户端开发中，最经常使用的就是各种列表了，列表性能的好坏，很大程度上决定了一个应用的使用体验如何。关于如何优化列表性能，大家基本都能说出来一些基本方">
@@ -385,7 +385,21 @@
 <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// self.viewModelDict = @&#123;"identifier_0" : "viewModel_0", "identifier_1" : "viewModel_1"&#125;;</span></span><br><span class="line"></span><br><span class="line">- (<span class="built_in">CGFloat</span>)tableView:(<span class="built_in">UITableView</span> *)tableView heightForRowAtIndexPath:(<span class="built_in">NSIndexPath</span> *)indexPath &#123;</span><br><span class="line">    <span class="comment">// 获取数据的identifer</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">self</span>.viewModelDict[identifier]) &#123;</span><br><span class="line">        ViewModel *vm = <span class="keyword">self</span>.viewModelDict[identifier];</span><br><span class="line">        <span class="keyword">return</span> vm.heigth;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// calculate viewModel</span></span><br><span class="line">        ViewModel *vm = [ViewModel new];</span><br><span class="line">        <span class="comment">// calculate cellHeight</span></span><br><span class="line">        vm.height = height;</span><br><span class="line">        <span class="comment">// calculate label0's frame</span></span><br><span class="line">        vm.label0Frame = label0Frame;</span><br><span class="line">        <span class="comment">// calculate label1's frame</span></span><br><span class="line">        vm.label1Frame = label1Frame;</span><br><span class="line">        <span class="keyword">self</span>.viewModelDict[identifier] = vm;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> height;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)tableView:(<span class="built_in">UITableView</span> *)tableView willDisplayCell:(<span class="built_in">UITableViewCell</span> *)cell forRowAtIndexPath:(<span class="built_in">NSIndexPath</span> *)indexPath &#123;</span><br><span class="line">    <span class="comment">// 获取数据的identifer</span></span><br><span class="line">    ViewModel *vm = <span class="keyword">self</span>.viewModelDict[identifier];</span><br><span class="line"></span><br><span class="line">    label0.text = model.text0;</span><br><span class="line">    label0.frame = vm.label0.frame;</span><br><span class="line"></span><br><span class="line">    label1.text = model.text1;</span><br><span class="line">    label1.frame = vm.label1.frame;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>当然，上面的ViewModel中并不仅局限于存储height、frame等数据，还可以存储许多布局时需要的数据，比如label对应的text或attributedText等。</p>
 <p>总的来说，这种 <strong>Cell数据缓存 + MVVM</strong> 的方式能够避免很多不必要的重复计算带来的性能开销，很好地提升列表的滚动流畅性；同时将计算布局的代码和实际布局UI的代码拆分开，代码结构更加清晰，并且为之后的进一步优化打好了基础（比如将布局代码放到子线程计算）。</p>
-
+<p><div id="container"></div></p>
+<p><link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css"></p>
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+  var gitment = new Gitment({
+    id: 'location.href', // 可选。默认为 location.href
+    owner: 'jerrychu', // 可以是你的GitHub用户名，也可以是github id
+    repo: 'jerrychu.github.io',
+    oauth: {
+      client_id: '2820df553658e8bf2ed9',
+      client_secret: 'c08951159957d795f7e1ec43cecc5b85fa954178',
+    },
+  })
+  gitment.render('container')
+</script>
       
     </div>
     
