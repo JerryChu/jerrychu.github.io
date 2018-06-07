@@ -100,31 +100,34 @@
 
 
   
-  <meta name="keywords" content="iOS," />
+  <meta name="keywords" content="iOS,WWDC," />
 
 
-<meta name="description" content="iOS编程中，需要在主线程中进行操作时，我们经常会用到以下代码： dispatch_async(dispatch_get_main_queue(), ^{      // TODO 0:      }); 仔细观察这部分代码， dispatch_get_main_queue() 实际获取的是 主队列（Main Queue） 。我们看dispatch_get_main_queue() 的官方文档：">
-<meta name="keywords" content="iOS">
+<meta name="description" content="不出所料，iOS 12 果然没有什么大改动出现，所有支持 iOS 11 的设备都可以升级到 iOS 12，称之为 iOS 11 的 bugfix 版本也不为过。对开发者来说，这未必不是一件好事，毕竟 iOS 11 的bug的确有点多。同时，更少的改动意味着更少的适配工作，大家可以安心的写bug了。   不过，作为一次大版本更新，iOS 12 还是有一些特性可以说一说的。  明显的性能提升大会key">
+<meta name="keywords" content="iOS,WWDC">
 <meta property="og:type" content="article">
-<meta property="og:title" content="iOS中的主线程（Main Thread）与主队列（Main Queue）">
-<meta property="og:url" content="http://jerrychu.github.io/2018/03/25/MainQueue/index.html">
+<meta property="og:title" content="WWDC笔记（技术篇）">
+<meta property="og:url" content="http://jerrychu.github.io/2018/06/05/WWDC-tech/index.html">
 <meta property="og:site_name" content="JerryChu&#39;s Blog">
-<meta property="og:description" content="iOS编程中，需要在主线程中进行操作时，我们经常会用到以下代码： dispatch_async(dispatch_get_main_queue(), ^{      // TODO 0:      }); 仔细观察这部分代码， dispatch_get_main_queue() 实际获取的是 主队列（Main Queue） 。我们看dispatch_get_main_queue() 的官方文档：">
+<meta property="og:description" content="不出所料，iOS 12 果然没有什么大改动出现，所有支持 iOS 11 的设备都可以升级到 iOS 12，称之为 iOS 11 的 bugfix 版本也不为过。对开发者来说，这未必不是一件好事，毕竟 iOS 11 的bug的确有点多。同时，更少的改动意味着更少的适配工作，大家可以安心的写bug了。   不过，作为一次大版本更新，iOS 12 还是有一些特性可以说一说的。  明显的性能提升大会key">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-04-07T13:46:35.800Z">
+<meta property="og:image" content="https://wx4.sinaimg.cn/mw690/83e01499ly1fs2iawktbwj209905etag.jpg">
+<meta property="og:image" content="https://wx2.sinaimg.cn/mw690/83e01499ly1fs2hg8z30wj20va1von43.jpg">
+<meta property="og:updated_time" content="2018-06-07T04:35:03.993Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="iOS中的主线程（Main Thread）与主队列（Main Queue）">
-<meta name="twitter:description" content="iOS编程中，需要在主线程中进行操作时，我们经常会用到以下代码： dispatch_async(dispatch_get_main_queue(), ^{      // TODO 0:      }); 仔细观察这部分代码， dispatch_get_main_queue() 实际获取的是 主队列（Main Queue） 。我们看dispatch_get_main_queue() 的官方文档：">
+<meta name="twitter:title" content="WWDC笔记（技术篇）">
+<meta name="twitter:description" content="不出所料，iOS 12 果然没有什么大改动出现，所有支持 iOS 11 的设备都可以升级到 iOS 12，称之为 iOS 11 的 bugfix 版本也不为过。对开发者来说，这未必不是一件好事，毕竟 iOS 11 的bug的确有点多。同时，更少的改动意味着更少的适配工作，大家可以安心的写bug了。   不过，作为一次大版本更新，iOS 12 还是有一些特性可以说一说的。  明显的性能提升大会key">
+<meta name="twitter:image" content="https://wx4.sinaimg.cn/mw690/83e01499ly1fs2iawktbwj209905etag.jpg">
 
 
 
 
 
 
-  <link rel="canonical" href="http://jerrychu.github.io/2018/03/25/MainQueue/"/>
+  <link rel="canonical" href="http://jerrychu.github.io/2018/06/05/WWDC-tech/"/>
 
 
-  <title>iOS中的主线程（Main Thread）与主队列（Main Queue） | JerryChu's Blog</title>
+  <title>WWDC笔记（技术篇） | JerryChu's Blog</title>
   
 
 
@@ -265,7 +268,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://jerrychu.github.io/2018/03/25/MainQueue/">
+    <link itemprop="mainEntityOfPage" href="http://jerrychu.github.io/2018/06/05/WWDC-tech/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="JerryChu">
@@ -282,7 +285,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">iOS中的主线程（Main Thread）与主队列（Main Queue）</h1>
+          <h1 class="post-title" itemprop="name headline">WWDC笔记（技术篇）</h1>
         
 
         <div class="post-meta">
@@ -294,7 +297,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-25T04:11:20-07:00">2018-03-25</time>
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-05T08:06:57-07:00">2018-06-05</time>
             
 
             
@@ -312,8 +315,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/03/25/MainQueue/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count gitment-comments-count" data-xid="/2018/03/25/MainQueue/" itemprop="commentsCount"></span>
+                <a href="/2018/06/05/WWDC-tech/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count gitment-comments-count" data-xid="/2018/06/05/WWDC-tech/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -341,64 +344,35 @@
       
 
       
-        <p>iOS编程中，需要在主线程中进行操作时，我们经常会用到以下代码：</p>
-<pre><code>dispatch_async(dispatch_get_main_queue(), ^{ 
-    // TODO 0:     
-});
-</code></pre><p>仔细观察这部分代码， <em>dispatch_get_main_queue()</em> 实际获取的是 <strong>主队列（Main Queue）</strong> 。我们看<em>dispatch_get_main_queue()</em> 的官方文档：</p>
-<blockquote>
-<p>Returns the main queue. This queue is created automatically on behalf of the main thread before main() is called.</p>
-</blockquote>
-<p>而当我们需要判断当前线程是不是 <strong>主线程（Main Thread）</strong> 时，会这样写：</p>
-<pre><code>if ([NSThread isMainThread]) {
-    // TODO 1:
-}
-</code></pre><p>那么我们会想到以下几个问题： </p>
-<p><strong>1. 主线程和主队列到底有什么关系？</strong><br><strong>2. 为什么通过 <em>dispatch_get_main_queue()</em> 就可以确保在代码在主线程执行了？</strong><br><strong>3. 主线程可以执行非主队列里的任务吗？</strong> </p>
-<p>我们知道，主队列是系统自动为我们创建的一个串行队列，因此不用我们手动创建。在每个应用程序只有一个主队列，专门负责调度主线程里的任务，不允许开辟新的线程。也就是说，<strong>在主队列里的任务，即使是异步的，最终也只能在主线程中运行</strong>。因此，开头的第一段代码是可以保证在主线程中运行的。我们使用如下代码做测试：</p>
-<pre><code>- (void)testMainThread {
-    NSLog(@&quot;begin&quot;);
-    for (int i = 0 ; i &lt; 10; i ++) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            NSLog(@&quot;current Thread: %@; Task: %@&quot;,[NSThread currentThread], @(i));
-        });
-    }
-    NSLog(@&quot;end&quot;);
-}
-</code></pre><p>输出为：</p>
-<pre><code>2016-08-28 21:22:18.384 Test[72358:1633765] begin
-2016-08-28 21:22:18.384 Test[72358:1633765] end
-2016-08-28 21:22:18.388 Test[72358:1633765] isMainThread: 1; Task: 0
-2016-08-28 21:22:18.388 Test[72358:1633765] isMainThread: 1; Task: 1
-2016-08-28 21:22:18.388 Test[72358:1633765] isMainThread: 1; Task: 2
-2016-08-28 21:22:18.388 Test[72358:1633765] isMainThread: 1; Task: 3
-2016-08-28 21:22:18.389 Test[72358:1633765] isMainThread: 1; Task: 4
-</code></pre><p>由于block内的任务是异步执行，主线程在将当前方法（<em>testMainThread</em> ）执行完毕之后，才会去继续执行主队列里的任务。那么如果我们把异步任务换成同步的出现什么结果呢？</p>
-<pre><code>- (void)testMainThread {
-    NSLog(@&quot;begin&quot;);
-    for (int i = 0 ; i &lt; 10; i ++) {
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            NSLog(@&quot;current Thread: %@; Task: %@&quot;,[NSThread currentThread], @(i));
-        });
-    }
-    NSLog(@&quot;end&quot;);
-}
-</code></pre><p>输出为：</p>
-<pre><code>2016-08-28 21:26:29.918 Test[72386:1636378] begin
-</code></pre><p>也就是说，主线层被阻塞了。这个也好理解，因为此时主队列里的任务是同步执行的，同步任务必需被立刻执行。但同时由于主线程里的<em>testMainThread</em> 还没有执行完，主线程没法去处理主队列里的任务，导致程序死锁。也就是说<strong>主线程空闲时才会调度队列中的任务在主线程执行, 如果当前主线程正在有任务执行，那么无论主队列中当前被添加了什么任务，都不会被调度。</strong> 这也是我们平常写代码需要注意的。</p>
-<p>主队列的任务一定在主线程中执行，那么我们再来看最后一个问题：<em>主线程可以执行非主队列里的任务吗？</em>   我们使用下面的代码做测试：</p>
-<pre><code> NSLog(@&quot;isMainThread: %@&quot;, @([NSThread isMainThread]));
-dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-    NSLog(@&quot;isMainThread: %@&quot;, @([NSThread isMainThread]));
-});
-</code></pre><p>在主线程中同步执行一个后台队列（使用_dispatch_get_global<em>queue</em>() 方法获取系统创建的全局并发队列）的任务。运行输出为：</p>
-<pre><code>2016-08-28 21:55:26.262 Test[72533:1649394] isMainThread: 1
-2016-08-28 21:55:26.263 Test[72533:1649394] isMainThread: 1
-</code></pre><p>可以看到，这个后台队列的任务也是在主线程中执行的。下面是从 <a href="http://blog.benjamin-encz.de/post/main-queue-vs-main-thread" target="_blank" rel="noopener">http://blog.benjamin-encz.de 的一篇博客</a> 摘抄下来的一段说明：</p>
-<blockquote>
-<p>While doing some research for this post I found <a href="https://libdispatch.macosforge.org/trac/changeset/156" target="_blank" rel="noopener">a commit to libdispatch that ensures that blocks dispatched with dispatch_sync are always executed on the current thread</a>. This means if you use dispatch_sync to dispatch a block from the main queue to a concurrent background queue, the code executing on the background queue will actually be executed on the main thread. While this might not be entirely intuitive, it makes sense: since the main queue needs to wait until the dispatched block completed, the main thread will be available to process blocks from queues other than the main queue.</p>
-</blockquote>
-<p>所以，主线程是可以执行主队列之外其他队列的任务的。即使<em>[NSThread mainThread]</em> 判断当前线程是主线程，也不能保证当前执行的任务是主队列的任务（系统并没有为我们提供一个判断是不是在主队列的API）。</p>
+        <p>不出所料，<strong>iOS 12</strong> 果然没有什么大改动出现，所有支持 <strong>iOS 11</strong> 的设备都可以升级到 <strong>iOS 12</strong>，称之为 <strong>iOS 11</strong> 的 <em>bugfix</em> 版本也不为过。对开发者来说，这未必不是一件好事，毕竟 <strong>iOS 11</strong> 的bug的确有点多。同时，更少的改动意味着更少的适配工作，大家可以安心的写bug了。  </p>
+<p>不过，作为一次大版本更新，<strong>iOS 12</strong> 还是有一些特性可以说一说的。</p>
+<ul>
+<li><strong>明显的性能提升</strong><br>大会keynote上写着APP启动时间提升了 <strong>(up to)40%</strong>。虽然有个 <em>up to</em>，但是如果真能有这个级别的提升，那还真挺令人激动的，毕竟大家一直在探索各种降低启动时间的方法。从另一个方面想，<strong>iOS 11</strong> 到底是有多慢…</li>
+</ul>
+<p><img src="https://wx4.sinaimg.cn/mw690/83e01499ly1fs2iawktbwj209905etag.jpg" alt="img"></p>
+<ul>
+<li><p><strong>Siri Shortcut</strong><br>使用 <strong>siri</strong> 完成一系列预定事件，标志着Siri终于支持<code>workflow</code>，看着是个不错的功能。但是明显能感觉到苹果在推进 <strong>Siri</strong> 的路上走得并不快。而且从之前接入<code>SiriKit</code>的经验来看，预计会有不少坑，比如识别的语法太固定，识别的场景太狭窄，而且之前接入<code>SiriKit</code>之后出现各种各样的审核问题和奇怪的崩溃问题让人很心累。希望这一次 <strong>Siri</strong> 可以做得更好。</p>
+</li>
+<li><p><strong>ARKit</strong><br>今年仍然花了不少时间来讲<code>ARKit</code>，并且发布了<code>ARKit 2</code>。<code>ARKit 2</code>开始支持再拍照时测量尺寸了，这是个挺好用也好玩的功能。只不过 <a href="https://measurekit.com/" target="_blank" rel="noopener">MeasureKit</a> 的开发者可能就没时间这么想了，看来是得赶紧开发点新东西了。同时<code>ARKit 2</code>也支持了在拍摄视频或者视频聊天时实时在头上盖一个（想不到用啥形容词了…）动物，可以实时模拟你的表情。不过既然<code>ARemoji</code>都已经支持模拟真人了，所以被<a href="(https://twitter.com/developar/status/1003959954833924096">吐槽一下</a>)也就很正常了。</p>
+</li>
+<li><p><strong>Grouped Notifications</strong><br>系统通知终于支持分类了，再也不用被微信通知刷屏了。系统通知的分类会按照APP设置的通知分类来进行组织，属于一类的通知在展示时会叠加在一起，点击之后可以展开全部，并且支持一些自定义的文案。这部分功能需要开发者进行些适配工作（设置指定的属性等），如果不进行适配的话，APP的所有通知默认全部叠加在一起，这很显然是大家不希望看到的。稍后会补充个demo进来。</p>
+</li>
+<li><p><strong>Photos Share</strong><br>在 <strong>iOS 12</strong> 中，相册会自动识别出照片中的联系人并推荐你将此照片分享给该联系人。不仅如此，你的朋友在收到你分享过来的照片之后，系统也会推荐TA礼尚往来地分享一些包含你的照片给你（如果找不到就尴尬了）。这一切都是基于图像识别实现的，所以首先，你得在通讯录里加上你朋友的照片。</p>
+</li>
+<li><p><strong>Screen Time</strong><br><strong>iOS 12</strong> 在设置页面新增了一个<code>Screen Time（屏幕时间）</code>选项，在这里你可以看到所有APP的使用时长等信息。这下终于能知道时间都去哪儿了。更爆炸的是，这个页面还有一个<code>App Limits（应用限制）</code>功能，可以限制每个APP的使用时长，时间到了之后直接就把应用锁住不让用了，很适合作为一款防沉迷神器。这简直是熊孩子的噩梦，熊孩子家长的福音啊。</p>
+</li>
+</ul>
+<p><img src="https://wx2.sinaimg.cn/mw690/83e01499ly1fs2hg8z30wj20va1von43.jpg" alt="img"></p>
+<ul>
+<li><p><strong>Group Facetime</strong><br><strong>FaceTime</strong> 支持群聊啦！咦，这好像不是啥新功能，微信不早就可以了吗？！最多支持 <strong>32</strong> 人同时在线群聊哦！呵呵，想象下32个人在一个聊天室里是啥场景，就算手机不爆炸，人也该爆炸了。上限不是20，也不是50，是整整 <strong>32</strong>，看来苹果工程师还是有情怀的。</p>
+</li>
+<li><p><strong>IAP</strong><br>刚听说微信公众号的赞赏功能又要上线了，苹果还真是做出了让步啊！不过对开发者和测试同学来说，有个更好的消息，sandbox测试账号与实际账号分离出来了，会支持设置一个单独的测试账号，再也不用在手机上来回切换啦！</p>
+</li>
+</ul>
+<p>除此之外，<strong>mac OS</strong> 还有几个比较重要的改动。<strong>mac OS</strong> 延续了名字很难读的特性，<strong>Mojavi</strong>，也不知道是啥，但是看着屏幕背景图还挺好看。<strong>mac OS Mojavi</strong> 支持夜间模式了！体验了下，显得还挺高端的。但是 iOS 目前不支持，所以这部分的适配工作也可以先挂起了🤓。  </p>
+<p>最后要说一下Xcode，今年 <strong>Xcode</strong> 有不少新特性加入，个人认为应该是这次 WWDC 最大的亮点了。<strong>Xcode 10</strong> 进一步增加了对<code>gitlab</code>和<code>gitbucket</code>的支持，同时会自动拉取代码，并在可能出现冲突时提前进行提示。同时 <strong>Xcode 10</strong> 支持并行跑单元测试，在代码覆盖率检测等工具上也都有很多的提升，逐渐要长成一个代码编辑器应该有的样子了。。同时 <strong>Xcode</strong> 也支持了夜间模式，让大家在夜深人静的时候能够更舒服地挖坑，苹果真的是很了解码农们的需求啊！</p>
+<p>到现在设备都还没挂过，从beta版本的使用情况来看，<strong>iOS 12</strong> 确实还挺稳定的。希望苹果能越来越好！  </p>
+<p>基本也就这些了，更多更详细的内容，大家可以看 <strong>WWDC</strong> 的视频。欢迎交流讨论！</p>
 
       
     </div>
@@ -418,6 +392,8 @@ dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
           
             <a href="/tags/iOS/" rel="tag"># iOS</a>
           
+            <a href="/tags/WWDC/" rel="tag"># WWDC</a>
+          
         </div>
       
 
@@ -429,8 +405,8 @@ dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/03/25/CellModel/" rel="next" title="列表性能优化之cell数据缓存">
-                <i class="fa fa-chevron-left"></i> 列表性能优化之cell数据缓存
+              <a href="/2018/06/03/WWDC-travel/" rel="next" title="WWDC笔记（出行篇）">
+                <i class="fa fa-chevron-left"></i> WWDC笔记（出行篇）
               </a>
             
           </div>
@@ -438,10 +414,6 @@ dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/04/07/OC_POP/" rel="prev" title="面向协议的第三方分享模块实现（OC）">
-                面向协议的第三方分享模块实现（OC） <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
