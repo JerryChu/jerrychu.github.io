@@ -261,6 +261,156 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://jerrychu.github.io/2018/08/05/Xcode-warnings/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="JerryChu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JerryChu's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/08/05/Xcode-warnings/" itemprop="url">Xcode展示自定义warning提示</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-05T16:56:47+08:00">2018-08-05</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>在 Xcode 的 <em>Build Setting</em> 中，可以进行一些warning设置，便于在编译阶段提前发现代码问题，比如 <em>隐式类型转换</em> 或者 <em>返回类型不匹配</em> 等。但有时我们需要展示一些 <strong>自定义的warning提示</strong> ，最常见就是对代码中的<code>TODO</code>、<code>FIXME</code>等标签进行warning提示，以免之后忘记修改。我们想要的效果是这个样子：</p>
+<p><img src="https://wx3.sinaimg.cn/mw690/83e01499gy1ftywvsuc4zj21kw07qq4f.jpg" alt="img"></p>
+<h3 id="如何在Xcode中展示warning提示"><a href="#如何在Xcode中展示warning提示" class="headerlink" title="如何在Xcode中展示warning提示"></a>如何在Xcode中展示warning提示</h3><p>如何让 Xcode 展示出我们自定义的waring呢？其实很简单，只要我们按如下格式输出一段文本，Xcode就会把这段文本在对应的位置展示出来。</p>
+<pre><code>/path/to/file:row: warning: text
+/path/to/file:row:column: warning: text
+</code></pre><p>那么我们怎么去输出这段文本呢？我们知道Xcode的 <em>Build Phases</em> 中，可以添加 <em>Run Script</em> 。没错，我们只需要在 <em>Run Script</em> 中输出这段文本就行了。  </p>
+<p><img src="https://wx4.sinaimg.cn/mw690/83e01499gy1ftywvt6v6aj21900cgq59.jpg" alt="img"></p>
+<p>点击图中左上角的“+”，选择 <code>New Run Script Phase</code>，在输入框中添加如下脚本，然后编译。</p>
+<pre><code>echo &quot;${SRCROOT}/Demo/ViewController.m:1:1: warning: haha&quot;    
+</code></pre><p>编译之后，我们就能看到Xcode左侧的warning列表中出现了一条warning，点击这条warning，就能够像Xcode自己输出的warning一样，自动定位到对应的位置。这样我们就能够在<code>ViewController.m</code>的第一行第一列看到一条warning提示。</p>
+<p><img src="https://wx2.sinaimg.cn/mw690/83e01499gy1ftywvs5efjj20g0046weu.jpg" alt="img"></p>
+<p><img src="https://wx3.sinaimg.cn/mw690/83e01499gy1ftywvso3xnj21j009swg0.jpg" alt="img"></p>
+<p>按同样的方法也可以展示自定义的error提示，格式如下：</p>
+<pre><code>/path/to/file:row: error: text
+/path/to/file:row:column: error: text.
+</code></pre><h3 id="如何检测代码中的指定标签"><a href="#如何检测代码中的指定标签" class="headerlink" title="如何检测代码中的指定标签"></a>如何检测代码中的指定标签</h3><p>知道了如何展示自定义的warning后，接下来的目标就很清晰了，即如何去找到<code>TODO</code>、<code>FIXME</code>等标签所在的文件及行数。<br>为了实现这个功能，我们需要遍历每一个文件的每一行代码，检测代码中是否出现了对应的标签。这一步我们可以用下面的脚本实现。参考自 <a href="https://krakendev.io/blog/generating-warnings-in-xcode" target="_blank" rel="noopener">https://krakendev.io/blog/generating-warnings-in-xcode</a> 。</p>
+<pre><code># 需要检测的标签
+TAGS=&quot;TODO:|FIXME:&quot;
+# 对目录下所有.m .h文件进行逐行的匹配检测
+find &quot;${SRCROOT}&quot; \( -name &quot;*.m&quot; -or -name &quot;*.h&quot; \) -print0 \  
+        | xargs -0 egrep --with-filename --line-number --only-matching   &quot;($TAGS).*\$&quot;
+</code></pre><p>如果有匹配行，那我们就需要按上面提到的指定格式进行输出。由于我们已经能拿到文件地址以及匹配行，所以接下来只需要按格式输出即可。这里使用perl语言可以很方便地实现。</p>
+<pre><code>TAGS=&quot;TODO:|FIXME:&quot;  
+ find &quot;${SRCROOT}&quot; \( -name &quot;*.m&quot; -or -name &quot;*.h&quot; \) -print0 \  
+        | xargs -0 egrep --with-filename --line-number --only-matching   &quot;($TAGS).*\$&quot; \  
+     | perl -p -e &quot;s/($TAGS)/ warning: \$1/&quot;
+</code></pre><p>再次编译，左侧的warning列表中就会出现另一个warning，点击这个warning，会看到所在行有一个<code>TODO:</code>标签。这样就实现了添加自定义warning提示的功能。</p>
+<p><img src="https://wx3.sinaimg.cn/mw690/83e01499gy1ftywvsuc4zj21kw07qq4f.jpg" alt="img"></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>了解Xcode展示warning的原理后，我们可以基于这个功能做很多有趣的事情。除了本文提到的对指定标签展示warning提示外，还可以在Xcode中集成重复代码检测工具，或者进行代码风格提示等。Xcode是一个强大的编译器，还有更多有意思的功能等着我们去探索。</p>
+<p>示例项目地址：<a href="https://github.com/JerryChu/Xcode-tips" target="_blank" rel="noopener">https://github.com/JerryChu/Xcode-tips</a>。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://jerrychu.github.io/2018/06/05/WWDC-tech/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1224,7 +1374,7 @@ dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-count">7</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -1237,7 +1387,7 @@ dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 
                 <div class="site-state-item site-state-tags">
                   <a href="/tags/index.html">
-                    <span class="site-state-item-count">4</span>
+                    <span class="site-state-item-count">5</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>

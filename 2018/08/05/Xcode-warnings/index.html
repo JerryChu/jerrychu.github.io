@@ -100,31 +100,37 @@
 
 
   
-  <meta name="keywords" content="iOS," />
+  <meta name="keywords" content="iOS,Xcode," />
 
 
-<meta name="description" content="iOS编程中，需要在主线程中进行操作时，我们经常会用到以下代码： dispatch_async(dispatch_get_main_queue(), ^{      // TODO 0:      }); 仔细观察这部分代码， dispatch_get_main_queue() 实际获取的是 主队列（Main Queue） 。我们看dispatch_get_main_queue() 的官方文档：">
-<meta name="keywords" content="iOS">
+<meta name="description" content="在 Xcode 的 Build Setting 中，可以进行一些warning设置，便于在编译阶段提前发现代码问题，比如 隐式类型转换 或者 返回类型不匹配 等。但有时我们需要展示一些 自定义的warning提示 ，最常见就是对代码中的TODO、FIXME等标签进行warning提示，以免之后忘记修改。我们想要的效果是这个样子：  如何在Xcode中展示warning提示如何让 Xcode 展示出">
+<meta name="keywords" content="iOS,Xcode">
 <meta property="og:type" content="article">
-<meta property="og:title" content="iOS中的主线程（Main Thread）与主队列（Main Queue）">
-<meta property="og:url" content="http://jerrychu.github.io/2018/03/25/MainQueue/index.html">
+<meta property="og:title" content="Xcode展示自定义warning提示">
+<meta property="og:url" content="http://jerrychu.github.io/2018/08/05/Xcode-warnings/index.html">
 <meta property="og:site_name" content="JerryChu&#39;s Blog">
-<meta property="og:description" content="iOS编程中，需要在主线程中进行操作时，我们经常会用到以下代码： dispatch_async(dispatch_get_main_queue(), ^{      // TODO 0:      }); 仔细观察这部分代码， dispatch_get_main_queue() 实际获取的是 主队列（Main Queue） 。我们看dispatch_get_main_queue() 的官方文档：">
+<meta property="og:description" content="在 Xcode 的 Build Setting 中，可以进行一些warning设置，便于在编译阶段提前发现代码问题，比如 隐式类型转换 或者 返回类型不匹配 等。但有时我们需要展示一些 自定义的warning提示 ，最常见就是对代码中的TODO、FIXME等标签进行warning提示，以免之后忘记修改。我们想要的效果是这个样子：  如何在Xcode中展示warning提示如何让 Xcode 展示出">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-04-07T13:46:35.800Z">
+<meta property="og:image" content="https://wx3.sinaimg.cn/mw690/83e01499gy1ftywvsuc4zj21kw07qq4f.jpg">
+<meta property="og:image" content="https://wx4.sinaimg.cn/mw690/83e01499gy1ftywvt6v6aj21900cgq59.jpg">
+<meta property="og:image" content="https://wx2.sinaimg.cn/mw690/83e01499gy1ftywvs5efjj20g0046weu.jpg">
+<meta property="og:image" content="https://wx3.sinaimg.cn/mw690/83e01499gy1ftywvso3xnj21j009swg0.jpg">
+<meta property="og:image" content="https://wx3.sinaimg.cn/mw690/83e01499gy1ftywvsuc4zj21kw07qq4f.jpg">
+<meta property="og:updated_time" content="2018-08-05T09:04:21.907Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="iOS中的主线程（Main Thread）与主队列（Main Queue）">
-<meta name="twitter:description" content="iOS编程中，需要在主线程中进行操作时，我们经常会用到以下代码： dispatch_async(dispatch_get_main_queue(), ^{      // TODO 0:      }); 仔细观察这部分代码， dispatch_get_main_queue() 实际获取的是 主队列（Main Queue） 。我们看dispatch_get_main_queue() 的官方文档：">
+<meta name="twitter:title" content="Xcode展示自定义warning提示">
+<meta name="twitter:description" content="在 Xcode 的 Build Setting 中，可以进行一些warning设置，便于在编译阶段提前发现代码问题，比如 隐式类型转换 或者 返回类型不匹配 等。但有时我们需要展示一些 自定义的warning提示 ，最常见就是对代码中的TODO、FIXME等标签进行warning提示，以免之后忘记修改。我们想要的效果是这个样子：  如何在Xcode中展示warning提示如何让 Xcode 展示出">
+<meta name="twitter:image" content="https://wx3.sinaimg.cn/mw690/83e01499gy1ftywvsuc4zj21kw07qq4f.jpg">
 
 
 
 
 
 
-  <link rel="canonical" href="http://jerrychu.github.io/2018/03/25/MainQueue/"/>
+  <link rel="canonical" href="http://jerrychu.github.io/2018/08/05/Xcode-warnings/"/>
 
 
-  <title>iOS中的主线程（Main Thread）与主队列（Main Queue） | JerryChu's Blog</title>
+  <title>Xcode展示自定义warning提示 | JerryChu's Blog</title>
   
 
 
@@ -265,7 +271,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://jerrychu.github.io/2018/03/25/MainQueue/">
+    <link itemprop="mainEntityOfPage" href="http://jerrychu.github.io/2018/08/05/Xcode-warnings/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="JerryChu">
@@ -282,7 +288,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">iOS中的主线程（Main Thread）与主队列（Main Queue）</h1>
+          <h1 class="post-title" itemprop="name headline">Xcode展示自定义warning提示</h1>
         
 
         <div class="post-meta">
@@ -294,7 +300,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-25T04:11:20-07:00">2018-03-25</time>
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-05T16:56:47+08:00">2018-08-05</time>
             
 
             
@@ -312,8 +318,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/03/25/MainQueue/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count gitment-comments-count" data-xid="/2018/03/25/MainQueue/" itemprop="commentsCount"></span>
+                <a href="/2018/08/05/Xcode-warnings/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count gitment-comments-count" data-xid="/2018/08/05/Xcode-warnings/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -341,64 +347,36 @@
       
 
       
-        <p>iOS编程中，需要在主线程中进行操作时，我们经常会用到以下代码：</p>
-<pre><code>dispatch_async(dispatch_get_main_queue(), ^{ 
-    // TODO 0:     
-});
-</code></pre><p>仔细观察这部分代码， <em>dispatch_get_main_queue()</em> 实际获取的是 <strong>主队列（Main Queue）</strong> 。我们看<em>dispatch_get_main_queue()</em> 的官方文档：</p>
-<blockquote>
-<p>Returns the main queue. This queue is created automatically on behalf of the main thread before main() is called.</p>
-</blockquote>
-<p>而当我们需要判断当前线程是不是 <strong>主线程（Main Thread）</strong> 时，会这样写：</p>
-<pre><code>if ([NSThread isMainThread]) {
-    // TODO 1:
-}
-</code></pre><p>那么我们会想到以下几个问题： </p>
-<p><strong>1. 主线程和主队列到底有什么关系？</strong><br><strong>2. 为什么通过 <em>dispatch_get_main_queue()</em> 就可以确保在代码在主线程执行了？</strong><br><strong>3. 主线程可以执行非主队列里的任务吗？</strong> </p>
-<p>我们知道，主队列是系统自动为我们创建的一个串行队列，因此不用我们手动创建。在每个应用程序只有一个主队列，专门负责调度主线程里的任务，不允许开辟新的线程。也就是说，<strong>在主队列里的任务，即使是异步的，最终也只能在主线程中运行</strong>。因此，开头的第一段代码是可以保证在主线程中运行的。我们使用如下代码做测试：</p>
-<pre><code>- (void)testMainThread {
-    NSLog(@&quot;begin&quot;);
-    for (int i = 0 ; i &lt; 10; i ++) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            NSLog(@&quot;current Thread: %@; Task: %@&quot;,[NSThread currentThread], @(i));
-        });
-    }
-    NSLog(@&quot;end&quot;);
-}
-</code></pre><p>输出为：</p>
-<pre><code>2016-08-28 21:22:18.384 Test[72358:1633765] begin
-2016-08-28 21:22:18.384 Test[72358:1633765] end
-2016-08-28 21:22:18.388 Test[72358:1633765] isMainThread: 1; Task: 0
-2016-08-28 21:22:18.388 Test[72358:1633765] isMainThread: 1; Task: 1
-2016-08-28 21:22:18.388 Test[72358:1633765] isMainThread: 1; Task: 2
-2016-08-28 21:22:18.388 Test[72358:1633765] isMainThread: 1; Task: 3
-2016-08-28 21:22:18.389 Test[72358:1633765] isMainThread: 1; Task: 4
-</code></pre><p>由于block内的任务是异步执行，主线程在将当前方法（<em>testMainThread</em> ）执行完毕之后，才会去继续执行主队列里的任务。那么如果我们把异步任务换成同步的出现什么结果呢？</p>
-<pre><code>- (void)testMainThread {
-    NSLog(@&quot;begin&quot;);
-    for (int i = 0 ; i &lt; 10; i ++) {
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            NSLog(@&quot;current Thread: %@; Task: %@&quot;,[NSThread currentThread], @(i));
-        });
-    }
-    NSLog(@&quot;end&quot;);
-}
-</code></pre><p>输出为：</p>
-<pre><code>2016-08-28 21:26:29.918 Test[72386:1636378] begin
-</code></pre><p>也就是说，主线层被阻塞了。这个也好理解，因为此时主队列里的任务是同步执行的，同步任务必需被立刻执行。但同时由于主线程里的<em>testMainThread</em> 还没有执行完，主线程没法去处理主队列里的任务，导致程序死锁。也就是说<strong>主线程空闲时才会调度队列中的任务在主线程执行, 如果当前主线程正在有任务执行，那么无论主队列中当前被添加了什么任务，都不会被调度。</strong> 这也是我们平常写代码需要注意的。</p>
-<p>主队列的任务一定在主线程中执行，那么我们再来看最后一个问题：<em>主线程可以执行非主队列里的任务吗？</em>   我们使用下面的代码做测试：</p>
-<pre><code> NSLog(@&quot;isMainThread: %@&quot;, @([NSThread isMainThread]));
-dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-    NSLog(@&quot;isMainThread: %@&quot;, @([NSThread isMainThread]));
-});
-</code></pre><p>在主线程中同步执行一个后台队列（使用_dispatch_get_global<em>queue</em>() 方法获取系统创建的全局并发队列）的任务。运行输出为：</p>
-<pre><code>2016-08-28 21:55:26.262 Test[72533:1649394] isMainThread: 1
-2016-08-28 21:55:26.263 Test[72533:1649394] isMainThread: 1
-</code></pre><p>可以看到，这个后台队列的任务也是在主线程中执行的。下面是从 <a href="http://blog.benjamin-encz.de/post/main-queue-vs-main-thread" target="_blank" rel="noopener">http://blog.benjamin-encz.de 的一篇博客</a> 摘抄下来的一段说明：</p>
-<blockquote>
-<p>While doing some research for this post I found <a href="https://libdispatch.macosforge.org/trac/changeset/156" target="_blank" rel="noopener">a commit to libdispatch that ensures that blocks dispatched with dispatch_sync are always executed on the current thread</a>. This means if you use dispatch_sync to dispatch a block from the main queue to a concurrent background queue, the code executing on the background queue will actually be executed on the main thread. While this might not be entirely intuitive, it makes sense: since the main queue needs to wait until the dispatched block completed, the main thread will be available to process blocks from queues other than the main queue.</p>
-</blockquote>
-<p>所以，主线程是可以执行主队列之外其他队列的任务的。即使<em>[NSThread mainThread]</em> 判断当前线程是主线程，也不能保证当前执行的任务是主队列的任务（系统并没有为我们提供一个判断是不是在主队列的API）。</p>
+        <p>在 Xcode 的 <em>Build Setting</em> 中，可以进行一些warning设置，便于在编译阶段提前发现代码问题，比如 <em>隐式类型转换</em> 或者 <em>返回类型不匹配</em> 等。但有时我们需要展示一些 <strong>自定义的warning提示</strong> ，最常见就是对代码中的<code>TODO</code>、<code>FIXME</code>等标签进行warning提示，以免之后忘记修改。我们想要的效果是这个样子：</p>
+<p><img src="https://wx3.sinaimg.cn/mw690/83e01499gy1ftywvsuc4zj21kw07qq4f.jpg" alt="img"></p>
+<h3 id="如何在Xcode中展示warning提示"><a href="#如何在Xcode中展示warning提示" class="headerlink" title="如何在Xcode中展示warning提示"></a>如何在Xcode中展示warning提示</h3><p>如何让 Xcode 展示出我们自定义的waring呢？其实很简单，只要我们按如下格式输出一段文本，Xcode就会把这段文本在对应的位置展示出来。</p>
+<pre><code>/path/to/file:row: warning: text
+/path/to/file:row:column: warning: text
+</code></pre><p>那么我们怎么去输出这段文本呢？我们知道Xcode的 <em>Build Phases</em> 中，可以添加 <em>Run Script</em> 。没错，我们只需要在 <em>Run Script</em> 中输出这段文本就行了。  </p>
+<p><img src="https://wx4.sinaimg.cn/mw690/83e01499gy1ftywvt6v6aj21900cgq59.jpg" alt="img"></p>
+<p>点击图中左上角的“+”，选择 <code>New Run Script Phase</code>，在输入框中添加如下脚本，然后编译。</p>
+<pre><code>echo &quot;${SRCROOT}/Demo/ViewController.m:1:1: warning: haha&quot;    
+</code></pre><p>编译之后，我们就能看到Xcode左侧的warning列表中出现了一条warning，点击这条warning，就能够像Xcode自己输出的warning一样，自动定位到对应的位置。这样我们就能够在<code>ViewController.m</code>的第一行第一列看到一条warning提示。</p>
+<p><img src="https://wx2.sinaimg.cn/mw690/83e01499gy1ftywvs5efjj20g0046weu.jpg" alt="img"></p>
+<p><img src="https://wx3.sinaimg.cn/mw690/83e01499gy1ftywvso3xnj21j009swg0.jpg" alt="img"></p>
+<p>按同样的方法也可以展示自定义的error提示，格式如下：</p>
+<pre><code>/path/to/file:row: error: text
+/path/to/file:row:column: error: text.
+</code></pre><h3 id="如何检测代码中的指定标签"><a href="#如何检测代码中的指定标签" class="headerlink" title="如何检测代码中的指定标签"></a>如何检测代码中的指定标签</h3><p>知道了如何展示自定义的warning后，接下来的目标就很清晰了，即如何去找到<code>TODO</code>、<code>FIXME</code>等标签所在的文件及行数。<br>为了实现这个功能，我们需要遍历每一个文件的每一行代码，检测代码中是否出现了对应的标签。这一步我们可以用下面的脚本实现。参考自 <a href="https://krakendev.io/blog/generating-warnings-in-xcode" target="_blank" rel="noopener">https://krakendev.io/blog/generating-warnings-in-xcode</a> 。</p>
+<pre><code># 需要检测的标签
+TAGS=&quot;TODO:|FIXME:&quot;
+# 对目录下所有.m .h文件进行逐行的匹配检测
+find &quot;${SRCROOT}&quot; \( -name &quot;*.m&quot; -or -name &quot;*.h&quot; \) -print0 \  
+        | xargs -0 egrep --with-filename --line-number --only-matching   &quot;($TAGS).*\$&quot;
+</code></pre><p>如果有匹配行，那我们就需要按上面提到的指定格式进行输出。由于我们已经能拿到文件地址以及匹配行，所以接下来只需要按格式输出即可。这里使用perl语言可以很方便地实现。</p>
+<pre><code>TAGS=&quot;TODO:|FIXME:&quot;  
+ find &quot;${SRCROOT}&quot; \( -name &quot;*.m&quot; -or -name &quot;*.h&quot; \) -print0 \  
+        | xargs -0 egrep --with-filename --line-number --only-matching   &quot;($TAGS).*\$&quot; \  
+     | perl -p -e &quot;s/($TAGS)/ warning: \$1/&quot;
+</code></pre><p>再次编译，左侧的warning列表中就会出现另一个warning，点击这个warning，会看到所在行有一个<code>TODO:</code>标签。这样就实现了添加自定义warning提示的功能。</p>
+<p><img src="https://wx3.sinaimg.cn/mw690/83e01499gy1ftywvsuc4zj21kw07qq4f.jpg" alt="img"></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>了解Xcode展示warning的原理后，我们可以基于这个功能做很多有趣的事情。除了本文提到的对指定标签展示warning提示外，还可以在Xcode中集成重复代码检测工具，或者进行代码风格提示等。Xcode是一个强大的编译器，还有更多有意思的功能等着我们去探索。</p>
+<p>示例项目地址：<a href="https://github.com/JerryChu/Xcode-tips" target="_blank" rel="noopener">https://github.com/JerryChu/Xcode-tips</a>。</p>
 
       
     </div>
@@ -418,6 +396,8 @@ dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
           
             <a href="/tags/iOS/" rel="tag"># iOS</a>
           
+            <a href="/tags/Xcode/" rel="tag"># Xcode</a>
+          
         </div>
       
 
@@ -429,8 +409,8 @@ dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/03/25/CellModel/" rel="next" title="列表性能优化之cell数据缓存">
-                <i class="fa fa-chevron-left"></i> 列表性能优化之cell数据缓存
+              <a href="/2018/06/05/WWDC-tech/" rel="next" title="WWDC笔记（技术篇）">
+                <i class="fa fa-chevron-left"></i> WWDC笔记（技术篇）
               </a>
             
           </div>
@@ -438,10 +418,6 @@ dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/04/07/OC_POP/" rel="prev" title="面向协议的第三方分享模块实现（OC）">
-                面向协议的第三方分享模块实现（OC） <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -497,8 +473,17 @@ dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -552,6 +537,22 @@ dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#如何在Xcode中展示warning提示"><span class="nav-number">1.</span> <span class="nav-text">如何在Xcode中展示warning提示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何检测代码中的指定标签"><span class="nav-number">2.</span> <span class="nav-text">如何检测代码中的指定标签</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
