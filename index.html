@@ -261,6 +261,165 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://jerrychu.github.io/2018/08/05/Xcode-cpd/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="JerryChu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JerryChu's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/08/05/Xcode-cpd/" itemprop="url">Xcode重复代码检测</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-05T18:18:32+08:00">2018-08-05</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>随着项目的推进和业务的增长，代码中不可避免地会出现很多重复代码，这些重复代码大多是从某个地方拷贝过去的，所以我们称之为<code>Copy-Paste-Code</code>。尤其是项目成员较多时，大家碰到不太熟悉的业务模块，经常会直接copy前人写好的代码，一来简单迅速，二来风险较低，但却会导致<code>Copy-Paste-Code</code>越来越多。这种代码让项目非常难以维护，一处修改，处处修改。  </p>
+<h3 id="重复代码检测工具"><a href="#重复代码检测工具" class="headerlink" title="重复代码检测工具"></a>重复代码检测工具</h3><p>如何找出项目中的重复代码呢？现在有很多的重复代码检测工具（<code>Copy-Paste-Detector</code>，简称<code>CPD</code>）可以帮助我们完成这件事情。<code>CPD</code>的原理比较好理解，就是一个字符串匹配算法。如果两个代码片段完全相同，即认为这两处代码是<code>Copy-Paste-Code</code>。  </p>
+<p><a href="https://pmd.github.io/" target="_blank" rel="noopener">PMD</a>是一个比较流行的静态代码分析工具，支持多种语言。我们可以使用其提供的<a href="https://pmd.github.io/pmd-6.6.0/pmd_userdocs_cpd.html" target="_blank" rel="noopener">CPD</a>对OC代码做重复检测。  </p>
+<h4 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h4><p>使用<code>brew</code>就可以安装<code>PMD</code></p>
+<pre><code>brew install pmd
+</code></pre><p>如果安装失败（像我一样…），也可以自行下载源码运行。mac上可以按如下命令执行</p>
+<pre><code>$ cd $HOME
+$ curl -OL https://github.com/pmd/pmd/releases/download/pmd_releases%2F6.6.0/pmd-bin-6.6.0.zip
+$ unzip pmd-bin-6.6.0.zip
+$ alias pmd=&quot;$HOME/pmd-bin-6.6.0/bin/run.sh&quot;
+</code></pre><h4 id="检测"><a href="#检测" class="headerlink" title="检测"></a>检测</h4><p>安装好<code>PMD</code>后，就可以直接检测项目中的重复代码。<code>PMD-CPD</code>有GUI工具，如下命令即可打开</p>
+<pre><code>pmd cpdgui 
+</code></pre><p>在GUI工具中选择目录、语言、和检测阈值（demo中使用的是20，实际项目中建议取值在100到150之前，视具体情况而定）后，点击 <em>Go</em> 就可以检测了。</p>
+<p><img src="https://wx4.sinaimg.cn/mw690/83e01499gy1ftz11juatyj21kk0uste5.jpg" alt="img"></p>
+<p>图中可以很清楚的看到哪些地方存在重复代码。有了这个检测结果，我们就可以拿来做针对性的修改与重构。  </p>
+<h3 id="集成到Xcode"><a href="#集成到Xcode" class="headerlink" title="集成到Xcode"></a>集成到Xcode</h3><p>但是，只使用GUI工具检测出来重复还是不能够避免大家写代码时随心所欲的 <strong>Copy-Paste</strong>, 为了进一步规避<code>Copy-Paste-Code</code>，我们决定将这个工具集成到Xcode中去，只要出现了<code>Copy-Paste-Code</code>，让Xcode在编译期就发出警告，督促大家放弃 <strong>Copy-Paste</strong>，花几分钟时间思考更为合理的解决方案。  </p>
+<p>为了实现这个目的，我们需要分两步走：  </p>
+<ol>
+<li>找到所有重复代码及其所在的文件、行数  </li>
+<li>在Xcode中将warning展示出来</li>
+</ol>
+<h4 id="生成检测结果"><a href="#生成检测结果" class="headerlink" title="生成检测结果"></a>生成检测结果</h4><p>第一步使用<code>PMD-CPD</code>就可以实现，上面提到的<code>PMD-CPD</code>不仅有GUI工具，还支持直接将重复代码检测结果以指定格式输出到文件中。</p>
+<pre><code>pmd cpd --files Demo --minimum-tokens 20 --language objectivec --encoding UTF-8 --format xml &gt; output.xml
+</code></pre><p>其中 <em>files</em> 用于指定需要检测的文件列表，<em>minimum-tokens</em> 用于设置最小重复阈值，<em>format</em> 用于指定输出文件的格式。<code>PMD-CPD</code>支持xml、csv、txt等格式，为了方便下一步处理，这里使用xml格式。生成的xml文件结构如下：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span><br><span class="line"><span class="tag">&lt;<span class="name">pmd-cpd</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">duplication</span> <span class="attr">lines</span>=<span class="string">"7"</span> <span class="attr">tokens</span>=<span class="string">"23"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">file</span> <span class="attr">line</span>=<span class="string">"24"</span></span></span><br><span class="line"><span class="tag">            <span class="attr">path</span>=<span class="string">"..Demo/ViewController.m"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">file</span> <span class="attr">line</span>=<span class="string">"36"</span></span></span><br><span class="line"><span class="tag">            <span class="attr">path</span>=<span class="string">"..Demo/ViewController.m"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">codefragment</span>&gt;</span>&lt;![CDATA[- (int)hello0 &#123;</span><br><span class="line">    int a = 0, b = 0;</span><br><span class="line">    int c = a + b;</span><br><span class="line">    return c;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (int)hello1 &#123;]]&gt;<span class="tag">&lt;/<span class="name">codefragment</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">duplication</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">pmd-cpd</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h4 id="展示Xcode-warnings"><a href="#展示Xcode-warnings" class="headerlink" title="展示Xcode warnings"></a>展示Xcode warnings</h4><p>拿到这个文件后，我们就可以实施第二步了。关于如何实现在Xcode中生成自定义的warning提示，可以参考之前一篇文章<a href="https://jerrychu.github.io/2018/08/05/Xcode-warnings/">Xcode展示自定义warning提示</a>。简而言之，我们需要在检测出来的每一处重复代码的位置，按如下形式在Xcode中输出一行warning：</p>
+<pre><code>echo &quot;${SRCROOT}/Demo/ViewController.m:1:1: warning: xxx copy-paste lines from xxx&quot;    
+</code></pre><p>在Xcode的 <em>Build Phases</em> 中，我们增加一个新的 <em>Run Script</em>，并添加如下代码</p>
+<pre><code># 检测并输出结果到output.xml
+sh ./pmd_cpd/bin/run.sh cpd --files ${EXECUTABLE_NAME} --minimum-tokens 20 --language objectivec --encoding UTF-8 --format xml &gt; output.xml
+# 解析xml并生成Xcode warning
+ruby parse.rb
+</code></pre><p>解析脚本parse.rb代码如下：</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">require</span> <span class="string">'rexml/document'</span></span><br><span class="line"><span class="keyword">include</span> REXML  </span><br><span class="line"></span><br><span class="line">file = File.new(<span class="string">'output.xml'</span>)</span><br><span class="line">doc = Document.new(file)</span><br><span class="line">root = doc.root</span><br><span class="line">root.each_element(<span class="string">'duplication'</span>) &#123; <span class="params">|item|</span> </span><br><span class="line">    duplicatedFiles = []</span><br><span class="line">	item.each_element(<span class="string">'file'</span>) &#123; <span class="params">|file|</span></span><br><span class="line">		duplicatedFiles.push(file)</span><br><span class="line">	&#125;</span><br><span class="line">	item.each_element(<span class="string">'file'</span>) &#123; <span class="params">|file|</span></span><br><span class="line">		duplicatedString = duplicatedFiles.select&#123;<span class="params">|e|</span> e != file&#125;.map &#123;<span class="params">|e|</span> <span class="string">"<span class="subst">#&#123;e.attributes[<span class="string">'path'</span>].split(<span class="string">'/'</span>).last&#125;</span>:<span class="subst">#&#123;e.attributes[<span class="string">'line'</span>]&#125;</span>"</span>&#125;.join(<span class="string">', '</span>)</span><br><span class="line">		puts <span class="string">"<span class="subst">#&#123;file.attributes[<span class="string">'path'</span>]&#125;</span>:<span class="subst">#&#123;file.attributes[<span class="string">'line'</span>]&#125;</span>:1: warning: <span class="subst">#&#123;item.attributes[<span class="string">'lines'</span>]&#125;</span> copy-pasted lines from: <span class="subst">#&#123;duplicatedString&#125;</span>"</span></span><br><span class="line">	&#125;	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>添加后直接编译，我们就能在Xcode中的warning列表中发现如下warning，大功告成了！</p>
+<p><img src="https://wx4.sinaimg.cn/mw690/83e01499gy1ftz1fm7w4zj20g40dkabd.jpg" alt="img"></p>
+<p><img src="https://wx4.sinaimg.cn/mw690/83e01499gy1ftz1h2nba0j21j20dgtaq.jpg" alt="img"></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>使用重复代码检测工具可以方便地检测出重复代码，进一步解析检测结果并以warning的形式集成到Xcode中，在编译期间就可以很清晰地看到代码中的warning，方便发现已有重复代码，同时避免产生新的重复代码。</p>
+<p>示例项目地址：<a href="https://github.com/JerryChu/Xcode-tips" target="_blank" rel="noopener">https://github.com/JerryChu/Xcode-tips</a>。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://jerrychu.github.io/2018/08/05/Xcode-warnings/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -360,165 +519,6 @@ find &quot;${SRCROOT}&quot; \( -name &quot;*.m&quot; -or -name &quot;*.h&quot; \
 </code></pre><p>再次编译，左侧的warning列表中就会出现另一个warning，点击这个warning，会看到所在行有一个<code>TODO:</code>标签。这样就实现了添加自定义warning提示的功能。</p>
 <p><img src="https://wx3.sinaimg.cn/mw690/83e01499gy1ftywvsuc4zj21kw07qq4f.jpg" alt="img"></p>
 <h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>了解Xcode展示warning的原理后，我们可以基于这个功能做很多有趣的事情。除了本文提到的对指定标签展示warning提示外，还可以在Xcode中集成重复代码检测工具，或者进行代码风格提示等。Xcode是一个强大的编译器，还有更多有意思的功能等着我们去探索。</p>
-<p>示例项目地址：<a href="https://github.com/JerryChu/Xcode-tips" target="_blank" rel="noopener">https://github.com/JerryChu/Xcode-tips</a>。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://jerrychu.github.io/2018/08/04/Xcode-cpd/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="JerryChu">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="JerryChu's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/08/04/Xcode-cpd/" itemprop="url">Xcode重复代码检测</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-05T02:18:32+08:00">2018-08-05</time>
-            
-
-            
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>随着项目的推进和业务的增长，代码中不可避免地会出现很多重复代码，这些重复代码大多是从某个地方拷贝过去的，所以我们称之为<code>Copy-Paste-Code</code>。尤其是项目成员较多时，大家碰到不太熟悉的业务模块，经常会直接copy前人写好的代码，一来简单迅速，二来风险较低，但却会导致<code>Copy-Paste-Code</code>越来越多。这种代码让项目非常难以维护，一处修改，处处修改。  </p>
-<h3 id="重复代码检测工具"><a href="#重复代码检测工具" class="headerlink" title="重复代码检测工具"></a>重复代码检测工具</h3><p>如何找出项目中的重复代码呢？现在有很多的重复代码检测工具（<code>Copy-Paste-Detector</code>，简称<code>CPD</code>）可以帮助我们完成这件事情。<code>CPD</code>的原理比较好理解，就是一个字符串匹配算法。如果两个代码片段完全相同，即认为这两处代码是<code>Copy-Paste-Code</code>。  </p>
-<p><a href="https://pmd.github.io/" target="_blank" rel="noopener">PMD</a>是一个比较流行的静态代码分析工具，支持多种语言。我们可以使用其提供的<a href="https://pmd.github.io/pmd-6.6.0/pmd_userdocs_cpd.html" target="_blank" rel="noopener">CPD</a>对OC代码做重复检测。  </p>
-<h4 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h4><p>使用<code>brew</code>就可以安装<code>PMD</code></p>
-<pre><code>brew install pmd
-</code></pre><p>如果安装失败（像我一样…），也可以自行下载源码运行。mac上可以按如下命令执行</p>
-<pre><code>$ cd $HOME
-$ curl -OL https://github.com/pmd/pmd/releases/download/pmd_releases%2F6.6.0/pmd-bin-6.6.0.zip
-$ unzip pmd-bin-6.6.0.zip
-$ alias pmd=&quot;$HOME/pmd-bin-6.6.0/bin/run.sh&quot;
-</code></pre><h4 id="检测"><a href="#检测" class="headerlink" title="检测"></a>检测</h4><p>安装好<code>PMD</code>后，就可以直接检测项目中的重复代码。<code>PMD-CPD</code>有GUI工具，如下命令即可打开</p>
-<pre><code>pmd cpdgui 
-</code></pre><p>在GUI工具中选择目录、语言、和检测阈值（demo中使用的是20，实际项目中建议取值在100到150之前，视具体情况而定）后，点击 <em>Go</em> 就可以检测了。</p>
-<p><img src="https://wx4.sinaimg.cn/mw690/83e01499gy1ftz11juatyj21kk0uste5.jpg" alt="img"></p>
-<p>图中可以很清楚的看到哪些地方存在重复代码。有了这个检测结果，我们就可以拿来做针对性的修改与重构。  </p>
-<h3 id="集成到Xcode"><a href="#集成到Xcode" class="headerlink" title="集成到Xcode"></a>集成到Xcode</h3><p>但是，只使用GUI工具检测出来重复还是不能够避免大家写代码时随心所欲的 <strong>Copy-Paste</strong>, 为了进一步规避<code>Copy-Paste-Code</code>，我们决定将这个工具集成到Xcode中去，只要出现了<code>Copy-Paste-Code</code>，让Xcode在编译期就发出警告，督促大家放弃 <strong>Copy-Paste</strong>，花几分钟时间思考更为合理的解决方案。  </p>
-<p>为了实现这个目的，我们需要分两步走：  </p>
-<ol>
-<li>找到所有重复代码及其所在的文件、行数  </li>
-<li>在Xcode中将warning展示出来</li>
-</ol>
-<h4 id="生成检测结果"><a href="#生成检测结果" class="headerlink" title="生成检测结果"></a>生成检测结果</h4><p>第一步使用<code>PMD-CPD</code>就可以实现，上面提到的<code>PMD-CPD</code>不仅有GUI工具，还支持直接将重复代码检测结果以指定格式输出到文件中。</p>
-<pre><code>pmd cpd --files Demo --minimum-tokens 20 --language objectivec --encoding UTF-8 --format xml &gt; output.xml
-</code></pre><p>其中 <em>files</em> 用于指定需要检测的文件列表，<em>minimum-tokens</em> 用于设置最小重复阈值，<em>format</em> 用于指定输出文件的格式。<code>PMD-CPD</code>支持xml、csv、txt等格式，为了方便下一步处理，这里使用xml格式。生成的xml文件结构如下：</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span><br><span class="line"><span class="tag">&lt;<span class="name">pmd-cpd</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">duplication</span> <span class="attr">lines</span>=<span class="string">"7"</span> <span class="attr">tokens</span>=<span class="string">"23"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">file</span> <span class="attr">line</span>=<span class="string">"24"</span></span></span><br><span class="line"><span class="tag">            <span class="attr">path</span>=<span class="string">"..Demo/ViewController.m"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">file</span> <span class="attr">line</span>=<span class="string">"36"</span></span></span><br><span class="line"><span class="tag">            <span class="attr">path</span>=<span class="string">"..Demo/ViewController.m"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">codefragment</span>&gt;</span>&lt;![CDATA[- (int)hello0 &#123;</span><br><span class="line">    int a = 0, b = 0;</span><br><span class="line">    int c = a + b;</span><br><span class="line">    return c;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (int)hello1 &#123;]]&gt;<span class="tag">&lt;/<span class="name">codefragment</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">duplication</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">pmd-cpd</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<h4 id="展示Xcode-warnings"><a href="#展示Xcode-warnings" class="headerlink" title="展示Xcode warnings"></a>展示Xcode warnings</h4><p>拿到这个文件后，我们就可以实施第二步了。关于如何实现在Xcode中生成自定义的warning提示，可以参考之前一篇文章<a href="https://jerrychu.github.io/2018/08/05/Xcode-warnings/">Xcode展示自定义warning提示</a>。简而言之，我们需要在检测出来的每一处重复代码的位置，按如下形式在Xcode中输出一行warning：</p>
-<pre><code>echo &quot;${SRCROOT}/Demo/ViewController.m:1:1: warning: xxx copy-paste lines from xxx&quot;    
-</code></pre><p>在Xcode的 <em>Build Phases</em> 中，我们增加一个新的 <em>Run Script</em>，并添加如下代码</p>
-<pre><code># 检测并输出结果到output.xml
-sh ./pmd_cpd/bin/run.sh cpd --files ${EXECUTABLE_NAME} --minimum-tokens 20 --language objectivec --encoding UTF-8 --format xml &gt; output.xml
-# 解析xml并生成Xcode warning
-ruby parse.rb
-</code></pre><p>解析脚本parse.rb代码如下：</p>
-<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">require</span> <span class="string">'rexml/document'</span></span><br><span class="line"><span class="keyword">include</span> REXML  </span><br><span class="line"></span><br><span class="line">file = File.new(<span class="string">'output.xml'</span>)</span><br><span class="line">doc = Document.new(file)</span><br><span class="line">root = doc.root</span><br><span class="line">root.each_element(<span class="string">'duplication'</span>) &#123; <span class="params">|item|</span> </span><br><span class="line">    duplicatedFiles = []</span><br><span class="line">	item.each_element(<span class="string">'file'</span>) &#123; <span class="params">|file|</span></span><br><span class="line">		duplicatedFiles.push(file)</span><br><span class="line">	&#125;</span><br><span class="line">	item.each_element(<span class="string">'file'</span>) &#123; <span class="params">|file|</span></span><br><span class="line">		duplicatedString = duplicatedFiles.select&#123;<span class="params">|e|</span> e != file&#125;.map &#123;<span class="params">|e|</span> <span class="string">"<span class="subst">#&#123;e.attributes[<span class="string">'path'</span>].split(<span class="string">'/'</span>).last&#125;</span>:<span class="subst">#&#123;e.attributes[<span class="string">'line'</span>]&#125;</span>"</span>&#125;.join(<span class="string">', '</span>)</span><br><span class="line">		puts <span class="string">"<span class="subst">#&#123;file.attributes[<span class="string">'path'</span>]&#125;</span>:<span class="subst">#&#123;file.attributes[<span class="string">'line'</span>]&#125;</span>:1: warning: <span class="subst">#&#123;item.attributes[<span class="string">'lines'</span>]&#125;</span> copy-pasted lines from: <span class="subst">#&#123;duplicatedString&#125;</span>"</span></span><br><span class="line">	&#125;	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>添加后直接编译，我们就能在Xcode中的warning列表中发现如下warning，大功告成了！</p>
-<p><img src="https://wx4.sinaimg.cn/mw690/83e01499gy1ftz1fm7w4zj20g40dkabd.jpg" alt="img"></p>
-<p><img src="https://wx4.sinaimg.cn/mw690/83e01499gy1ftz1h2nba0j21j20dgtaq.jpg" alt="img"></p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>使用重复代码检测工具可以方便地检测出重复代码，进一步解析检测结果并以warning的形式集成到Xcode中，在编译期间就可以很清晰地看到代码中的warning，方便发现已有重复代码，同时避免产生新的重复代码。</p>
 <p>示例项目地址：<a href="https://github.com/JerryChu/Xcode-tips" target="_blank" rel="noopener">https://github.com/JerryChu/Xcode-tips</a>。</p>
 
           
