@@ -17,7 +17,7 @@ tags:
 
     brew install pmd
 
-如果安装失败（像我一样...），也可以自行下载源码运行。mac上可以按如下命令执行
+也可以自行下载源码运行。mac上可以按如下命令执行
 
     $ cd $HOME
     $ curl -OL https://github.com/pmd/pmd/releases/download/pmd_releases%2F6.6.0/pmd-bin-6.6.0.zip
