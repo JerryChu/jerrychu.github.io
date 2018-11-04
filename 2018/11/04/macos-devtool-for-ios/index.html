@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.0.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.0.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.0.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.0.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.0.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.0.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  
+  <meta name="keywords" content="iOS,Peertalk,usbmux," />
+
+
+<meta name="description" content="在日常开发中，我们经常需要通过scheme打开指定的页面。这时候我们一般会在打开手机 Safari ，在地址输入框中输入myapp://somepage?pageid=xxx进行页面的跳转。但是由于移动手机的尺寸限制，每次输入这些scheme都挺繁琐，效率低且容易出错。如果能直接在电脑上输入scheme，然后就能打开手机APP里的指定页面，那该多好啊。  模拟器可以直接通过 xcrun simct">
+<meta name="keywords" content="iOS,Peertalk,usbmux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS开发之桌面辅助开发工具">
+<meta property="og:url" content="http://jerrychu.github.io/2018/11/04/macos-devtool-for-ios/index.html">
+<meta property="og:site_name" content="JerryChu&#39;s Blog">
+<meta property="og:description" content="在日常开发中，我们经常需要通过scheme打开指定的页面。这时候我们一般会在打开手机 Safari ，在地址输入框中输入myapp://somepage?pageid=xxx进行页面的跳转。但是由于移动手机的尺寸限制，每次输入这些scheme都挺繁琐，效率低且容易出错。如果能直接在电脑上输入scheme，然后就能打开手机APP里的指定页面，那该多好啊。  模拟器可以直接通过 xcrun simct">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://wx1.sinaimg.cn/mw690/83e01499ly1fwwc0ffnz8j216u0ugdip.jpg">
+<meta property="og:updated_time" content="2018-11-04T13:31:40.553Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS开发之桌面辅助开发工具">
+<meta name="twitter:description" content="在日常开发中，我们经常需要通过scheme打开指定的页面。这时候我们一般会在打开手机 Safari ，在地址输入框中输入myapp://somepage?pageid=xxx进行页面的跳转。但是由于移动手机的尺寸限制，每次输入这些scheme都挺繁琐，效率低且容易出错。如果能直接在电脑上输入scheme，然后就能打开手机APP里的指定页面，那该多好啊。  模拟器可以直接通过 xcrun simct">
+<meta name="twitter:image" content="https://wx1.sinaimg.cn/mw690/83e01499ly1fwwc0ffnz8j216u0ugdip.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="http://jerrychu.github.io/2018/11/04/macos-devtool-for-ios/"/>
+
+
+  <title>iOS开发之桌面辅助开发工具 | JerryChu's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">JerryChu's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://jerrychu.github.io/2018/11/04/macos-devtool-for-ios/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="JerryChu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JerryChu's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">iOS开发之桌面辅助开发工具</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-11-04T21:07:49+08:00">2018-11-04</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/11/04/macos-devtool-for-ios/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count gitment-comments-count" data-xid="/2018/11/04/macos-devtool-for-ios/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在日常开发中，我们经常需要通过scheme打开指定的页面。这时候我们一般会在打开手机 <em>Safari</em> ，在地址输入框中输入<code>myapp://somepage?pageid=xxx</code>进行页面的跳转。但是由于移动手机的尺寸限制，每次输入这些scheme都挺繁琐，效率低且容易出错。如果能直接在电脑上输入scheme，然后就能打开手机APP里的指定页面，那该多好啊。</p>
+<blockquote>
+<p>模拟器可以直接通过 <code>xcrun simctl openurl booted scheme</code> 打开scheme  </p>
+</blockquote>
+<p>考虑到需要在电脑上控制手机里的APP，那就肯定需要电脑和手机进行通信了，这里主要想到两种方式：  </p>
+<ul>
+<li>使用WiFi连接，电脑和手机连接到同一个局域网中，使用socket通过网络协议通信。 </li>
+<li>使用USB连接，将电脑和手机直接连接在一起。</li>
+</ul>
+<p>WiFi连接的问题是连接不稳定，容易断开，我们从Xcode的无线调试功能中也能领略到。<br>USB连接的话，既然是有线连接，稳定性自然得到了保证，也不需要切换网络。但是如何通过USB来进行电脑和手机的通性呢？会不会开发起来很复杂？</p>
+<p>进一步研究发现，Apple提供了一个叫 <code>usbmux</code>的东西来实现电脑和手机基于USB的通信，iTunes和Xcode都用到了这个东西，所以通过USB连接进行通信方案肯定是可行的了。  </p>
+<p>接下来就是好好研究研究<code>usbmux</code>了，苹果的官方文档是这样说的：  </p>
+<blockquote>
+<p>During normal operations, iTunes communicates with the iPhone using something called “usbmux” – this is a system for multiplexing several “connections” over one USB pipe. Conceptually, it provides a TCP-like system – processes on the host machine open up connections to specific, numbered ports on the mobile device. (This resemblance is more than superficial – on the mobile device, usbmuxd actually makes TCP connections to localhost using the port number you give it.)</p>
+</blockquote>
+<p>简单翻译一下，就是<code>usbmux</code>在USB协议上实现多路TCP连接，将USB通信抽象为TCP通信。这样一来，通过USB连接电脑和手机之后，电脑和手机就可以通过建立TCP连接进行通信了！这样说可能有些抽象，下面通过这个图来简要介绍下基于<code>usbmux</code>的电脑和手机通信流程。 </p>
+<p><img src="https://wx1.sinaimg.cn/mw690/83e01499ly1fwwc0ffnz8j216u0ugdip.jpg" alt="img"></p>
+<ol>
+<li>电脑端iTunes或其他第三方应用程序向<code>usbmuxd</code>发起连接，请求获取USB连接的通知。</li>
+<li>手机通过USB连接到电脑上</li>
+<li><code>usbmuxd</code>监听到有手机连接，并向手机发送一个packet</li>
+<li>手机回复</li>
+<li><code>usbmuxd</code>确认手机已经成功连接，并通知电脑端应用程序</li>
+<li>电脑端应用程序向<code>usbmuxd</code>发起建立新的一条连接，请求连接手机的指定端口</li>
+<li><code>usbmuxd</code>向手机发送“假的TCP”（基于USB的TCP） SYN packet</li>
+<li>手机收到SYN packet并在指定端口打开TCP连接</li>
+<li>手机回复 TCP SYN/ACK 确认端口已经打开可以进一步建立连接</li>
+<li><code>usbmuxd</code>向手机发送 ACK 完成握手</li>
+<li><code>usbmuxd</code>向电脑端应用程序发送连接建立成功的通知 </li>
+<li>之后电脑端应用程序向<code>usbmuxd</code>发送的socket，都会经过USB-TCP协议发送到手机的指定端口上，然后手机端的应用程序可以通过监听该端口接受信息。手机向电脑传递信息，也是一样的流程。</li>
+</ol>
+<p>开源库<a href="https://github.com/rsms/peertalk" target="_blank" rel="noopener">Peertalk</a>就是封装了上面的一套流程，并提供了发起连接的接口以及收发消息的端口。这样一来，我们可以直接使用 <em>Peertalk</em> 实现基于USB的电脑和手机通信了。  </p>
+<p>下面以电脑端发送scheme信息给手机端应用程序为例，介绍下使用Peertalk进行通信的流程。</p>
+<ul>
+<li>电脑端应用程序需要监听手机连接的通知</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">- (void)startListeningForDevices &#123;</span><br><span class="line">  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];</span><br><span class="line">  </span><br><span class="line">  [nc addObserverForName:PTUSBDeviceDidAttachNotification object:PTUSBHub.sharedHub queue:nil usingBlock:^(NSNotification *note) &#123;</span><br><span class="line">  	// 手机插入处理</span><br><span class="line">  	// ...</span><br><span class="line">  	// 建立连接</span><br><span class="line">	[self connectToUSBDevice];</span><br><span class="line">  &#125;];</span><br><span class="line">  </span><br><span class="line">  [nc addObserverForName:PTUSBDeviceDidDetachNotification object:PTUSBHub.sharedHub queue:nil usingBlock:^(NSNotification *note) &#123;</span><br><span class="line">  	// 手机拔出处理</span><br><span class="line">  &#125;];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (void)connectToUSBDevice &#123;</span><br><span class="line">  PTChannel *channel = [PTChannel channelWithDelegate:self];</span><br><span class="line">  [channel connectToPort:PTExampleProtocolIPv4PortNumber overUSBHub:PTUSBHub.sharedHub deviceID:connectingToDeviceID_ callback:^(NSError *error) &#123;</span><br><span class="line">  	// 连接建立成功</span><br><span class="line">  &#125;];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>电脑端发出信息</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">- (IBAction)sendMessage:(id)sender &#123;</span><br><span class="line">    NSString *message = @&quot;qqnews://detail?newsid=xxx&amp;commentid=xxx&quot;;</span><br><span class="line">    dispatch_data_t payload = PTExampleTextDispatchDataWithString(message);</span><br><span class="line">    [channel sendFrameOfType:PTExampleFrameTypeTextMessage tag:PTFrameNoTag withPayload:payload callback:^(NSError *error) &#123;</span><br><span class="line">    	// 发送完成</span><br><span class="line">    &#125;];</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>手机端监听该端口并处理接收到的消息</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">// 监听本地端口</span><br><span class="line">  PTChannel *channel = [PTChannel channelWithDelegate:self];</span><br><span class="line">  [channel listenOnPort:PTExampleProtocolIPv4PortNumber IPv4Address:INADDR_LOOPBACK callback:^(NSError *error) &#123;</span><br><span class="line">  &#125;];</span><br><span class="line"></span><br><span class="line">// 处理接受到的消息</span><br><span class="line">- (void)ioFrameChannel:(PTChannel*)channel didReceiveFrameOfType:(uint32_t)type tag:(uint32_t)tag payload:(PTData*)payload &#123;</span><br><span class="line">  if (type == PTExampleFrameTypeTextMessage) &#123;</span><br><span class="line">    PTExampleTextFrame *textFrame = (PTExampleTextFrame*)payload.data;</span><br><span class="line">    textFrame-&gt;length = ntohl(textFrame-&gt;length);</span><br><span class="line">    NSString *scheme = [[NSString alloc] initWithBytes:textFrame-&gt;utf8text length:textFrame-&gt;length encoding:NSUTF8StringEncoding];</span><br><span class="line">    // handle scheme</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样就实现了在电脑端输入scheme打开手机APP指定页面的功能，再也不用在手机 <em>Safari</em> 上输入一长串scheme了！但是这种方式有个缺陷，就是没法通过电脑端传递的scheme冷启动APP，因为接收端口消息并处理的逻辑都是在APP里，APP没启动，这些逻辑自然处理不了。这个问题接下来我会再研究研究。</p>
+<p>话说回来，既然知道了如何让电脑和手机通信，那肯定不能仅满足于打开scheme这一个功能了！比如我们可以把客户端的日志通过这个流程发送给电脑，就可以在电脑上实时看客户端日志了。基于这个，我们可以做很多有意思的开发工具。    </p>
+<p>另外Facebook开源的桌面开发工具Flipper也使用了Peertalk，提供了查看日志、页面视图等功能，同时支持iOS和android。但是作为一个开发辅助工具，Flipper搞得有点复杂了，各种依赖一大堆，不过其特性的实现代码和设计思想还是值得研究的。 </p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+            <a href="/tags/Peertalk/" rel="tag"># Peertalk</a>
+          
+            <a href="/tags/usbmux/" rel="tag"># usbmux</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/08/05/Xcode-cpd/" rel="next" title="Xcode重复代码检测">
+                <i class="fa fa-chevron-left"></i> Xcode重复代码检测
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      
+        <div id="gitment-container"></div>
+      
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">JerryChu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    <span class="site-state-item-count">7</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">JerryChu</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Mist</a> v6.0.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.0.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.0.2"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+<!-- LOCAL: You can save these files to your site and update links -->
+    
+        
+        <link rel="stylesheet" href="https://aimingoo.github.io/gitmint/style/default.css">
+        <script src="https://aimingoo.github.io/gitmint/dist/gitmint.browser.js"></script>
+    
+<!-- END LOCAL -->
+
+    
+
+    
+      <script type="text/javascript">
+      function renderGitment(){
+        var gitment = new Gitmint({
+            id: window.location.pathname,
+            owner: 'jerrychu',
+            repo: 'jerrychu.github.io',
+            
+            lang: "" || navigator.language || navigator.systemLanguage || navigator.userLanguage,
+            
+            oauth: {
+            
+            
+                client_secret: 'c08951159957d795f7e1ec43cecc5b85fa954178',
+            
+                client_id: '2820df553658e8bf2ed9'
+            }});
+        gitment.render('gitment-container');
+      }
+
+      
+      renderGitment();
+      
+      </script>
+    
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
