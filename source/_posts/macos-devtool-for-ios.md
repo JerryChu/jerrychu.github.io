@@ -113,6 +113,6 @@ USB连接的话，既然是有线连接，稳定性自然得到了保证，也�
 
 
 ### 参考链接：  
-- [https://cocoapods.org/pods/usbmuxd](https://cocoapods.org/pods/usbmuxd)  
+- [https://www.theiphonewiki.com/wiki/Usbmux](https://www.theiphonewiki.com/wiki/Usbmux)  
 - [https://cocoapods.org/pods/usbmuxd](https://cocoapods.org/pods/usbmuxd)
 
