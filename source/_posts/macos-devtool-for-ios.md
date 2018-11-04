@@ -111,3 +111,8 @@ USB连接的话，既然是有线连接，稳定性自然得到了保证，也�
 
 另外Facebook开源的桌面开发工具Flipper也使用了Peertalk，提供了查看日志、页面视图等功能，同时支持iOS和android。但是作为一个开发辅助工具，Flipper搞得有点复杂了，各种依赖一大堆，不过其特性的实现代码和设计思想还是值得研究的。 
 
+
+### 参考链接：  
+- [https://cocoapods.org/pods/usbmuxd](https://cocoapods.org/pods/usbmuxd)  
+- [https://cocoapods.org/pods/usbmuxd](https://cocoapods.org/pods/usbmuxd)
+
