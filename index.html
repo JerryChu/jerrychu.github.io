@@ -181,7 +181,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2020-06-07 21:48:33 / Modified: 21:50:29" itemprop="dateCreated datePublished" datetime="2020-06-07T21:48:33+08:00">2020-06-07</time>
+              <time title="Created: 2020-06-07 21:48:33 / Modified: 21:59:53" itemprop="dateCreated datePublished" datetime="2020-06-07T21:48:33+08:00">2020-06-07</time>
             </span>
 
           
@@ -199,10 +199,10 @@
 <p>为了统计增量代码覆盖率，首先要获取增量代码，本文介绍如何快速准确地获取增量代码数据。</p>
 </blockquote>
 <h2 id="获取代码diff"><a href="#获取代码diff" class="headerlink" title="获取代码diff"></a>获取代码diff</h2><h3 id="git-diff-输出分析"><a href="#git-diff-输出分析" class="headerlink" title="git diff 输出分析"></a>git diff 输出分析</h3><p>相信大家都会使用<code>git diff</code>命令获取代码diff，比如在<a href="https://github.com/JerryChu/UnitTestDemo" target="_blank" rel="noopener">UnitTestDemo项目</a>中执行：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git diff e53b8299 a25e1cc3</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git diff e53b8299 a25e1cc3</span><br></pre></td></tr></table></figure>
 
 <p>将会获得如下的输出：</p>
-<p><img src="./diff.png" alt="diff结果"></p>
+<p><img src="https://raw.githubusercontent.com/JerryChu/UnitTestParser/master/docs/diff.png" alt="diff结果"></p>
 <p>其中，<code>-</code>表示删除的行，<code>+</code>表示新增的行（修改其实就是删除+新增）；<code>@@ -30,8 +30,8 @@</code> 表示删除了原先从第30行开始的8行，新增了从第30行开始的8行。</p>
 <p>从上面的diff结果中可以获取到如下信息：</p>
 <ul>
@@ -214,20 +214,31 @@
 <p>虽然<code>git diff</code>的这个默认行为不会影响到diff的展示（我们可以看到上图红色/绿色部分确实是4行），但是却会对我们统计新增/修改代码行造成困扰。比如这次只修改了4行，但是<code>git diff</code>说有8行变更，导致统计到的数据<strong>偏大</strong>。  </p>
 <p>如何解决这个问题呢？需要进一步对<code>git diff</code>进行深入研究。</p>
 <p>从<code>git diff</code> 的帮助文档中可以看到一个有意思的参数：  </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">-U&lt;n&gt;</span><br><span class="line">--unified&#x3D;&lt;n&gt;</span><br><span class="line">Generate diffs with &lt;n&gt; lines of context instead of the usual three. Implies --patch. Implies -p.</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">-U&lt;n&gt;</span><br><span class="line">--unified=&lt;n&gt;</span><br><span class="line">Generate diffs with &lt;n&gt; lines of context instead of the usual three. Implies --patch. Implies -p.</span><br></pre></td></tr></table></figure>
 
 <p>也就是说，我们可以通过设置 <em>unified</em> 的值，来修改 <code>git diff</code> 的默认行为。尝试再命令行中执行：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">git diff e53b8299 a25e1cc3 --unified&#x3D;0</span><br><span class="line">&#96;&#96;&#96;  </span><br><span class="line"></span><br><span class="line">将会获得如下的输出：</span><br><span class="line"></span><br><span class="line">![diff结果](.&#x2F;diff1.png)</span><br><span class="line"></span><br><span class="line">可以看到，加上&#96;--unified&#x3D;0&#96;之后，&#96;git diff&#96;的新增&#x2F;修改行数统计就是准确的了。  </span><br><span class="line"></span><br><span class="line">## 解析diff数据</span><br><span class="line"></span><br><span class="line">拿到准确的diff数据之后，我们还需要把&#96;git diff&#96;输出的数据转化为代码可以读取的数据。对于增量代码统计，我们希望获取到如下数据：</span><br><span class="line"></span><br><span class="line">- 所有变更文件的文件名</span><br><span class="line">- 每个变更文件对应的的所有变更代码行</span><br><span class="line"></span><br><span class="line">其实&#96;git diff&#96;输出的结果中已经包含了这两份数据，我们要做的就是从输出的结果中解析出这些数据。   </span><br><span class="line"></span><br><span class="line">本项目提供 [*diffParser.rb*](..&#x2F;utils&#x2F;diffParser.rb) 用于从&#96;git diff&#96;的输出结果中解析出最终需要的数据。  </span><br><span class="line"></span><br><span class="line">在命令行中执行</span><br></pre></td></tr></table></figure>
-<p>git diff e53b8299 a25e1cc3 –unified=0 &gt; a.diff</p>
-<p>ruby utils/diffParser.rb –diff-file=a.diff</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">就会获得如下的数据</span><br></pre></td></tr></table></figure>
-<p>{“docs/targetCoverage.md”=&gt;[33, 34, 35, 36]}</p>
-<pre><code>
-其中，*key* 为所有发生变更的文件名，*value* 为该文件对应的变更代码行（新增/修改的代码行）。  
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git diff e53b8299 a25e1cc3 --unified=0</span><br></pre></td></tr></table></figure>
 
-## 总结
 
-通过使用`git diff`命令，并对输出结果进行自定义的解析，我们就可以很容易地获取到新增代码数据了。下一篇文章会继续介绍如何在已经有了增量代码数据的基础上仅一步统计增量代码覆盖率。</code></pre>
+<p>将会获得如下的输出：</p>
+<p><img src="https://raw.githubusercontent.com/JerryChu/UnitTestParser/master/docs/diff1.png" alt="diff结果"></p>
+<p>可以看到，加上<code>--unified=0</code>之后，<code>git diff</code>的新增/修改行数统计就是准确的了。  </p>
+<h2 id="解析diff数据"><a href="#解析diff数据" class="headerlink" title="解析diff数据"></a>解析diff数据</h2><p>拿到准确的diff数据之后，我们还需要把<code>git diff</code>输出的数据转化为代码可以读取的数据。对于增量代码统计，我们希望获取到如下数据：</p>
+<ul>
+<li>所有变更文件的文件名</li>
+<li>每个变更文件对应的的所有变更代码行</li>
+</ul>
+<p>其实<code>git diff</code>输出的结果中已经包含了这两份数据，我们要做的就是从输出的结果中解析出这些数据。   </p>
+<p>本项目提供 <a href="../utils/diffParser.rb"><em>diffParser.rb</em></a> 用于从<code>git diff</code>的输出结果中解析出最终需要的数据。  </p>
+<p>在命令行中执行</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git diff e53b8299 a25e1cc3 --unified=0 &gt; a.diff</span><br><span class="line"></span><br><span class="line">ruby utils/diffParser.rb --diff-file=a.diff</span><br></pre></td></tr></table></figure>
+
+<p>就会获得如下的数据</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;"docs/targetCoverage.md"=&gt;[33, 34, 35, 36]&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中，<em>key</em> 为所有发生变更的文件名，<em>value</em> 为该文件对应的变更代码行（新增/修改的代码行）。  </p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过使用<code>git diff</code>命令，并对输出结果进行自定义的解析，我们就可以很容易地获取到新增代码数据了。下一篇文章会继续介绍如何在已经有了增量代码数据的基础上仅一步统计增量代码覆盖率。</p>
+
       
     </div>
 
