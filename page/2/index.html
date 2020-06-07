@@ -156,6 +156,120 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://jerrychu.github.io/2018/03/25/MainQueue/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="JerryChu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JerryChu's blogs">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2018/03/25/MainQueue/" class="post-title-link" itemprop="url">iOS中的主线程（Main Thread）与主队列（Main Queue）</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-03-25 19:11:20" itemprop="dateCreated datePublished" datetime="2018-03-25T19:11:20+08:00">2018-03-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2019-05-19 23:01:38" itemprop="dateModified" datetime="2019-05-19T23:01:38+08:00">2019-05-19</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>iOS编程中，需要在主线程中进行操作时，我们经常会用到以下代码：</p>
+<pre><code>dispatch_async(dispatch_get_main_queue(), ^{ 
+    // TODO 0:     
+});</code></pre><p>仔细观察这部分代码， <em>dispatch_get_main_queue()</em> 实际获取的是 <strong>主队列（Main Queue）</strong> 。我们看<em>dispatch_get_main_queue()</em> 的官方文档：</p>
+<blockquote>
+<p>Returns the main queue. This queue is created automatically on behalf of the main thread before main() is called.</p>
+</blockquote>
+<p>而当我们需要判断当前线程是不是 <strong>主线程（Main Thread）</strong> 时，会这样写：</p>
+<pre><code>if ([NSThread isMainThread]) {
+    // TODO 1:
+}</code></pre><p>那么我们会想到以下几个问题： </p>
+<p><strong>1. 主线程和主队列到底有什么关系？</strong><br><strong>2. 为什么通过 <em>dispatch_get_main_queue()</em> 就可以确保在代码在主线程执行了？</strong><br><strong>3. 主线程可以执行非主队列里的任务吗？</strong> </p>
+<p>我们知道，主队列是系统自动为我们创建的一个串行队列，因此不用我们手动创建。在每个应用程序只有一个主队列，专门负责调度主线程里的任务，不允许开辟新的线程。也就是说，<strong>在主队列里的任务，即使是异步的，最终也只能在主线程中运行</strong>。因此，开头的第一段代码是可以保证在主线程中运行的。我们使用如下代码做测试：</p>
+<pre><code>- (void)testMainThread {
+    NSLog(@&quot;begin&quot;);
+    for (int i = 0 ; i &lt; 10; i ++) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSLog(@&quot;current Thread: %@; Task: %@&quot;,[NSThread currentThread], @(i));
+        });
+    }
+    NSLog(@&quot;end&quot;);
+}</code></pre><p>输出为：</p>
+<pre><code>2016-08-28 21:22:18.384 Test[72358:1633765] begin
+2016-08-28 21:22:18.384 Test[72358:1633765] end
+2016-08-28 21:22:18.388 Test[72358:1633765] isMainThread: 1; Task: 0
+2016-08-28 21:22:18.388 Test[72358:1633765] isMainThread: 1; Task: 1
+2016-08-28 21:22:18.388 Test[72358:1633765] isMainThread: 1; Task: 2
+2016-08-28 21:22:18.388 Test[72358:1633765] isMainThread: 1; Task: 3
+2016-08-28 21:22:18.389 Test[72358:1633765] isMainThread: 1; Task: 4</code></pre><p>由于block内的任务是异步执行，主线程在将当前方法（<em>testMainThread</em> ）执行完毕之后，才会去继续执行主队列里的任务。那么如果我们把异步任务换成同步的出现什么结果呢？</p>
+<pre><code>- (void)testMainThread {
+    NSLog(@&quot;begin&quot;);
+    for (int i = 0 ; i &lt; 10; i ++) {
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            NSLog(@&quot;current Thread: %@; Task: %@&quot;,[NSThread currentThread], @(i));
+        });
+    }
+    NSLog(@&quot;end&quot;);
+}</code></pre><p>输出为：</p>
+<pre><code>2016-08-28 21:26:29.918 Test[72386:1636378] begin</code></pre><p>也就是说，主线层被阻塞了。这个也好理解，因为此时主队列里的任务是同步执行的，同步任务必需被立刻执行。但同时由于主线程里的<em>testMainThread</em> 还没有执行完，主线程没法去处理主队列里的任务，导致程序死锁。也就是说<strong>主线程空闲时才会调度队列中的任务在主线程执行, 如果当前主线程正在有任务执行，那么无论主队列中当前被添加了什么任务，都不会被调度。</strong> 这也是我们平常写代码需要注意的。</p>
+<p>主队列的任务一定在主线程中执行，那么我们再来看最后一个问题：<em>主线程可以执行非主队列里的任务吗？</em>   我们使用下面的代码做测试：</p>
+<pre><code> NSLog(@&quot;isMainThread: %@&quot;, @([NSThread isMainThread]));
+dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    NSLog(@&quot;isMainThread: %@&quot;, @([NSThread isMainThread]));
+});</code></pre><p>在主线程中同步执行一个后台队列（使用<em>dispatch_get_global_queue</em>() 方法获取系统创建的全局并发队列）的任务。运行输出为：</p>
+<pre><code>2016-08-28 21:55:26.262 Test[72533:1649394] isMainThread: 1
+2016-08-28 21:55:26.263 Test[72533:1649394] isMainThread: 1</code></pre><p>可以看到，这个后台队列的任务也是在主线程中执行的。下面是从 <a href="http://blog.benjamin-encz.de/post/main-queue-vs-main-thread" target="_blank" rel="noopener">http://blog.benjamin-encz.de 的一篇博客</a> 摘抄下来的一段说明：</p>
+<blockquote>
+<p>While doing some research for this post I found <a href="https://libdispatch.macosforge.org/trac/changeset/156" target="_blank" rel="noopener">a commit to libdispatch that ensures that blocks dispatched with dispatch_sync are always executed on the current thread</a>. This means if you use dispatch_sync to dispatch a block from the main queue to a concurrent background queue, the code executing on the background queue will actually be executed on the main thread. While this might not be entirely intuitive, it makes sense: since the main queue needs to wait until the dispatched block completed, the main thread will be available to process blocks from queues other than the main queue.</p>
+</blockquote>
+<p>所以，主线程是可以执行主队列之外其他队列的任务的。即使<em>[NSThread mainThread]</em> 判断当前线程是主线程，也不能保证当前执行的任务是主队列的任务（系统并没有为我们提供一个判断是不是在主队列的API）。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="http://jerrychu.github.io/2018/03/25/CellModel/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -425,14 +539,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-count">13</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-count">12</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
