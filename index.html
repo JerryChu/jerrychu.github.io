@@ -181,7 +181,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2020-06-07 21:48:33 / Modified: 21:59:53" itemprop="dateCreated datePublished" datetime="2020-06-07T21:48:33+08:00">2020-06-07</time>
+              <time title="Created: 2020-06-07 21:48:33 / Modified: 22:29:38" itemprop="dateCreated datePublished" datetime="2020-06-07T21:48:33+08:00">2020-06-07</time>
             </span>
 
           
@@ -229,7 +229,7 @@
 <li>每个变更文件对应的的所有变更代码行</li>
 </ul>
 <p>其实<code>git diff</code>输出的结果中已经包含了这两份数据，我们要做的就是从输出的结果中解析出这些数据。   </p>
-<p>本项目提供 <a href="../utils/diffParser.rb"><em>diffParser.rb</em></a> 用于从<code>git diff</code>的输出结果中解析出最终需要的数据。  </p>
+<p>本项目提供 <a href="https://github.com/JerryChu/UnitTestParser/blob/master/utils/diffParser.rb" target="_blank" rel="noopener"><em>diffParser.rb</em></a> 用于从<code>git diff</code>的输出结果中解析出最终需要的数据。  </p>
 <p>在命令行中执行</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git diff e53b8299 a25e1cc3 --unified=0 &gt; a.diff</span><br><span class="line"></span><br><span class="line">ruby utils/diffParser.rb --diff-file=a.diff</span><br></pre></td></tr></table></figure>
 
