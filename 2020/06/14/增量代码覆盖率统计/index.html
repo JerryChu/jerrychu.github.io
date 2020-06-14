@@ -20,12 +20,14 @@
     var CONFIG = {"hostname":"blog.jerrychu.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta property="og:type" content="article">
+  <meta name="description" content="建议先阅读iOS单元测试数据统计 和 iOS代码覆盖率统计。  本文涉及的所有脚本均托管在GitHub项目 UnitTestParser 中。Demo工程：UnitTestDemo  简介增量代码覆盖率指的就是新增代码的代码覆盖率，也就是新增代码中有多少代码被单元测试覆盖了。我们可以通过如下公式计算增量代码覆盖率 1deltaCov &#x3D; coveredDeltaLineCount &amp;">
+<meta property="og:type" content="article">
 <meta property="og:title" content="增量代码覆盖率统计">
 <meta property="og:url" content="http://blog.jerrychu.top/2020/06/14/%E5%A2%9E%E9%87%8F%E4%BB%A3%E7%A0%81%E8%A6%86%E7%9B%96%E7%8E%87%E7%BB%9F%E8%AE%A1/index.html">
 <meta property="og:site_name" content="JerryChu&#39;s blogs">
+<meta property="og:description" content="建议先阅读iOS单元测试数据统计 和 iOS代码覆盖率统计。  本文涉及的所有脚本均托管在GitHub项目 UnitTestParser 中。Demo工程：UnitTestDemo  简介增量代码覆盖率指的就是新增代码的代码覆盖率，也就是新增代码中有多少代码被单元测试覆盖了。我们可以通过如下公式计算增量代码覆盖率 1deltaCov &#x3D; coveredDeltaLineCount &amp;">
 <meta property="article:published_time" content="2020-06-14T08:19:41.000Z">
-<meta property="article:modified_time" content="2020-06-14T08:22:09.334Z">
+<meta property="article:modified_time" content="2020-06-14T08:26:32.495Z">
 <meta property="article:author" content="JerryChu">
 <meta property="article:tag" content="iOS">
 <meta property="article:tag" content="单元测试">
@@ -186,7 +188,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2020-06-14 16:19:41 / Modified: 16:22:09" itemprop="dateCreated datePublished" datetime="2020-06-14T16:19:41+08:00">2020-06-14</time>
+              <time title="Created: 2020-06-14 16:19:41 / Modified: 16:26:32" itemprop="dateCreated datePublished" datetime="2020-06-14T16:19:41+08:00">2020-06-14</time>
             </span>
 
           
@@ -200,7 +202,68 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        
+        <blockquote>
+<p> 建议先阅读<a href="https://blog.jerrychu.top/2020/05/23/iOS%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E6%95%B0%E6%8D%AE%E7%BB%9F%E8%AE%A1/">iOS单元测试数据统计</a> 和 <a href="https://blog.jerrychu.top/2020/05/23/iOS%E4%BB%A3%E7%A0%81%E8%A6%86%E7%9B%96%E7%8E%87%E7%BB%9F%E8%AE%A1/">iOS代码覆盖率统计</a>。</p>
+</blockquote>
+<p>本文涉及的所有脚本均托管在GitHub项目 <a href="https://github.com/JerryChu/UnitTestParser" target="_blank" rel="noopener">UnitTestParser</a> 中。<br>Demo工程：<a href="https://github.com/JerryChu/UnitTestDemo" target="_blank" rel="noopener">UnitTestDemo</a> </p>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p><code>增量代码覆盖率</code>指的就是新增代码的代码覆盖率，也就是新增代码中有多少代码被单元测试覆盖了。我们可以通过如下公式计算增量代码覆盖率</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">deltaCov &#x3D; coveredDeltaLineCount &#x2F; deltaLineCount</span><br></pre></td></tr></table></figure>
+
+<p>其中，<em>deltaLineCount</em> 指的是新增代码中的<strong>有效代码行数</strong>，<em>coveredDeltaLineCount</em> 指的是新增代码的有效代码行中，被单元测试覆盖的行数。用后者除以前者，就得到了本次新增代码的覆盖率，也就是增量代码覆盖率。</p>
+<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><p>增量代码覆盖率可以保证增量代码的单元测试水平，从而保证整体单元测试水平不断提升。一般情况下，我们会在如下几个场景统计增量代码覆盖率： </p>
+<ul>
+<li>有新的 PR（Pull Request）或 MR（Merge Request）时，检测本次PR/MR的增量代码覆盖率，决定是否合入。</li>
+<li>检测不同版本之间的增量代码覆盖率，评估每个版本的增量代码单元测试水平。</li>
+<li>定时检测每天的增量代码覆盖率，保证代码单元测试水平不断提升。</li>
+</ul>
+<p>增量代码覆盖率可以很好地体现新增代码的单元测试水平，有了增量代码覆盖率数据支撑之后，我们才能站在更高维度上把控项目代码的整体单元测试水平，提升代码覆盖率。</p>
+<h2 id="增量覆盖率计算"><a href="#增量覆盖率计算" class="headerlink" title="增量覆盖率计算"></a>增量覆盖率计算</h2><p>我们再回到增量代码覆盖率的计算公式：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">deltaCov &#x3D; coveredDeltaLineCount &#x2F; deltaLineCount</span><br></pre></td></tr></table></figure>
+
+<p>我们已经知道，<em>deltaLineCount</em> 指的是新增代码中的有效代码行数，<em>coveredDeltaLineCount</em> 指的是新增代码的有效代码行中，被单元测试覆盖的行数。  </p>
+<p>所以如果想计算增量代码覆盖率，我们需要分三步走：</p>
+<ol>
+<li>找到新增了哪些文件的那些代码行</li>
+<li>获取单个文件的代码覆盖率报告，确定每一行的覆盖情况</li>
+<li>确定新增的代码行是否被单元测试覆盖</li>
+</ol>
+<p>下面就按这3步来各个击破。  </p>
+<h3 id="1-新增代码统计"><a href="#1-新增代码统计" class="headerlink" title="1. 新增代码统计"></a>1. 新增代码统计</h3><p>怎么去找到本次提交/MR修改了哪些文件的那些代码行呢？  </p>
+<p>如果大家看过了<a href="https://blog.jerrychu.top/2020/06/07/%E8%8E%B7%E5%8F%96git%E5%A2%9E%E9%87%8F%E4%BB%A3%E7%A0%81%E6%95%B0%E6%8D%AE/">获取git增量代码数据</a>这篇文章的话，相信这不会是个问题。通过解析<code>git diff</code>的数据，我们就能够获取到<br>增量代码文件以及对应的代码行。  </p>
+<h3 id="2-单个文件覆盖率报告"><a href="#2-单个文件覆盖率报告" class="headerlink" title="2. 单个文件覆盖率报告"></a>2. 单个文件覆盖率报告</h3><p>通过新增代码统计获取到所有新增的文件之后，我们需要对每个文件进行单独的处理，确定这个文件的每一行是否被覆盖。因此，我们必须能够获取单个文件的代码覆盖率报告。  </p>
+<p>以<a href="https://github.com/JerryChu/UnitTestDemo" target="_blank" rel="noopener">UnitTestDemo</a>项目为例，使用如下命令就可以从 <em>.xcresult</em> 文件中获取到单个文件的代码覆盖率情况，其中包括了每一个代码行被单元测试执行的次数。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># &#x2F;path&#x2F;to&#x2F;file 为执行单元测试时文件的绝对地址</span><br><span class="line">xcrun xccov view --archive --file &#x2F;path&#x2F;to&#x2F;file &#x2F;path&#x2F;to&#x2F;xcresult_file</span><br></pre></td></tr></table></figure>
+
+<p>上面命令的输出结果如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line"> 1: *</span><br><span class="line"> 2: *</span><br><span class="line"> 3: *</span><br><span class="line"> 4: *</span><br><span class="line"> 5: *</span><br><span class="line"> 6: *</span><br><span class="line"> 7: *</span><br><span class="line"> 8: *</span><br><span class="line"> 9: *</span><br><span class="line">10: *</span><br><span class="line">11: *</span><br><span class="line">12: *</span><br><span class="line">13: *</span><br><span class="line">14: *</span><br><span class="line">15: *</span><br><span class="line">16: *</span><br><span class="line">17: *</span><br><span class="line">18: *</span><br><span class="line">19: 10</span><br><span class="line">20: 10</span><br><span class="line">21: 10 [</span><br><span class="line">(24, 0, 1)</span><br><span class="line">]</span><br><span class="line">22: 1</span><br><span class="line">23: 9 [</span><br><span class="line">(1, 5, 1)</span><br><span class="line">(30, 0, 2)</span><br><span class="line">]</span><br><span class="line">24: 2</span><br><span class="line">25: 7 [</span><br><span class="line">(1, 5, 2)</span><br><span class="line">]</span><br><span class="line">26: 7</span><br><span class="line">27: 7 [</span><br><span class="line">(6, 0, 10)</span><br><span class="line">]</span><br><span class="line">28: 10</span><br><span class="line">29: 10</span><br><span class="line">30: *</span><br><span class="line">31: *</span><br><span class="line">32: *</span><br><span class="line">33: *</span><br><span class="line">34: *</span><br><span class="line">35: *</span><br><span class="line">36: *</span><br><span class="line">37: 1</span><br><span class="line">38: 1</span><br><span class="line">39: 1 [</span><br><span class="line">(24, 0, 0)</span><br><span class="line">]</span><br><span class="line">40: 0</span><br><span class="line">41: 1 [</span><br><span class="line">(1, 5, 0)</span><br><span class="line">(30, 0, 0)</span><br><span class="line">]</span><br><span class="line">42: 0</span><br><span class="line">43: 1 [</span><br><span class="line">(1, 5, 0)</span><br><span class="line">]</span><br><span class="line">44: 1</span><br><span class="line">45: 1 [</span><br><span class="line">(12, 0, 0)</span><br><span class="line">]</span><br><span class="line">46: 0</span><br><span class="line">47: 0 [</span><br><span class="line">(6, 0, 1)</span><br><span class="line">]</span><br><span class="line">48: 1</span><br><span class="line">49: 1</span><br><span class="line">50: *</span><br><span class="line">51: *</span><br><span class="line">52: *</span><br><span class="line">53: 0</span><br><span class="line">54: 0</span><br><span class="line">55: 0</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>如果输出报错，先通过<code>xcrun xccov view --archive --file-list test.xcresult</code>命令查看填写的文件路径是否正确。</p>
+</blockquote>
+<p>左侧的索引就是文件的代码行索引，右侧的数字表示的是该行在单元测试中被执行的次数，其中 <code>*</code> 表示该行不是可执行代码行，比如空白行等，在进行覆盖率计算时，这些行不会被当成有效代码行，也就不会被统计进去。 </p>
+<blockquote>
+<p>相信看到这里大家就知道增量覆盖率计算公式中的<strong>有效代码行</strong>是什么意思了。</p>
+</blockquote>
+<h3 id="3-确定新增代码行是否被覆盖"><a href="#3-确定新增代码行是否被覆盖" class="headerlink" title="3. 确定新增代码行是否被覆盖"></a>3. 确定新增代码行是否被覆盖</h3><p>通过上面的两步，我们就拿到了本次修改的文件及代码行，及每一个代码行是否被单元测试覆盖。接下来我们只需要针对每个文件逐行去解析即可。统计规则如下：</p>
+<ul>
+<li>新增可执行代码行：行索引后面不为<code>*</code></li>
+<li>被覆盖的新增可执行代码行：行索引后面不为<code>*</code>，且数字大于0</li>
+</ul>
+<p><a href="https://github.com/JerryChu/UnitTestParser" target="_blank" rel="noopener">UnitTestParser</a>项目提供了 <a href="https://github.com/JerryChu/UnitTestParser/blob/master/deltaCov.rb" target="_blank" rel="noopener"><em>deltaCov.rb</em></a> 脚本来实现增量代码覆盖率的解析和输出。</p>
+<p>例如执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">╰─± ruby deltaCov.rb --xcresult-path&#x3D;path&#x2F;to&#x2F;xcresult_file --proj-dir&#x3D;.&#x2F; --diff-file&#x3D;path&#x2F;to&#x2F;diff_file --output-file&#x3D;deltaCov.txt</span><br></pre></td></tr></table></figure>
+
+<p>则会输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">新增代码覆盖率：1.0</span><br><span class="line">新增可执行代码行数：11</span><br><span class="line">被覆盖的新增可执行代码行数：11</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>如果输出报错，先通过<code>xcrun xccov view --archive --file-list test.xcresult</code>命令查看填写的文件路径是否正确。</p>
+</blockquote>
+<p>同时这些数据也会被写入到 <em>deltaCov.txt</em> 文件中，便于其他工具读取。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">╰─± cat deltaCov.txt</span><br><span class="line">1.0</span><br><span class="line">11</span><br><span class="line">11</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p><a href="https://github.com/JerryChu/UnitTestParser" target="_blank" rel="noopener">UnitTestParser</a>项目提供的脚本可以快速准确地解析出增量代码行数和增量代码覆盖行数，进而计算出增量代码覆盖率。</p>
+
     </div>
 
     
@@ -282,6 +345,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用场景"><span class="nav-number">2.</span> <span class="nav-text">使用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#增量覆盖率计算"><span class="nav-number">3.</span> <span class="nav-text">增量覆盖率计算</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-新增代码统计"><span class="nav-number">3.1.</span> <span class="nav-text">1. 新增代码统计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-单个文件覆盖率报告"><span class="nav-number">3.2.</span> <span class="nav-text">2. 单个文件覆盖率报告</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-确定新增代码行是否被覆盖"><span class="nav-number">3.3.</span> <span class="nav-text">3. 确定新增代码行是否被覆盖</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
