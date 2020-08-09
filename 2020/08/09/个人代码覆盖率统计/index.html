@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.jerrychu.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="建议先阅读iOS单元测试数据统计 和 iOS代码覆盖率统计。  本文涉及的所有脚本均托管在GitHub项目 UnitTestParser 中。Demo工程：UnitTestDemo  简介之前文章介绍的项目代码覆盖率统计和增量代码覆盖率统计都是基于这个那个项目维度，统计项目整体的代码覆盖率和增量覆盖率的。有时候我们想要知道项目中每个成员提交的代码覆盖率数据，辅助我们去评估大家提交的代码质量如何">
+<meta property="og:type" content="article">
+<meta property="og:title" content="个人代码覆盖率统计">
+<meta property="og:url" content="http://blog.jerrychu.top/2020/08/09/%E4%B8%AA%E4%BA%BA%E4%BB%A3%E7%A0%81%E8%A6%86%E7%9B%96%E7%8E%87%E7%BB%9F%E8%AE%A1/index.html">
+<meta property="og:site_name" content="JerryChu&#39;s blogs">
+<meta property="og:description" content="建议先阅读iOS单元测试数据统计 和 iOS代码覆盖率统计。  本文涉及的所有脚本均托管在GitHub项目 UnitTestParser 中。Demo工程：UnitTestDemo  简介之前文章介绍的项目代码覆盖率统计和增量代码覆盖率统计都是基于这个那个项目维度，统计项目整体的代码覆盖率和增量覆盖率的。有时候我们想要知道项目中每个成员提交的代码覆盖率数据，辅助我们去评估大家提交的代码质量如何">
+<meta property="article:published_time" content="2020-08-09T09:17:38.000Z">
+<meta property="article:modified_time" content="2020-08-09T09:18:41.321Z">
+<meta property="article:author" content="JerryChu">
+<meta property="article:tag" content="iOS">
+<meta property="article:tag" content="单元测试">
+<meta property="article:tag" content="代码覆盖率">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://blog.jerrychu.top/2020/08/09/%E4%B8%AA%E4%BA%BA%E4%BB%A3%E7%A0%81%E8%A6%86%E7%9B%96%E7%8E%87%E7%BB%9F%E8%AE%A1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>个人代码覆盖率统计 | JerryChu's blogs</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">JerryChu's blogs</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="home                          //首页 fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="archive          //归档 fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="tags                     //标签 fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="user                   //关于 fa-fw"></i>About</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/jerrychu" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://blog.jerrychu.top/2020/08/09/%E4%B8%AA%E4%BA%BA%E4%BB%A3%E7%A0%81%E8%A6%86%E7%9B%96%E7%8E%87%E7%BB%9F%E8%AE%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="JerryChu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="JerryChu's blogs">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          个人代码覆盖率统计
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-08-09 17:17:38 / Modified: 17:18:41" itemprop="dateCreated datePublished" datetime="2020-08-09T17:17:38+08:00">2020-08-09</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p> 建议先阅读<a href="https://blog.jerrychu.top/2020/05/23/iOS%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E6%95%B0%E6%8D%AE%E7%BB%9F%E8%AE%A1/">iOS单元测试数据统计</a> 和 <a href="https://blog.jerrychu.top/2020/05/23/iOS%E4%BB%A3%E7%A0%81%E8%A6%86%E7%9B%96%E7%8E%87%E7%BB%9F%E8%AE%A1/">iOS代码覆盖率统计</a>。</p>
+</blockquote>
+<p>本文涉及的所有脚本均托管在GitHub项目 <a href="https://github.com/JerryChu/UnitTestParser" target="_blank" rel="noopener">UnitTestParser</a> 中。<br>Demo工程：<a href="https://github.com/JerryChu/UnitTestDemo" target="_blank" rel="noopener">UnitTestDemo</a> </p>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>之前文章介绍的<a href="https://blog.jerrychu.top/2020/05/23/iOS%E4%BB%A3%E7%A0%81%E8%A6%86%E7%9B%96%E7%8E%87%E7%BB%9F%E8%AE%A1/">项目代码覆盖率统计</a>和<a href="https://blog.jerrychu.top/2020/06/14/%E5%A2%9E%E9%87%8F%E4%BB%A3%E7%A0%81%E8%A6%86%E7%9B%96%E7%8E%87%E7%BB%9F%E8%AE%A1/">增量代码覆盖率统计</a>都是基于这个那个项目维度，统计项目整体的代码覆盖率和增量覆盖率的。有时候我们想要知道项目中每个成员提交的代码覆盖率数据，辅助我们去评估大家提交的代码质量如何，同时也激励大家写出更高质量的单元测试。  </p>
+<h2 id="个人代码覆盖率"><a href="#个人代码覆盖率" class="headerlink" title="个人代码覆盖率"></a>个人代码覆盖率</h2><p>那么如何统计项目中所有代码提交者（committer）的代码覆盖率情况呢？首先我们得知道每一个committer到底提交了那些代码（精确到代码行），然后在此基础上确认这些代码行是否覆盖，最后计算得到代码覆盖率。</p>
+<h3 id="代码行负责人"><a href="#代码行负责人" class="headerlink" title="代码行负责人"></a>代码行负责人</h3><p>我们知道在Xcode中点击代码编辑器右上角的 <em>Author</em> 按钮，就能够看到当前文件每一行代码的“负责人”，也就是谁最后增新增或者修改了这一行。这个功能是怎么实现的呢？其实就是基于<code>git blame</code>命令。</p>
+<blockquote>
+<p>git-blame - Show what revision and author last modified each line of a file</p>
+</blockquote>
+<p>（详细用法可以在命令行中输入<code>git blame</code>查看，或者参考<a href="https://git-scm.com/docs/git-blame" target="_blank" rel="noopener">官方文档</a>。）</p>
+<p>比如在<a href="https://github.com/JerryChu/UnitTestDemo" target="_blank" rel="noopener">Demo项目</a>目录下命令行中执行：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">╰─± git blame -c --date=<span class="keyword">short</span> Demo/CDataUtil.h</span><br></pre></td></tr></table></figure>
+
+<p>就能看到如下输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">9caa7b6b        (  jerrychu     2020-03-29      1)&#x2F;&#x2F;</span><br><span class="line">9caa7b6b        (  jerrychu     2020-03-29      2)&#x2F;&#x2F;  CDataUtil.h</span><br><span class="line">9caa7b6b        (  jerrychu     2020-03-29      3)&#x2F;&#x2F;  Demo</span><br><span class="line">9caa7b6b        (  jerrychu     2020-03-29      4)&#x2F;&#x2F;</span><br><span class="line">9caa7b6b        (  jerrychu     2020-03-29      5)&#x2F;&#x2F;  Created by JerryChu on 2019&#x2F;12&#x2F;15.</span><br><span class="line">9caa7b6b        (  jerrychu     2020-03-29      6)&#x2F;&#x2F;  Copyright © 2019 Chu. All rights reserved.</span><br><span class="line">9caa7b6b        (  jerrychu     2020-03-29      7)&#x2F;&#x2F;</span><br><span class="line">9caa7b6b        (  jerrychu     2020-03-29      8)</span><br><span class="line">9caa7b6b        (  jerrychu     2020-03-29      9)#import &lt;Foundation&#x2F;Foundation.h&gt;</span><br><span class="line">9caa7b6b        (  jerrychu     2020-03-29      10)</span><br><span class="line">9caa7b6b        (  jerrychu     2020-03-29      11)NS_ASSUME_NONNULL_BEGIN</span><br><span class="line">9caa7b6b        (  jerrychu     2020-03-29      12)</span><br><span class="line">9caa7b6b        (  jerrychu     2020-03-29      13)@interface CDataUtil : NSObject</span><br><span class="line">9caa7b6b        (  jerrychu     2020-03-29      14)</span><br><span class="line">9caa7b6b        (  jerrychu     2020-03-29      15)&#x2F;&#x2F;&#x2F; 将数字转化为字符串</span><br><span class="line">9caa7b6b        (  jerrychu     2020-03-29      16)&#x2F;&#x2F;&#x2F; @discussion 大于等于10万时，展示xx万，不带小数点</span><br><span class="line">9caa7b6b        (  jerrychu     2020-03-29      17)&#x2F;&#x2F;&#x2F; @discussion 大于等于1万时，展示1.x万，保留一位小数点</span><br><span class="line">9caa7b6b        (  jerrychu     2020-03-29      18)&#x2F;&#x2F;&#x2F; @discussion 低于1万时，展示实际数字</span><br><span class="line">9caa7b6b        (  jerrychu     2020-03-29      19)&#x2F;&#x2F;&#x2F; @param count 数字</span><br><span class="line">9caa7b6b        (  jerrychu     2020-03-29      20)+ (NSString *)descForCount:(NSInteger)count;</span><br><span class="line">9caa7b6b        (  jerrychu     2020-03-29      21)</span><br><span class="line">9caa7b6b        (  jerrychu     2020-03-29      22)&#x2F;&#x2F;&#x2F; 将数字转化为字符串</span><br><span class="line">9caa7b6b        (  jerrychu     2020-03-29      23)&#x2F;&#x2F;&#x2F; @discussion 大于等于10万时，展示xx万，不带小数点</span><br><span class="line">9caa7b6b        (  jerrychu     2020-03-29      24)&#x2F;&#x2F;&#x2F; @discussion 大于等于1万时，展示1.x万，保留一位小数点</span><br><span class="line">9caa7b6b        (  jerrychu     2020-03-29      25)&#x2F;&#x2F;&#x2F; @discussion 大于&#96;countThreshold&#96;时，展示实际数字</span><br><span class="line">9caa7b6b        (  jerrychu     2020-03-29      26)&#x2F;&#x2F;&#x2F; @discussion 小于等于&#96;countThreshold&#96;时，不展示</span><br><span class="line">9caa7b6b        (  jerrychu     2020-03-29      27)&#x2F;&#x2F;&#x2F; @param count 数字</span><br><span class="line">9caa7b6b        (  jerrychu     2020-03-29      28)+ (NSString *)descForCount2:(NSInteger)count;</span><br><span class="line">9caa7b6b        (  jerrychu     2020-03-29      29)</span><br><span class="line">7e08d03f        (jerrychu(褚佳义)       2020-05-01      30)&#x2F;&#x2F; 将threshold作为参数传入，避免内部产生依赖</span><br><span class="line">7e08d03f        (jerrychu(褚佳义)       2020-05-01      31)+ (NSString *)descForCount2:(NSInteger)count withThreshold:(NSInteger)threshold;</span><br><span class="line">7e08d03f        (jerrychu(褚佳义)       2020-05-01      32)</span><br><span class="line">9caa7b6b        (  jerrychu     2020-03-29      33)@end</span><br><span class="line">9caa7b6b        (  jerrychu     2020-03-29      34)</span><br><span class="line">9caa7b6b        (  jerrychu     2020-03-29      35)NS_ASSUME_NONNULL_END</span><br></pre></td></tr></table></figure>
+
+<p>既然通过<code>git blame</code>命令就能找到项目中的每一行的代码负责人，那接下来的具体步骤就很清晰了。   </p>
+<h3 id="具体步骤"><a href="#具体步骤" class="headerlink" title="具体步骤"></a>具体步骤</h3><ol>
+<li>遍历所有文件，获取每个committer负责所有代码行。</li>
+<li>遍历其负责的代码行数据，确定代码行是否被覆盖。</li>
+<li>对每个committer分别统计代码覆盖率。</li>
+</ol>
+<p>第一步通过对<code>git blame</code>命令的输出结果进行解析和统计，就可以得到。<br>第二步可以直接参考之前的<a href="https://blog.jerrychu.top/2020/06/14/%E5%A2%9E%E9%87%8F%E4%BB%A3%E7%A0%81%E8%A6%86%E7%9B%96%E7%8E%87%E7%BB%9F%E8%AE%A1/">增量代码覆盖率统计</a>文章，里面详细得介绍了如何判断代码行是否被覆盖，原理是一样的。<br>第三步就是单纯的计算了，没啥可说的，写出来主要是为了分三步走。  </p>
+<h3 id="脚本实现"><a href="#脚本实现" class="headerlink" title="脚本实现"></a>脚本实现</h3><p><a href="https://github.com/JerryChu/UnitTestParser" target="_blank" rel="noopener">UnitTestParser</a>项目提供了 <a href="https://github.com/JerryChu/UnitTestParser/blob/master/userCov.rb" target="_blank" rel="noopener"><em>userCov.rb</em></a> 脚本来实现个人代码覆盖率的解析和输出。</p>
+<p>例如执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">╰─± ruby ..&#x2F;UnitTestParser&#x2F;userCov.rb --xcresult-path&#x3D;test.xcresult --output-file&#x3D;userCov.html --proj-dir&#x3D;.&#x2F;</span><br></pre></td></tr></table></figure>
+
+<p>则会生成如下的html</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">代码覆盖率（from 1970-01-01 to 2020-08-09）</span><br><span class="line">开发者	增加/修改代码行数	覆盖代码行数	覆盖率</span><br><span class="line">jerrychu	154	            130 	0.84</span><br></pre></td></tr></table></figure>
+
+<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h3><ol>
+<li><p>脚本中使用的 <em>test.xcresult</em> 文件为我本地生成的结果文件，大家使用Demo项目测试该命令之前，需要先在自己机器上重新生成一份 <em>test.xcresult</em> 文件，否则会由于路径不匹配导致无法获取结果数据。  </p>
+<p> 如何生成 <em>test.xcresult</em> 文件呢？之前的文章都已经提到过，这里再复习一遍。</p>
+ <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> <span class="keyword">for</span> xcodeproj</span></span><br><span class="line">xcodebuild test -project Demo.xcodeproj -scheme Demo -derivedDataPath "$&#123;BUILD_DIR&#125;/" -destination "$&#123;SIMULATOR_PLATFORM&#125;" -resultBundlePath "$&#123;XCRESULT_PATH&#125;" -resultBundleVersion 3</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>脚本中需要设置开发人员名单，不在名单内的数据将不会被统计进去。</p>
+ <figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment"># 要统计的开发者列表</span></span><br><span class="line">$developer_list = [<span class="string">"jerrychu"</span>]</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<h2 id="个人新增代码覆盖率"><a href="#个人新增代码覆盖率" class="headerlink" title="个人新增代码覆盖率"></a>个人新增代码覆盖率</h2><p>如果详细看了 <em>userCov.rb</em> 脚本的话，大家会发现脚本执行参数中有一个 <em>begin_date</em> 选项，用于指定从什么时间点开始统计。</p>
+<p>为什么要加这样一个参数呢？我们在统计每个committer的代码覆盖率时，更希望看到最近一段时间（比如当前版本的开始时间）内每个committer提交的代码的覆盖率情况。而<code>git blame</code>会把项目中每一个代码行都展示出来，但是其中很多是历史代码，参考意义不大。</p>
+<p>附：<code>git blame</code> 也提供一些参数用来设置时间区间或commit区间，但是并不符合我们这里的统计需求，有兴趣的可以在命令行中执行<code>git help blame</code>看下。</p>
+<p>设置 <em>begin_date</em> 选项之后，脚本里在解析<code>git blame</code>结果时，就会将这个时间点之前的代码行都过滤掉，只统计这个时间点之后新增或修改的代码行。在实际应用中，我们可以把这个参数设置为版本开始的时间，用来统计从版本开始到现在，大家提交代码的覆盖率情况。</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 根据git blame统计begin_date时间之后每个人修改过的文件及行数</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">user_files_map</span><span class="params">(proj_dir, begin_date)</span></span></span><br></pre></td></tr></table></figure>
+
+<p>在执行脚本时增加 <em>begin-date</em> 参数即可统计到该时间点之后的committer新增代码覆盖率情况。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">╰─± ruby ..&#x2F;UnitTestParser&#x2F;userCov.rb --xcresult-path&#x3D;test.xcresult --proj-dir&#x3D;.&#x2F; --output-file&#x3D;userCov.html --begin-date&#x3D;&quot;2019-10-18&quot;</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>个人代码覆盖率的统计对提升每个项目成员的单元测试水平和整体单元测试水平都有重要的作用。<br><a href="https://github.com/JerryChu/UnitTestParser" target="_blank" rel="noopener">UnitTestParser</a>项目提供的脚本可以快速准确地解析出项目中每个人的代码覆盖率，以及每个人的增量代码覆盖率，并且可以做到自动化统计。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/iOS/" rel="tag"># iOS</a>
+              <a href="/tags/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/" rel="tag"># 单元测试</a>
+              <a href="/tags/%E4%BB%A3%E7%A0%81%E8%A6%86%E7%9B%96%E7%8E%87/" rel="tag"># 代码覆盖率</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/06/21/Swizzle%E7%9A%84%E6%AD%A3%E7%A1%AE%E5%A7%BF%E5%8A%BF/" rel="prev" title="Swizzle的正确姿势（一）">
+      <i class="fa fa-chevron-left"></i> Swizzle的正确姿势（一）
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#个人代码覆盖率"><span class="nav-number">2.</span> <span class="nav-text">个人代码覆盖率</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#代码行负责人"><span class="nav-number">2.1.</span> <span class="nav-text">代码行负责人</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#具体步骤"><span class="nav-number">2.2.</span> <span class="nav-text">具体步骤</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#脚本实现"><span class="nav-number">2.3.</span> <span class="nav-text">脚本实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#注意事项"><span class="nav-number">2.4.</span> <span class="nav-text">注意事项</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#个人新增代码覆盖率"><span class="nav-number">3.</span> <span class="nav-text">个人新增代码覆盖率</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">JerryChu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">JerryChu</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
