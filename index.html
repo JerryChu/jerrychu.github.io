@@ -156,6 +156,136 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://blog.jerrychu.top/2020/11/29/Swift%E5%AD%97%E7%AC%A6%E4%B8%B2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="JerryChu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="++">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/11/29/Swift%E5%AD%97%E7%AC%A6%E4%B8%B2/" class="post-title-link" itemprop="url">Swift字符串</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-11-29 14:14:14 / Modified: 16:09:22" itemprop="dateCreated datePublished" datetime="2020-11-29T14:14:14+08:00">2020-11-29</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>用Swift做算法题时，经常遇到输入为<code>String</code>的情况，但是用Swift的<code>String</code> API遍历元素非常麻烦，每次都得Google一下。做这类题目时，我一般会直接把<code>String</code>转成<code>Array</code>，然后就能愉快地用数组下标访问元素了。</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 直接使用String遍历字符串</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="number">0</span>..&lt;s.<span class="built_in">count</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> ch = s[s.index(s.startIndex, offsetBy: i)]</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 转换为Array再遍历字符串</span></span><br><span class="line"><span class="keyword">let</span> array = <span class="type">Array</span>(string)</span><br><span class="line"><span class="keyword">for</span> ch <span class="keyword">in</span> array &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>但是转换为<code>Array</code>毕竟会产生额外的内存消耗，身为有追求的程序员，咱必须最求严格要求自己。于是有一天刷到<a href="https://leetcode-cn.com/problems/valid-anagram/" target="_blank" rel="noopener">有效的字母异位词</a>这个题目时，我决定直接使用Swift的<code>String</code> API来写。  </p>
+<p>题目很简单，主要步骤就是遍历字符串，并存储在哈希表中。直接上代码（解法也很朴素😳）：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">isAnagram</span><span class="params">(<span class="number">_</span> s: String, <span class="number">_</span> t: String)</span></span> -&gt; <span class="type">Bool</span> &#123;</span><br><span class="line">    <span class="keyword">guard</span> s.<span class="built_in">count</span> == t.<span class="built_in">count</span> <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">var</span> <span class="built_in">map</span> = [<span class="type">Character</span>: <span class="type">Int</span>]()</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="number">0</span>..&lt;s.<span class="built_in">count</span> &#123;</span><br><span class="line">        <span class="keyword">let</span> ch = s[s.index(s.startIndex, offsetBy: i)]</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">map</span>[ch] != <span class="literal">nil</span> &#123;</span><br><span class="line">            <span class="built_in">map</span>[ch] = <span class="built_in">map</span>[ch]! + <span class="number">1</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="built_in">map</span>[ch] = <span class="number">1</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="number">0</span>..&lt;t.<span class="built_in">count</span> &#123;</span><br><span class="line">        <span class="keyword">let</span> ch = t[t.index(t.startIndex, offsetBy: i)]</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">map</span>[ch] != <span class="literal">nil</span> &#123;</span><br><span class="line">            <span class="built_in">map</span>[ch] = <span class="built_in">map</span>[ch]! - <span class="number">1</span></span><br><span class="line">            <span class="keyword">if</span> <span class="built_in">map</span>[ch] == <span class="number">0</span> &#123;</span><br><span class="line">                <span class="built_in">map</span>[ch] = <span class="literal">nil</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">map</span>.<span class="built_in">count</span> == <span class="number">0</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>一提交，超时了。当输入为特别长（如50000）的字符串时，提示上述代码的运行时间超过限制。<br>我反复研究了自己写的代码，<code>O(n)</code>的时间复杂度，没啥毛病啊。怀着试一试的心态，我又提交了一次，还是超时。。  </p>
+<p>实在没办法了，我决定把<code>String</code>转成<code>Array</code>，然后直接基于<code>Array</code>来遍历。</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">isAnagram</span><span class="params">(<span class="number">_</span> s: String, <span class="number">_</span> t: String)</span></span> -&gt; <span class="type">Bool</span> &#123;</span><br><span class="line">    <span class="keyword">guard</span> s.<span class="built_in">count</span> == t.<span class="built_in">count</span> <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">var</span> <span class="built_in">map</span> = [<span class="type">Character</span>: <span class="type">Int</span>]()</span><br><span class="line">    <span class="keyword">let</span> sArray = <span class="type">Array</span>(s)</span><br><span class="line">    <span class="keyword">let</span> tArray = <span class="type">Array</span>(t)</span><br><span class="line">    <span class="keyword">for</span> ch <span class="keyword">in</span> sArray &#123;</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">map</span>[ch] != <span class="literal">nil</span> &#123;</span><br><span class="line">            <span class="built_in">map</span>[ch] = <span class="built_in">map</span>[ch]! + <span class="number">1</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="built_in">map</span>[ch] = <span class="number">1</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> ch <span class="keyword">in</span> tArray &#123;</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">map</span>[ch] != <span class="literal">nil</span> &#123;</span><br><span class="line">            <span class="built_in">map</span>[ch] = <span class="built_in">map</span>[ch]! - <span class="number">1</span></span><br><span class="line">            <span class="keyword">if</span> <span class="built_in">map</span>[ch] == <span class="number">0</span> &#123;</span><br><span class="line">                <span class="built_in">map</span>[ch] = <span class="literal">nil</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">map</span>.<span class="built_in">count</span> == <span class="number">0</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>再提交，竟然就通过了😂。</p>
+<h2 id="性能测试"><a href="#性能测试" class="headerlink" title="性能测试"></a>性能测试</h2><p>难道是LeetCode的问题？我决定用Swift Playground跑个性能测试看看结果。</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">PerformanceTest</span>: <span class="title">XCTestCase</span> </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> string = <span class="string">"..."</span> <span class="comment">// 长度为50000的字符串</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">testPerformanceOfArray</span><span class="params">()</span></span> &#123;</span><br><span class="line">        measure &#123;</span><br><span class="line">            <span class="keyword">let</span> <span class="number">_</span> = solution.isAnagramUsingArrayApi(string, string)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">testPerformanceOfString</span><span class="params">()</span></span> &#123;</span><br><span class="line">        measure &#123;</span><br><span class="line">            <span class="keyword">let</span> <span class="number">_</span> = solution.isAnagramUsingStringApi(string, string)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">PerformanceTest</span>.defaultTestSuite.run()</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>使用Array的性能测试结果：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;unknown&gt;:0: Test Case &#39;-[__lldb_expr_20.PerformanceTest testPerformanceOfArray]&#39; measured [Time, seconds] average: 1.709, relative standard deviation: 4.094%, values: [1.792613, 1.672665, 1.666029, 1.608078, 1.619144, 1.832425, 1.732586, 1.706398, 1.772683, 1.683238], performanceMetricID:com.apple.XCTPerformanceMetric_WallClockTime, baselineName: &quot;&quot;, baselineAverage: , maxPercentRegression: 10.000%, maxPercentRelativeStandardDeviation: 10.000%, maxRegression: 0.100, maxStandardDeviation: 0.100</span><br></pre></td></tr></table></figure>
+
+<p>平均运行时间为 <strong>1.709 s</strong>。</p>
+<ul>
+<li>使用String的性能测试结果：  </li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;unknown&gt;:0: Test Case &#39;-[__lldb_expr_28.PerformanceTest testPerformanceOfString]&#39; measured [Time, seconds] average: 33.674, relative standard deviation: 1.500%, values: [32.627662, 33.954215, 34.245659, 34.001036, 33.695257, 34.446044, 33.701735, 33.209314, 33.351506, 33.507718], performanceMetricID:com.apple.XCTPerformanceMetric_WallClockTime, baselineName: &quot;&quot;, baselineAverage: , maxPercentRegression: 10.000%, maxPercentRelativeStandardDeviation: 10.000%, maxRegression: 0.100, maxStandardDeviation: 0.100</span><br></pre></td></tr></table></figure>
+
+<p>平均运行时间为 <strong>33.674 s</strong>。</p>
+<p>眼前的结果不禁令人陷入沉思，Swift的<code>String</code> API不仅难用，性能也不行，到底是出了什么问题？</p>
+<h2 id="Swift的String变迁史"><a href="#Swift的String变迁史" class="headerlink" title="Swift的String变迁史"></a>Swift的String变迁史</h2><p>通过阅读Swift的文档，我们知道<code>String</code>其实是一个<code>Collection</code>类型（遵循<code>Collection</code>协议），也就是说，<code>String</code>是可以使用下标访问的。  </p>
+<blockquote>
+<p>A Unicode string value that is a collection of characters.<br>A string is a series of characters, such as “Swift”, that forms a collection. Strings in Swift are Unicode correct and locale insensitive, and are designed to be efficient. The String type bridges with the Objective-C class NSString and offers interoperability with C functions that works with strings.</p>
+</blockquote>
+<p>在Swift语言的历史上，<code>String</code>有三次比较大的改动：</p>
+<ol>
+<li>Swift1 版本，遵循<code>Collection</code>协议</li>
+<li>Swift2-3 版本，不再遵循<code>Collection</code>协议</li>
+<li>Swift4 版本，重新遵循<code>Collection</code>协议</li>
+</ol>
+<p>可以看到，Swift Core Team对<code>String</code>该何如实现也是有过争议和动摇的，但是最终还是让遵循<code>Collection</code>协议了。<br>为什么最终会遵循<code>Collection</code>协议呢？我理解主要有以下两点：</p>
+<ul>
+<li>更易于理解，字符串其实就是字符的集合</li>
+<li>从设计上，<code>String</code>和<code>Collection</code>可以直接用一套API</li>
+</ul>
+<p>关于最终的选型，Swift Core Team有更深入的思考，有兴趣的可以继续阅读<a href="https://github.com/apple/swift/blob/main/docs/StringManifesto.md" target="_blank" rel="noopener">https://github.com/apple/swift/blob/main/docs/StringManifesto.md</a>。  </p>
+<p>遵循<code>Collection</code>协议本身对开发者应该是个好事，因为这样更容易理解，一套API就可以搞定所有常用的集合类型。但是为什么<code>String</code>的接口这么复杂，性能也不高呢？</p>
+<h2 id="字符串一直都很难"><a href="#字符串一直都很难" class="headerlink" title="字符串一直都很难"></a>字符串一直都很难</h2><p>字符串一直是个老大难的问题，Unicode也一直是开发者的噩梦。</p>
+<p>上文说过，Swift的<code>String</code>对外表现是字符的集合，其底层实现其实是<code>UTF-8</code>编码单位的集合，每个字符由1到4个<code>UTF-8</code>编码单位组成。也就是说，<code>String</code>的每一个元素的长度是不一定相等的，我们无法直接使用<code>Int</code>类型的数字下标去访问集合中的字符，这也是<code>String</code>与<code>Array</code>等其他集合类型的最大区别。  </p>
+<p>正是由于这个原因，Swift不得不放弃<code>Int</code>类型的下标，在内部通过自定义的<code>Index</code>类型记录对应元素的偏移量，并提供通过<code>Index</code>进行元素访问的接口。</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// A position of a character or code unit in a string.</span></span><br><span class="line">@frozen <span class="keyword">public</span> <span class="class"><span class="keyword">struct</span> <span class="title">Index</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 读取string的第2个字符</span></span><br><span class="line"><span class="keyword">let</span> string = <span class="string">"Swift"</span></span><br><span class="line"><span class="keyword">let</span> index = string.index(string.startIndex, offsetBy: <span class="number">1</span>)</span><br><span class="line">string[index]</span><br></pre></td></tr></table></figure>
+
+<h2 id="对性能的影响"><a href="#对性能的影响" class="headerlink" title="对性能的影响"></a>对性能的影响</h2><p>无论是<code>Int</code>类型的下标还是<code>Index</code>类型的下标，作为集合类型，通过下标访问元素的时间复杂度都应该是<code>O(1)</code>，那为什么Swift中方法<code>String</code>的元素会比访问<code>Array</code>的元素性能差这么多呢？  </p>
+<p>问题就出在<code>Index</code>的计算上。也就是</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> index = string.index(string.startIndex, offsetBy: <span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+
+<p>对于每个 <em>index</em> ，都需要根据当前 <em>string</em> 的实际字符情况计算真实的偏移量，不难看出，这一步的时间复杂度是 <em>O(n)*。<br>而对于数组来说，不需要计算这个 *index</em> ，自然性能会更高。 </p>
+<p>回到最开始的算法题，如下代码中，遍历获取字符串 <em>s</em> 中的字符时，每次都会重新计算 <em>index</em>，导致运行时间过长。</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">isAnagram</span><span class="params">(<span class="number">_</span> s: String, <span class="number">_</span> t: String)</span></span> -&gt; <span class="type">Bool</span> &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="number">0</span>..&lt;s.<span class="built_in">count</span> &#123;</span><br><span class="line">        <span class="keyword">let</span> ch = s[s.index(s.startIndex, offsetBy: i)]</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">map</span>[ch] != <span class="literal">nil</span> &#123;</span><br><span class="line">            <span class="built_in">map</span>[ch] = <span class="built_in">map</span>[ch]! + <span class="number">1</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="built_in">map</span>[ch] = <span class="number">1</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>那如果不要每次都重新计算 <em>index</em> ，而是保存当前的 <em>index</em> 结果，每次只需继续向后偏移 1 位，会不会提升性能呢？<br>我们将上面的代码稍作修改，重新跑一边性能测试。</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">isAnagram</span><span class="params">(<span class="number">_</span> s: String, <span class="number">_</span> t: String)</span></span> -&gt; <span class="type">Bool</span> &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="keyword">var</span> index = s.startIndex</span><br><span class="line">    <span class="keyword">for</span> <span class="number">_</span> <span class="keyword">in</span> <span class="number">0</span>..&lt;s.<span class="built_in">count</span> &#123;</span><br><span class="line">        <span class="keyword">let</span> ch = s[index]</span><br><span class="line">        index = s.index(index, offsetBy: <span class="number">1</span>)</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">map</span>[ch] != <span class="literal">nil</span> &#123;</span><br><span class="line">            <span class="built_in">map</span>[ch] = <span class="built_in">map</span>[ch]! + <span class="number">1</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="built_in">map</span>[ch] = <span class="number">1</span> </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;unknown&gt;:0: Test Case &#39;-[__lldb_expr_30.PerformanceTest testPerformanceOfString]&#39; measured [Time, seconds] average: 20.650, relative standard deviation: 2.606%, values: [20.168230, 20.097321, 21.516863, 21.269714, 20.570309, 21.345641, 20.949756, 20.261627, 20.081277, 20.239225], performanceMetricID:com.apple.XCTPerformanceMetric_WallClockTime, baselineName: &quot;&quot;, baselineAverage: , maxPercentRegression: 10.000%, maxPercentRelativeStandardDeviation: 10.000%, maxRegression: 0.100, maxStandardDeviation: 0.100</span><br></pre></td></tr></table></figure>
+
+<p>果然，平均运行时间降低到了 <strong>20.650s</strong>，但是还是没有预期的快，更深层次的原因有待继续追踪。另外，String内部没有对index的计算结果做缓存吗？这些问题留待接下来的文章继续探讨吧。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>Swift中的字符串历经多个版本的变迁，依然令人非常头疼。其之所以使用起来麻烦，是因为内部字符长度长度不固定，无法直接使用普通的数字下标进行索引，必须维护内部特殊的<code>Index</code>。而<code>Index</code>需要经过计算得出，也就带来了访问字符串元素时的性能问题。  </p>
+<p>但是无论如何，Swift一直在对<code>String</code>进行持续优化，包括提供更方便的接口（如<a href="https://github.com/apple/swift-evolution/blob/master/proposals/0265-offset-indexing-and-slicing.md" target="_blank" rel="noopener">Offset-Based Access</a>）等。从Swift的设计理念上来说，正确性比易用性更重要。为了保证代码不出问题，稍微麻烦一点也是可以接受的。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://github.com/apple/swift/blob/main/docs/StringManifesto.md" target="_blank" rel="noopener">https://github.com/apple/swift/blob/main/docs/StringManifesto.md</a></li>
+<li><a href="https://kemchenj.github.io/2019-10-07/" target="_blank" rel="noopener">https://kemchenj.github.io/2019-10-07/</a></li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="http://blog.jerrychu.top/2020/11/22/Swift%E5%85%A8%E6%A0%88%E9%A1%B9%E7%9B%AE%E8%AE%A1%E5%88%92/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2017,7 +2147,7 @@ dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">18</span>
+          <span class="site-state-item-count">19</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
