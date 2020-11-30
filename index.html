@@ -179,10 +179,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2020-11-29 14:14:14 / Modified: 16:15:46" itemprop="dateCreated datePublished" datetime="2020-11-29T14:14:14+08:00">2020-11-29</time>
+              <time title="Created: 2020-11-29 14:14:14" itemprop="dateCreated datePublished" datetime="2020-11-29T14:14:14+08:00">2020-11-29</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-11-30 20:27:30" itemprop="dateModified" datetime="2020-11-30T20:27:30+08:00">2020-11-30</time>
+              </span>
 
           
 
@@ -258,11 +264,13 @@
 <p>那如果不要每次都重新计算 <em>index</em> ，而是保存当前的 <em>index</em> 结果，每次只需继续向后偏移 1 位，会不会提升性能呢？<br>我们将上面的代码稍作修改，重新跑一边性能测试。</p>
 <figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">isAnagram</span><span class="params">(<span class="number">_</span> s: String, <span class="number">_</span> t: String)</span></span> -&gt; <span class="type">Bool</span> &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="keyword">var</span> index = s.startIndex</span><br><span class="line">    <span class="keyword">for</span> <span class="number">_</span> <span class="keyword">in</span> <span class="number">0</span>..&lt;s.<span class="built_in">count</span> &#123;</span><br><span class="line">        <span class="keyword">let</span> ch = s[index]</span><br><span class="line">        index = s.index(index, offsetBy: <span class="number">1</span>)</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">map</span>[ch] != <span class="literal">nil</span> &#123;</span><br><span class="line">            <span class="built_in">map</span>[ch] = <span class="built_in">map</span>[ch]! + <span class="number">1</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="built_in">map</span>[ch] = <span class="number">1</span> </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;unknown&gt;:0: Test Case &#39;-[__lldb_expr_30.PerformanceTest testPerformanceOfString]&#39; measured [Time, seconds] average: 20.650, relative standard deviation: 2.606%, values: [20.168230, 20.097321, 21.516863, 21.269714, 20.570309, 21.345641, 20.949756, 20.261627, 20.081277, 20.239225], performanceMetricID:com.apple.XCTPerformanceMetric_WallClockTime, baselineName: &quot;&quot;, baselineAverage: , maxPercentRegression: 10.000%, maxPercentRelativeStandardDeviation: 10.000%, maxRegression: 0.100, maxStandardDeviation: 0.100</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;unknown&gt;:0: Test Case &#39;-[__lldb_expr_38.PerformanceTest testPerformanceOfString]&#39; measured [Time, seconds] average: 6.137, relative standard deviation: 6.898%, values: [5.295313, 6.041929, 7.026869, 6.305301, 6.466630, 5.881635, 5.932458, 5.979560, 6.214758, 6.226155], performanceMetricID:com.apple.XCTPerformanceMetric_WallClockTime, baselineName: &quot;&quot;, baselineAverage: , maxPercentRegression: 10.000%, maxPercentRelativeStandardDeviation: 10.000%, maxRegression: 0.100, maxStandardDeviation: 0.100</span><br></pre></td></tr></table></figure>
 
-<p>果然，平均运行时间降低到了 <strong>20.650s</strong>，但是还是没有预期的快，更深层次的原因有待继续追踪。另外，String内部没有对index的计算结果做缓存吗？这些问题留待接下来的文章继续探讨吧。</p>
+<p>果然，平均运行时间降低到了 <strong>6.137s</strong>，虽然还是比用<code>Array</code>慢，不过已经快了很多！验证结果符合预期✌️。 </p>
+<p>看来<code>String</code>内部并没有对index的计算结果做缓存，不过从语言设计上看，确实不该在内部做这个缓存。</p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>Swift中的字符串历经多个版本的变迁，依然令人非常头疼。其之所以使用起来麻烦，是因为内部字符长度长度不固定，无法直接使用普通的数字下标进行索引，必须维护内部特殊的<code>Index</code>。而<code>Index</code>需要经过计算得出，也就带来了访问字符串元素时的性能问题。  </p>
 <p>但是无论如何，Swift一直在对<code>String</code>进行持续优化，包括提供更方便的接口（如<a href="https://github.com/apple/swift-evolution/blob/master/proposals/0265-offset-indexing-and-slicing.md" target="_blank" rel="noopener">Offset-Based Access</a>）等。从Swift的设计理念上来说，正确性比易用性更重要。为了保证代码不出问题，稍微麻烦一点也是可以接受的。</p>
+<p><code>String</code>还有很多有意思的地方值得深入学习，接下来的文章继续探讨吧。</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="https://github.com/apple/swift/blob/main/docs/StringManifesto.md" target="_blank" rel="noopener">https://github.com/apple/swift/blob/main/docs/StringManifesto.md</a></li>
 <li><a href="https://kemchenj.github.io/2019-10-07/" target="_blank" rel="noopener">https://kemchenj.github.io/2019-10-07/</a></li>
