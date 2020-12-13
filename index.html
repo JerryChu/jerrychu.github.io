@@ -156,6 +156,111 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://blog.jerrychu.top/2020/12/13/Swift%E4%B8%AD%E7%9A%84reduce%E6%96%B9%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="JerryChu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="++">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/12/13/Swift%E4%B8%AD%E7%9A%84reduce%E6%96%B9%E6%B3%95/" class="post-title-link" itemprop="url">Swift中的reduce方法</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-12-13 13:33:28 / Modified: 15:57:19" itemprop="dateCreated datePublished" datetime="2020-12-13T13:33:28+08:00">2020-12-13</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>在常用的<a href="https://zh.wikipedia.org/wiki/%E9%AB%98%E9%98%B6%E5%87%BD%E6%95%B0" target="_blank" rel="noopener">高阶函数</a>中，相比于 <em>map<em>、</em>flatMap<em>、</em>filter</em> 这些，<em>reduce</em> 理解起来更晦涩一些，不如前面几个功能明确。  </p>
+<p><em>reduce</em> 一词，在英文中的解释为“减少、降低等”，在函数式编程中，我们可以把这个单词理解为“合并、归纳”。也就是说，<em>reduce</em> 的作用是合并结果，把多项变成一项。至于怎么合并，就看传入的转换方法是什么。</p>
+<blockquote>
+<p>部分编程语言也会使用 <em>fold<em>、</em>compress</em> 等表示 <em>reduce*，参考 <a href="https://en.wikipedia.org/wiki/Fold_%28higher-order_function%29" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Fold_%28higher-order_function%29</a> 。但是主流编程语言中，还是使用 *reduce</em> 一词的比较多。</p>
+</blockquote>
+<h2 id="Swift中的-reduce"><a href="#Swift中的-reduce" class="headerlink" title="Swift中的 reduce"></a>Swift中的 <em>reduce</em></h2><p>Swift提供了两个不同的 <em>reduce</em> 方法。</p>
+<ul>
+<li><code>reduce(_:_:)</code></li>
+</ul>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// Returns the result of combining the elements of the sequence using the given closure.</span></span><br><span class="line">@inlinable <span class="keyword">public</span> <span class="function"><span class="keyword">func</span> <span class="title">reduce</span>&lt;Result&gt;<span class="params">(<span class="number">_</span> initialResult: Result, <span class="number">_</span> nextPartialResult: <span class="params">(Result, Element)</span></span></span> <span class="keyword">throws</span> -&gt; <span class="type">Result</span>) <span class="keyword">rethrows</span> -&gt; <span class="type">Result</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>reduce(into:_:)</code></li>
+</ul>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// Returns the result of combining the elements of the sequence using the given closure.</span></span><br><span class="line">@inlinable <span class="keyword">public</span> <span class="function"><span class="keyword">func</span> <span class="title">reduce</span>&lt;Result&gt;<span class="params">(into initialResult: Result, <span class="number">_</span> updateAccumulatingResult: <span class="params">(<span class="keyword">inout</span> Result, Element)</span></span></span> <span class="keyword">throws</span> -&gt; ()) <span class="keyword">rethrows</span> -&gt; <span class="type">Result</span></span><br></pre></td></tr></table></figure>
+
+<p>两个方法的作用完全一样，都是 <em>Returns the result of combining the elements of the sequence using the given closure*，翻译过来就是 *使用传入的closure合并序列并返回</em> 。在使用上两个方法有什么区别呢？</p>
+<blockquote>
+<p>TLDR: 具体作用没区别。只是当返回结果为<code>Array</code>、<code>Dictionary</code>等 <em>Coy On Write</em> 类型的数据时，优先使用<code>reduce(into:_:)</code>，提升性能。</p>
+</blockquote>
+<h3 id="reduce"><a href="#reduce" class="headerlink" title="reduce(_:_:)"></a><code>reduce(_:_:)</code></h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// - Parameters:</span></span><br><span class="line"><span class="comment">///   - initialResult: The value to use as the initial accumulating value.</span></span><br><span class="line"><span class="comment">///     `initialResult` is passed to `nextPartialResult` the first time the</span></span><br><span class="line"><span class="comment">///     closure is executed.</span></span><br><span class="line"><span class="comment">///   - nextPartialResult: A closure that combines an accumulating value and</span></span><br><span class="line"><span class="comment">///     an element of the sequence into a new accumulating value, to be used</span></span><br><span class="line"><span class="comment">///     in the next call of the `nextPartialResult` closure or returned to</span></span><br><span class="line"><span class="comment">///     the caller.</span></span><br><span class="line"><span class="comment">/// - Returns: The final accumulated value. If the sequence has no elements,</span></span><br><span class="line"><span class="comment">///   the result is `initialResult`.</span></span><br><span class="line"><span class="comment">///</span></span><br><span class="line"><span class="comment">/// - Complexity: O(*n*), where *n* is the length of the sequence.</span></span><br><span class="line">@inlinable <span class="keyword">public</span> <span class="function"><span class="keyword">func</span> <span class="title">reduce</span>&lt;Result&gt;<span class="params">(<span class="number">_</span> initialResult: Result, <span class="number">_</span> nextPartialResult: <span class="params">(Result, Element)</span></span></span> <span class="keyword">throws</span> -&gt; <span class="type">Result</span>) <span class="keyword">rethrows</span> -&gt; <span class="type">Result</span></span><br></pre></td></tr></table></figure>
+
+<p>以下面的代码为例，介绍<code>reduce(_:_:)</code>的执行流程。</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> numbers = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]</span><br><span class="line"><span class="keyword">let</span> numberSum = numbers.<span class="built_in">reduce</span>(<span class="number">0</span>, &#123; x, y <span class="keyword">in</span></span><br><span class="line">    x + y</span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">// numberSum == 10</span></span><br></pre></td></tr></table></figure>
+<ol>
+<li>调用 <em>nextPartialResult<em>，传入的参数为 <code>x</code>： *initialResult</em>（<code>0</code>），<code>y</code>：*numbers</em> 数组第一个元素(<code>1</code>)，返回相加的结果：<code>1</code>。</li>
+<li>继续调用 <em>nextPartialResult<em>，传入的参数为 <code>x</code>： 上一步的返回值，<code>y</code>：</em>numbers</em> 数组下一个元素，返回相加的结果。</li>
+<li><em>numbers</em> 数组遍历完毕后，将最后的结果最为返回值返回。</li>
+</ol>
+<p>如果 <em>numbers</em> 数组为空，则 <em>nextPartialResult</em> 不会执行，直接返回 <em>initialResult</em>。</p>
+<h3 id="reduce-into"><a href="#reduce-into" class="headerlink" title="reduce(into:_:)"></a><code>reduce(into:_:)</code></h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// - Parameters:</span></span><br><span class="line"><span class="comment">///   - initialResult: The value to use as the initial accumulating value.</span></span><br><span class="line"><span class="comment">///   - updateAccumulatingResult: A closure that updates the accumulating</span></span><br><span class="line"><span class="comment">///     value with an element of the sequence.</span></span><br><span class="line"><span class="comment">/// - Returns: The final accumulated value. If the sequence has no elements,</span></span><br><span class="line"><span class="comment">///   the result is `initialResult`.</span></span><br><span class="line"><span class="comment">///</span></span><br><span class="line"><span class="comment">/// - Complexity: O(*n*), where *n* is the length of the sequence.</span></span><br><span class="line">@inlinable <span class="keyword">public</span> <span class="function"><span class="keyword">func</span> <span class="title">reduce</span>&lt;Result&gt;<span class="params">(into initialResult: Result, <span class="number">_</span> updateAccumulatingResult: <span class="params">(<span class="keyword">inout</span> Result, Element)</span></span></span> <span class="keyword">throws</span> -&gt; ()) <span class="keyword">rethrows</span> -&gt; <span class="type">Result</span></span><br></pre></td></tr></table></figure>
+<p>以下面的代码为例，介绍<code>reduce(into:_:)</code>的执行流程。</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> letters = <span class="string">"abracadabra"</span></span><br><span class="line"><span class="keyword">let</span> letterCount = letters.<span class="built_in">reduce</span>(into: [:]) &#123; counts, letter <span class="keyword">in</span></span><br><span class="line">    counts[letter, <span class="keyword">default</span>: <span class="number">0</span>] += <span class="number">1</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// letterCount == ["a": 5, "b": 2, "r": 2, "c": 1, "d": 1]</span></span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>调用 <em>updateAccumulatingResult<em>，传入的参数为 <code>counts</code>： *initialResult</em>（<code>[:]</code>），<code>letter</code>：*letters</em> 数组第一个元素(<code>a</code>)，返回结果：<code>[a: 1]</code>。</li>
+<li>继续调用 <em>updateAccumulatingResult<em>，传入的参数为 <code>counts</code>： 上一步的返回值，<code>letter</code>：</em>letters</em> 数组下一个元素，返回结果。</li>
+<li><em>letters</em> 数组遍历完毕后，将最后的结果最为返回值返回。</li>
+</ol>
+<p>如果 <em>letters</em> 数组为空，则 <em>updateAccumulatingResult</em> 不会执行，直接返回 <em>initialResult</em>。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p> <code>reduce(_:_:)</code> 和  <code>reduce(into:_:)</code> 除了参数不一样外真没啥区别。不过从方法命名上看，我们也能大概猜到 <code>reduce(into:_:)</code> 会把归并结果会更新到 <em>initialResult</em> 中，而 <code>reduce(_:_:)</code> 会每次归并后会生成一份新的数据。这应该就是Swift官方推荐当返回结果为<code>Array</code>、<code>Dictionary</code>等 <em>Coy On Write</em> 类型的数据时，优先使用<code>reduce(into:_:)</code>的原因。</p>
+<blockquote>
+<p>This method(<code>reduce(into:_:)</code>) is preferred over <code>reduce(_:_:)</code> for efficiency when the result is a copy-on-write type, for example an Array or a Dictionary.</p>
+</blockquote>
+<h2 id="使用reduce实现map、filter等"><a href="#使用reduce实现map、filter等" class="headerlink" title="使用reduce实现map、filter等"></a>使用reduce实现map、filter等</h2><p>弄明白 <em>reduce</em> 的原理之后，大家可以发现这是一个很灵活的方法。基本上能用 <em>map<em>、</em>filter</em> 实现的功能都可以用 <em>reduce</em> 代替。 </p>
+<h3 id="使用reduce实现map"><a href="#使用reduce实现map" class="headerlink" title="使用reduce实现map"></a>使用reduce实现map</h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">extension</span> <span class="title">Array</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">func</span> <span class="title">mapUsingReduce</span>&lt;T&gt;<span class="params">(<span class="number">_</span> transform: <span class="params">(Element)</span></span></span> <span class="keyword">throws</span> -&gt; <span class="type">T</span>) <span class="keyword">rethrows</span> -&gt; [<span class="type">T</span>] &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">try</span> <span class="keyword">self</span>.<span class="built_in">reduce</span>(into: []) &#123; (result, element) <span class="keyword">in</span></span><br><span class="line">            result.append(<span class="keyword">try</span> transform(element))</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用reduce实现filter"><a href="#使用reduce实现filter" class="headerlink" title="使用reduce实现filter"></a>使用reduce实现filter</h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">extension</span> <span class="title">Array</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">func</span> <span class="title">mapUsingReduce</span>&lt;T&gt;<span class="params">(<span class="number">_</span> transform: <span class="params">(Element)</span></span></span> <span class="keyword">throws</span> -&gt; <span class="type">T</span>) <span class="keyword">rethrows</span> -&gt; [<span class="type">T</span>] &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">try</span> <span class="keyword">self</span>.<span class="built_in">reduce</span>(into: []) &#123; (result, element) <span class="keyword">in</span></span><br><span class="line">            result.append(<span class="keyword">try</span> transform(element))</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="http://blog.jerrychu.top/2020/12/05/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%A3%80%E6%B5%8B%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2279,7 +2384,7 @@ dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">20</span>
+          <span class="site-state-item-count">21</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
