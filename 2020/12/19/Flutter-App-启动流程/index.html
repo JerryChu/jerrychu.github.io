@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.jerrychu.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="本文为 Flutter 学习系列文章的第一篇，主要介绍 iOS APP 的启动流程的前绪部分，包括 iOS APP 工程的目录结构，Flutter Framework 的构建，以及 FlutterViewController 的创建等。  Flutter iOS Framework 源码地址： https:&#x2F;&#x2F;github.com&#x2F;flutter&#x2F;engine&#x2F;tree&#x2F;master&#x2F;shell&#x2F;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Flutter 系列之 iOS APP 构建流程（一）">
+<meta property="og:url" content="http://blog.jerrychu.top/2020/12/19/Flutter-App-%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B/index.html">
+<meta property="og:site_name" content="++">
+<meta property="og:description" content="本文为 Flutter 学习系列文章的第一篇，主要介绍 iOS APP 的启动流程的前绪部分，包括 iOS APP 工程的目录结构，Flutter Framework 的构建，以及 FlutterViewController 的创建等。  Flutter iOS Framework 源码地址： https:&#x2F;&#x2F;github.com&#x2F;flutter&#x2F;engine&#x2F;tree&#x2F;master&#x2F;shell&#x2F;">
+<meta property="article:published_time" content="2020-12-19T10:08:59.000Z">
+<meta property="article:modified_time" content="2020-12-19T13:45:18.903Z">
+<meta property="article:author" content="JerryChu">
+<meta property="article:tag" content="iOS">
+<meta property="article:tag" content="Flutter">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://blog.jerrychu.top/2020/12/19/Flutter-App-%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Flutter 系列之 iOS APP 构建流程（一） | ++</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">++</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="home                          //首页 fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="archive          //归档 fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="tags                     //标签 fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="user                   //关于 fa-fw"></i>About</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/jerrychu" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://blog.jerrychu.top/2020/12/19/Flutter-App-%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="JerryChu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="++">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Flutter 系列之 iOS APP 构建流程（一）
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-12-19 18:08:59 / Modified: 21:45:18" itemprop="dateCreated datePublished" datetime="2020-12-19T18:08:59+08:00">2020-12-19</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本文为 <strong>Flutter</strong> 学习系列文章的第一篇，主要介绍 iOS APP 的启动流程的前绪部分，包括 iOS APP 工程的目录结构，Flutter Framework 的构建，以及 <em>FlutterViewController</em> 的创建等。</p>
+<blockquote>
+<p>Flutter iOS Framework 源码地址： <a href="https://github.com/flutter/engine/tree/master/shell/platform/darwin/ios/framework/Source" target="_blank" rel="noopener">https://github.com/flutter/engine/tree/master/shell/platform/darwin/ios/framework/Source</a></p>
+</blockquote>
+<h2 id="工程目录"><a href="#工程目录" class="headerlink" title="工程目录"></a>工程目录</h2><p>安装并配置好 Flutter 之后，我们在命名行中执行 <code>flutter create myapp</code> 就能够创建一个 flutter 项目，包括 iOS 和 android 两个平台的代码。 代码目录结构如下： </p>
+<blockquote>
+<p>Flutter 的安装及配置参考 <a href="https://flutterchina.club/get-started/install/" target="_blank" rel="noopener">https://flutterchina.club/get-started/install/</a></p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">╰─○ ls -al myapp</span><br><span class="line">total 56</span><br><span class="line">drwxr-xr-x  14 chujiayi  staff   448 12 19 18:46 .</span><br><span class="line">drwxr-xr-x   8 chujiayi  staff   256 12 19 18:45 ..</span><br><span class="line">-rw-r--r--   1 chujiayi  staff  1491 12 19 18:45 .gitignore</span><br><span class="line">drwxr-xr-x   6 chujiayi  staff   192 12 19 18:45 .idea</span><br><span class="line">-rw-r--r--   1 chujiayi  staff   305 12 19 18:45 .metadata</span><br><span class="line">-rw-r--r--   1 chujiayi  staff  2477 12 19 18:46 .packages</span><br><span class="line">-rw-r--r--   1 chujiayi  staff   535 12 19 18:45 README.md</span><br><span class="line">drwxr-xr-x  11 chujiayi  staff   352 12 19 18:46 android</span><br><span class="line">drwxr-xr-x   6 chujiayi  staff   192 12 19 18:45 ios</span><br><span class="line">drwxr-xr-x   3 chujiayi  staff    96 12 19 18:45 lib</span><br><span class="line">-rw-r--r--   1 chujiayi  staff   896 12 19 18:45 myapp.iml</span><br><span class="line">-rw-r--r--   1 chujiayi  staff  3279 12 19 18:46 pubspec.lock</span><br><span class="line">-rw-r--r--   1 chujiayi  staff  2657 12 19 18:45 pubspec.yaml</span><br><span class="line">drwxr-xr-x   3 chujiayi  staff    96 12 19 18:45 test</span><br></pre></td></tr></table></figure>
+
+<p>其中主要有以下几个目录：</p>
+<ul>
+<li><em>ios</em> ：存放 iOS 平台的代码的目录</li>
+<li><em>android</em> ：存放 android 平台的代码的目录 </li>
+<li><em>lib</em>，存放 dart 代码的目录。</li>
+</ul>
+<p>继续看 <em>ios</em> 目录。该目录包含了运行 iOS APP 所需的代码，由 Flutter 自动生成。我们可以直接在 <code>Xcode</code> 中打开 <em>Runner.xcworkspace</em>，就能运行 APP 了。</p>
+<blockquote>
+<p>也可以直接在 <em>myapp</em> 目录执行 <code>flutter run ios</code> 。</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">╰─○ ls -al myapp/ios </span><br><span class="line">total 0</span><br><span class="line">drwxr-xr-x   6 chujiayi  staff  192 12 19 18:45 .</span><br><span class="line">drwxr-xr-x  14 chujiayi  staff  448 12 19 18:46 ..</span><br><span class="line">drwxr-xr-x   7 chujiayi  staff  224 12 19 18:46 Flutter</span><br><span class="line">drwxr-xr-x   9 chujiayi  staff  288 12 19 18:46 Runner</span><br><span class="line">drwxr-xr-x   5 chujiayi  staff  160 12 19 18:45 Runner.xcodeproj</span><br><span class="line">drwxr-xr-x   3 chujiayi  staff   96 12 19 18:45 Runner.xcworkspace</span><br></pre></td></tr></table></figure>
+
+<h2 id="Flutter动态库生成"><a href="#Flutter动态库生成" class="headerlink" title="Flutter动态库生成"></a>Flutter动态库生成</h2><p>打开 <code>Xcode</code> 之后，我们会发现在Xcode工程目录的 <em>Flutter</em> 子目录下有两个红色的文件， <em>App.framework</em> 和 <em>Flutter.framework</em> ，说明现在这两个 framework 并不存在。从命令行输出结果来看，也确实没有这两个文件。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">╰─○ ls -al myapp/ios/Flutter</span><br><span class="line">total 40</span><br><span class="line">drwxr-xr-x  7 chujiayi  staff  224 12 19 19:01 .</span><br><span class="line">drwxr-xr-x  6 chujiayi  staff  192 12 19 19:01 ..</span><br><span class="line">-rw-r--r--@ 1 chujiayi  staff  794  9 10  2019 AppFrameworkInfo.plist</span><br><span class="line">-rw-r--r--@ 1 chujiayi  staff   30  9 10  2019 Debug.xcconfig</span><br><span class="line">-rw-r--r--  1 chujiayi  staff  433 12 19 19:01 Generated.xcconfig</span><br><span class="line">-rw-r--r--@ 1 chujiayi  staff   30  9 10  2019 Release.xcconfig</span><br><span class="line">-rwxr-xr-x  1 chujiayi  staff  514 12 19 19:01 flutter_export_environment.sh</span><br></pre></td></tr></table></figure>
+
+<p>那么这两个 framework 是什么时候生成的呢？里面又包含了哪些东西呢？<br>先不用想这么多，我们不妨先尝试在 Xcode 中运行下项目，看看会不会有报错。    </p>
+<p>一运行，不仅没有任何报错，而且这两个 framework 竟然自动出现了！所以是我们点击运行时，XCode 自动生成了这来给你个 framework ？<br>我们再次查看Flutter目录，发现确实多了 <em>App.framework</em> 和 <em>Flutter.framework</em> 。 </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">╰─○ ls -al myapp/ios/Flutter</span><br><span class="line">total 40</span><br><span class="line">drwxr-xr-x  9 chujiayi  staff  288 12 19 20:18 .</span><br><span class="line">drwxr-xr-x  7 chujiayi  staff  224 12 19 20:25 ..</span><br><span class="line">drwxr-xr-x  5 chujiayi  staff  160 12 19 20:18 App.framework</span><br><span class="line">-rw-r--r--@ 1 chujiayi  staff  794  9 10  2019 AppFrameworkInfo.plist</span><br><span class="line">-rw-r--r--@ 1 chujiayi  staff   30  9 10  2019 Debug.xcconfig</span><br><span class="line">drwxr-xr-x@ 8 chujiayi  staff  256 12 19 20:18 Flutter.framework</span><br><span class="line">-rw-r--r--  1 chujiayi  staff  433 12 19 19:01 Generated.xcconfig</span><br><span class="line">-rw-r--r--@ 1 chujiayi  staff   30  9 10  2019 Release.xcconfig</span><br><span class="line">-rwxr-xr-x  1 chujiayi  staff  514 12 19 19:01 flutter_export_environment.sh</span><br></pre></td></tr></table></figure>
+
+<p>其实很容易想到，一定是最开始执行 <code>flutter create myapp</code> 时，我们的 iOS 工程被做了手脚。<br>哪里最有可能被做手脚呢？一定是 <strong>Build Phase</strong> 中添加了自定义的 <strong>Run Script</strong> 。  </p>
+<p>果不其然，我们在 Xcode 中找到了“罪魁祸首” – 一个特殊的 <strong>Run Script</strong> 。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/bin/sh "$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh" build</span><br></pre></td></tr></table></figure>
+
+<p>这个脚本存在于 Flutter 的安装目录下。代码有点多，我们挑重点部分来看：</p>
+<blockquote>
+<p>脚本完整代码可查看 <a href="https://github.com/flutter/flutter/blob/master/packages/flutter_tools/bin/xcode_backend.sh" target="_blank" rel="noopener">https://github.com/flutter/flutter/blob/master/packages/flutter_tools/bin/xcode_backend.sh</a></p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> Adds the App.framework as an embedded binary and the flutter_assets as</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> resources.</span></span><br><span class="line">EmbedFlutterFrameworks() &#123;</span><br><span class="line"><span class="meta">  #</span><span class="bash"> Embed App.framework from Flutter into the app (after creating the Frameworks directory</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> <span class="keyword">if</span> it doesn<span class="string">'t already exist).</span></span></span><br><span class="line">  local xcode_frameworks_dir="$&#123;TARGET_BUILD_DIR&#125;/$&#123;FRAMEWORKS_FOLDER_PATH&#125;"</span><br><span class="line">  RunCommand mkdir -p -- "$&#123;xcode_frameworks_dir&#125;"</span><br><span class="line">  RunCommand rsync -av --delete --filter "- .DS_Store/" "$&#123;BUILT_PRODUCTS_DIR&#125;/App.framework" "$&#123;xcode_frameworks_dir&#125;"</span><br><span class="line"></span><br><span class="line"><span class="meta">  #</span><span class="bash"> Embed the actual Flutter.framework that the Flutter app expects to run against,</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> <span class="built_in">which</span> could be a <span class="built_in">local</span> build or an arch/<span class="built_in">type</span> specific build.</span></span><br><span class="line"></span><br><span class="line"><span class="meta">  #</span><span class="bash"> Copy Xcode behavior and don<span class="string">'t copy over headers or modules.</span></span></span><br><span class="line">  RunCommand rsync -av --delete --filter "- .DS_Store/" --filter "- Headers/" --filter "- Modules/" "$&#123;BUILT_PRODUCTS_DIR&#125;/Flutter.framework" "$&#123;xcode_frameworks_dir&#125;/"</span><br><span class="line">  if [[ "$ACTION" != "install" || "$ENABLE_BITCODE" == "NO" ]]; then</span><br><span class="line">    # Strip bitcode from the destination unless archiving, or if bitcode is disabled entirely.</span><br><span class="line">    RunCommand "$&#123;DT_TOOLCHAIN_DIR&#125;"/usr/bin/bitcode_strip "$&#123;BUILT_PRODUCTS_DIR&#125;/Flutter.framework/Flutter" -r -o "$&#123;xcode_frameworks_dir&#125;/Flutter.framework/Flutter"</span><br><span class="line">  fi</span><br><span class="line"></span><br><span class="line"><span class="meta">  #</span><span class="bash"> Sign the binaries we moved.</span></span><br><span class="line">  if [[ -n "$&#123;EXPANDED_CODE_SIGN_IDENTITY:-&#125;" ]]; then</span><br><span class="line">    RunCommand codesign --force --verbose --sign "$&#123;EXPANDED_CODE_SIGN_IDENTITY&#125;" -- "$&#123;xcode_frameworks_dir&#125;/App.framework/App"</span><br><span class="line">    RunCommand codesign --force --verbose --sign "$&#123;EXPANDED_CODE_SIGN_IDENTITY&#125;" -- "$&#123;xcode_frameworks_dir&#125;/Flutter.framework/Flutter"</span><br><span class="line">  fi</span><br><span class="line"></span><br><span class="line">  AddObservatoryBonjourService</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面这部分的代码注释已经很清晰了，主要就是生成 <strong>App.framework</strong> 和 <strong>Flutter.framework</strong> 并放置到对应目录下。 生成工程项目的时候，Xcode 中已经引用了这两个 framework ，只不过当时它们还不存在；一执行编译，这两个 framework 就会自动生成，也就不会有任何报错了。  </p>
+<p>其中，<strong>Flutter.framework</strong> 为 <code>Flutter Engine</code> 部分的代码，由 C++ 编译而成。 <strong>App.framework</strong> 包含了 Dart 代码，包括 <em>lib</em> 目录下的 <em>main.dart</em> 等（在非 Debug 模式下包含的是 dart AOT 编译后的产物）。</p>
+<p>这两个库都是动态库，我们可以直接通过 <code>file</code> 命令进行验证。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">╰─○ file myapp/ios/Flutter/App.framework/App </span><br><span class="line">myapp/ios/Flutter/App.framework/App: Mach-O 64-bit dynamically linked shared library x86_64</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>总结：Flutter 项目会额外引入两个动态库，包含 Flutter Engine 和 Dart代码 等。</p>
+</blockquote>
+<h2 id="Flutter动态库加载"><a href="#Flutter动态库加载" class="headerlink" title="Flutter动态库加载"></a>Flutter动态库加载</h2><p>在执行 <code>flutter create myapp</code> 创建项目时，Flutter 就会在 Xcode 工程文件中添加这两个 framework 的引用。在 ** Xcode Build Phase** 的 <strong>Link Binary with Libraries</strong> 和 <strong>Embed Frameworks</strong> 中，我们都能看到这两个库的存在。  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;* Begin PBXFrameworksBuildPhase section *&#x2F;</span><br><span class="line">		97C146EB1CF9000F007C117D &#x2F;* Frameworks *&#x2F; &#x3D; &#123;</span><br><span class="line">			isa &#x3D; PBXFrameworksBuildPhase;</span><br><span class="line">			buildActionMask &#x3D; 2147483647;</span><br><span class="line">			files &#x3D; (</span><br><span class="line">				9705A1C61CF904A100538489 &#x2F;* Flutter.framework in Frameworks *&#x2F;,</span><br><span class="line">				3B80C3941E831B6300D905FE &#x2F;* App.framework in Frameworks *&#x2F;,</span><br><span class="line">			);</span><br><span class="line">			runOnlyForDeploymentPostprocessing &#x3D; 0;</span><br><span class="line">		&#125;;</span><br><span class="line">&#x2F;* End PBXFrameworksBuildPhase section *&#x2F;</span><br></pre></td></tr></table></figure>
+
+<p>因此，在 APP 的启动阶段，这两个动态库就会被自动加载。</p>
+<h2 id="APP-生命周期处理"><a href="#APP-生命周期处理" class="headerlink" title="APP 生命周期处理"></a>APP 生命周期处理</h2><p>继续观察之前创建好的项目，其实基本没有什么代码，主要就有一个 <em>AppDelegate</em> 类，继承自  <em>FlutterAppDelegate</em> 。</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@UIApplicationMain</span></span><br><span class="line"><span class="meta">@objc</span> <span class="class"><span class="keyword">class</span> <span class="title">AppDelegate</span>: <span class="title">FlutterAppDelegate</span> </span>&#123;</span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">func</span> <span class="title">application</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="number">_</span> application: UIApplication,</span></span></span><br><span class="line"><span class="function"><span class="params">    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: <span class="keyword">Any</span>]?</span></span></span><br><span class="line"><span class="function"><span class="params">  )</span></span> -&gt; <span class="type">Bool</span> &#123;</span><br><span class="line">    <span class="type">GeneratedPluginRegistrant</span>.register(with: <span class="keyword">self</span>)</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">super</span>.application(application, didFinishLaunchingWithOptions: launchOptions)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><em>FlutterAppDelegate</em> 类在 <strong>Flutter.framework</strong> 中定义。 <em>FlutterAppDelegate</em> 又继续将生命周期回调派发给各个 <em>FlutterPluginAppLifeCycleDelegate</em>，以便各个 Plugin 处理 APP 生命周期回调事件。</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="built_in">BOOL</span>)application:(<span class="built_in">UIApplication</span>*)application</span><br><span class="line">    didFinishLaunchingWithOptions:(<span class="built_in">NSDictionary</span>*)launchOptions &#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="built_in">NSObject</span>&lt;FlutterApplicationLifeCycleDelegate&gt;* delegate <span class="keyword">in</span> [_delegates allObjects]) &#123;</span><br><span class="line">    <span class="keyword">if</span> (!delegate) &#123;</span><br><span class="line">      <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> ([delegate respondsToSelector:_cmd]) &#123;</span><br><span class="line">      <span class="keyword">if</span> (![delegate application:application didFinishLaunchingWithOptions:launchOptions]) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NO</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">YES</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="FlutterViewController-和-FlutterView"><a href="#FlutterViewController-和-FlutterView" class="headerlink" title="FlutterViewController 和 FlutterView"></a>FlutterViewController 和 FlutterView</h2><p><em>FlutterAppDelegate</em> 类似乎并没有做什么其他事情，那 Flutter 的页面是怎么展示到屏幕上的呢？<br>如果我们去看 APP 的页面层级的话，会发现最顶层为一个 <em>FlutterViewController</em> ，其 <em>view</em> 为 <em>FlutterView</em> 。</p>
+<p>Flutter 创建的 APP 默认使用了 storyboard ，并在 storyboard 中将 <em>rootViewController</em> 设置为 <em>FlutterViewController</em> 。 <em>FlutterViewController</em> 及 <em>FlutterView</em> 就承载了具体的 Flutter 页面。</p>
+<p><em>FlutterViewController</em> 有两个新增的 <em>designated initializer</em>，其中默认调用的是 <code>initWithProject:nibName:bundle:</code>。  </p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">FlutterViewController</span> : <span class="title">UIViewController</span> &lt;<span class="title">FlutterTextureRegistry</span>, <span class="title">FlutterPluginRegistry</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Initializes this FlutterViewController with the specified `FlutterEngine`.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * The initialized viewcontroller will attach itself to the engine as part of this process.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @param engine The `FlutterEngine` instance to attach to.</span></span><br><span class="line"><span class="comment"> * @param nibNameOrNil The NIB name to initialize this UIViewController with.</span></span><br><span class="line"><span class="comment"> * @param nibBundleOrNil The NIB bundle.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">- (<span class="keyword">instancetype</span>)initWithEngine:(FlutterEngine*)engine</span><br><span class="line">                       nibName:(<span class="built_in">NSString</span>*)nibNameOrNil</span><br><span class="line">                        bundle:(<span class="built_in">NSBundle</span>*)nibBundleOrNil <span class="built_in">NS_DESIGNATED_INITIALIZER</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Initializes a new FlutterViewController and `FlutterEngine` with the specified</span></span><br><span class="line"><span class="comment"> * `FlutterDartProject`.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @param projectOrNil The `FlutterDartProject` to initialize the `FlutterEngine` with.</span></span><br><span class="line"><span class="comment"> * @param nibNameOrNil The NIB name to initialize this UIViewController with.</span></span><br><span class="line"><span class="comment"> * @param nibBundleOrNil The NIB bundle.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">- (<span class="keyword">instancetype</span>)initWithProject:(FlutterDartProject*)projectOrNil</span><br><span class="line">                        nibName:(<span class="built_in">NSString</span>*)nibNameOrNil</span><br><span class="line">                         bundle:(<span class="built_in">NSBundle</span>*)nibBundleOrNil <span class="built_in">NS_DESIGNATED_INITIALIZER</span>;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">instancetype</span>)initWithNibName:(<span class="built_in">NSString</span>*)nibNameOrNil bundle:(<span class="built_in">NSBundle</span>*)nibBundleOrNil &#123;</span><br><span class="line">  <span class="keyword">return</span> [<span class="keyword">self</span> initWithProject:<span class="literal">nil</span> nibName:<span class="literal">nil</span> bundle:<span class="literal">nil</span>];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们注意到，另一个初始化方法 <code>initWithEngine:nibName:bundle:</code> 支持传入一个 <em>FlutterEngine</em> 参数，这样就能够实现 <em>FlutterEngine</em> 的复用。但是要注意，同一时刻一个 <em>FlutterEngine</em> 最多只能绑定到一个  <em>FlutterViewController</em> 上，否则调用该初始化方法时就会直接报错。</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">instancetype</span>)initWithEngine:(FlutterEngine*)engine</span><br><span class="line">                       nibName:(<span class="keyword">nullable</span> <span class="built_in">NSString</span>*)nibName</span><br><span class="line">                        bundle:(<span class="keyword">nullable</span> <span class="built_in">NSBundle</span>*)nibBundle &#123;</span><br><span class="line">  <span class="built_in">NSAssert</span>(engine != <span class="literal">nil</span>, <span class="string">@"Engine is required"</span>);</span><br><span class="line">  <span class="keyword">self</span> = [<span class="keyword">super</span> initWithNibName:nibName bundle:nibBundle];</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">self</span>) &#123;</span><br><span class="line">    _viewOpaque = <span class="literal">YES</span>;</span><br><span class="line">    <span class="keyword">if</span> (engine.viewController) &#123;</span><br><span class="line">      FML_LOG(ERROR) &lt;&lt; <span class="string">"The supplied FlutterEngine "</span> &lt;&lt; [[engine description] UTF8String]</span><br><span class="line">                     &lt;&lt; <span class="string">" is already used with FlutterViewController instance "</span></span><br><span class="line">                     &lt;&lt; [[engine.viewController description] UTF8String]</span><br><span class="line">                     &lt;&lt; <span class="string">". One instance of the FlutterEngine can only be attached to one "</span></span><br><span class="line">                        <span class="string">"FlutterViewController at a time. Set FlutterEngine.viewController "</span></span><br><span class="line">                        <span class="string">"to nil before attaching it to another FlutterViewController."</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 此处省略 ...</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">self</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>文本主要介绍了 Flutter APP 工程目录、iOS Framework 的生成以及 <em>FlutterViewController</em> 的基本代码等，大家应该对  Flutter iOS APP 的构建流程有了基本的了解。  </p>
+<p>当然我们也遗留了很多问题还没解释清楚，比如 Flutter 页面最终是如何渲染到屏幕上的？ Flutter Engine 的作用是什么？ iOS 与 android 的启动流程有什么区别？ 这些问题都留待后续文章继续探讨。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://flutter.dev/docs/development/add-to-app/ios/project-setup" target="_blank" rel="noopener">https://flutter.dev/docs/development/add-to-app/ios/project-setup</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/iOS/" rel="tag"># iOS</a>
+              <a href="/tags/Flutter/" rel="tag"># Flutter</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/12/13/Swift%E4%B8%AD%E7%9A%84reduce%E6%96%B9%E6%B3%95/" rel="prev" title="Swift中的reduce方法">
+      <i class="fa fa-chevron-left"></i> Swift中的reduce方法
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#工程目录"><span class="nav-number">1.</span> <span class="nav-text">工程目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Flutter动态库生成"><span class="nav-number">2.</span> <span class="nav-text">Flutter动态库生成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Flutter动态库加载"><span class="nav-number">3.</span> <span class="nav-text">Flutter动态库加载</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#APP-生命周期处理"><span class="nav-number">4.</span> <span class="nav-text">APP 生命周期处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#FlutterViewController-和-FlutterView"><span class="nav-number">5.</span> <span class="nav-text">FlutterViewController 和 FlutterView</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">7.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">JerryChu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">22</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">JerryChu</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
