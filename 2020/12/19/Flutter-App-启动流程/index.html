@@ -27,7 +27,7 @@
 <meta property="og:site_name" content="++">
 <meta property="og:description" content="本文为 Flutter 学习系列文章的第一篇，主要介绍 iOS APP 的启动流程的前绪部分，包括 iOS APP 工程的目录结构，Flutter Framework 的构建，以及 FlutterViewController 的创建等。  Flutter iOS Framework 源码地址： https:&#x2F;&#x2F;github.com&#x2F;flutter&#x2F;engine&#x2F;tree&#x2F;master&#x2F;shell&#x2F;">
 <meta property="article:published_time" content="2020-12-19T10:08:59.000Z">
-<meta property="article:modified_time" content="2020-12-19T13:45:18.903Z">
+<meta property="article:modified_time" content="2020-12-26T07:32:20.912Z">
 <meta property="article:author" content="JerryChu">
 <meta property="article:tag" content="iOS">
 <meta property="article:tag" content="Flutter">
@@ -185,10 +185,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2020-12-19 18:08:59 / Modified: 21:45:18" itemprop="dateCreated datePublished" datetime="2020-12-19T18:08:59+08:00">2020-12-19</time>
+              <time title="Created: 2020-12-19 18:08:59" itemprop="dateCreated datePublished" datetime="2020-12-19T18:08:59+08:00">2020-12-19</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-12-26 15:32:20" itemprop="dateModified" datetime="2020-12-26T15:32:20+08:00">2020-12-26</time>
+              </span>
 
           
 
@@ -241,12 +247,12 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> Adds the App.framework as an embedded binary and the flutter_assets as</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> resources.</span></span><br><span class="line">EmbedFlutterFrameworks() &#123;</span><br><span class="line"><span class="meta">  #</span><span class="bash"> Embed App.framework from Flutter into the app (after creating the Frameworks directory</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> <span class="keyword">if</span> it doesn<span class="string">'t already exist).</span></span></span><br><span class="line">  local xcode_frameworks_dir="$&#123;TARGET_BUILD_DIR&#125;/$&#123;FRAMEWORKS_FOLDER_PATH&#125;"</span><br><span class="line">  RunCommand mkdir -p -- "$&#123;xcode_frameworks_dir&#125;"</span><br><span class="line">  RunCommand rsync -av --delete --filter "- .DS_Store/" "$&#123;BUILT_PRODUCTS_DIR&#125;/App.framework" "$&#123;xcode_frameworks_dir&#125;"</span><br><span class="line"></span><br><span class="line"><span class="meta">  #</span><span class="bash"> Embed the actual Flutter.framework that the Flutter app expects to run against,</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> <span class="built_in">which</span> could be a <span class="built_in">local</span> build or an arch/<span class="built_in">type</span> specific build.</span></span><br><span class="line"></span><br><span class="line"><span class="meta">  #</span><span class="bash"> Copy Xcode behavior and don<span class="string">'t copy over headers or modules.</span></span></span><br><span class="line">  RunCommand rsync -av --delete --filter "- .DS_Store/" --filter "- Headers/" --filter "- Modules/" "$&#123;BUILT_PRODUCTS_DIR&#125;/Flutter.framework" "$&#123;xcode_frameworks_dir&#125;/"</span><br><span class="line">  if [[ "$ACTION" != "install" || "$ENABLE_BITCODE" == "NO" ]]; then</span><br><span class="line">    # Strip bitcode from the destination unless archiving, or if bitcode is disabled entirely.</span><br><span class="line">    RunCommand "$&#123;DT_TOOLCHAIN_DIR&#125;"/usr/bin/bitcode_strip "$&#123;BUILT_PRODUCTS_DIR&#125;/Flutter.framework/Flutter" -r -o "$&#123;xcode_frameworks_dir&#125;/Flutter.framework/Flutter"</span><br><span class="line">  fi</span><br><span class="line"></span><br><span class="line"><span class="meta">  #</span><span class="bash"> Sign the binaries we moved.</span></span><br><span class="line">  if [[ -n "$&#123;EXPANDED_CODE_SIGN_IDENTITY:-&#125;" ]]; then</span><br><span class="line">    RunCommand codesign --force --verbose --sign "$&#123;EXPANDED_CODE_SIGN_IDENTITY&#125;" -- "$&#123;xcode_frameworks_dir&#125;/App.framework/App"</span><br><span class="line">    RunCommand codesign --force --verbose --sign "$&#123;EXPANDED_CODE_SIGN_IDENTITY&#125;" -- "$&#123;xcode_frameworks_dir&#125;/Flutter.framework/Flutter"</span><br><span class="line">  fi</span><br><span class="line"></span><br><span class="line">  AddObservatoryBonjourService</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>上面这部分的代码注释已经很清晰了，主要就是生成 <strong>App.framework</strong> 和 <strong>Flutter.framework</strong> 并放置到对应目录下。 生成工程项目的时候，Xcode 中已经引用了这两个 framework ，只不过当时它们还不存在；一执行编译，这两个 framework 就会自动生成，也就不会有任何报错了。  </p>
-<p>其中，<strong>Flutter.framework</strong> 为 <code>Flutter Engine</code> 部分的代码，由 C++ 编译而成。 <strong>App.framework</strong> 包含了 Dart 代码，包括 <em>lib</em> 目录下的 <em>main.dart</em> 等（在非 Debug 模式下包含的是 dart AOT 编译后的产物）。</p>
+<p>其中，<strong>Flutter.framework</strong> 为 <code>Flutter Engine</code> 部分的代码，由 C++ 编译而成。 <strong>App.framework</strong> （在Release模式下）包含了 dart AOT 编译后的产物）。</p>
 <p>这两个库都是动态库，我们可以直接通过 <code>file</code> 命令进行验证。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">╰─○ file myapp/ios/Flutter/App.framework/App </span><br><span class="line">myapp/ios/Flutter/App.framework/App: Mach-O 64-bit dynamically linked shared library x86_64</span><br></pre></td></tr></table></figure>
 
 <blockquote>
-<p>总结：Flutter 项目会额外引入两个动态库，包含 Flutter Engine 和 Dart代码 等。</p>
+<p>总结：Flutter 项目会额外引入两个动态库，包含 Flutter Engine 和 Dart 代码 等。</p>
 </blockquote>
 <h2 id="Flutter动态库加载"><a href="#Flutter动态库加载" class="headerlink" title="Flutter动态库加载"></a>Flutter动态库加载</h2><p>在执行 <code>flutter create myapp</code> 创建项目时，Flutter 就会在 Xcode 工程文件中添加这两个 framework 的引用。在 ** Xcode Build Phase** 的 <strong>Link Binary with Libraries</strong> 和 <strong>Embed Frameworks</strong> 中，我们都能看到这两个库的存在。  </p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;* Begin PBXFrameworksBuildPhase section *&#x2F;</span><br><span class="line">		97C146EB1CF9000F007C117D &#x2F;* Frameworks *&#x2F; &#x3D; &#123;</span><br><span class="line">			isa &#x3D; PBXFrameworksBuildPhase;</span><br><span class="line">			buildActionMask &#x3D; 2147483647;</span><br><span class="line">			files &#x3D; (</span><br><span class="line">				9705A1C61CF904A100538489 &#x2F;* Flutter.framework in Frameworks *&#x2F;,</span><br><span class="line">				3B80C3941E831B6300D905FE &#x2F;* App.framework in Frameworks *&#x2F;,</span><br><span class="line">			);</span><br><span class="line">			runOnlyForDeploymentPostprocessing &#x3D; 0;</span><br><span class="line">		&#125;;</span><br><span class="line">&#x2F;* End PBXFrameworksBuildPhase section *&#x2F;</span><br></pre></td></tr></table></figure>
@@ -295,7 +301,10 @@
     <a href="/2020/12/13/Swift%E4%B8%AD%E7%9A%84reduce%E6%96%B9%E6%B3%95/" rel="prev" title="Swift中的reduce方法">
       <i class="fa fa-chevron-left"></i> Swift中的reduce方法
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2020/12/26/Flutter-App-%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B2/" rel="next" title="Flutter 系列之 iOS APP 构建流程（二）">
+      Flutter 系列之 iOS APP 构建流程（二） <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -368,7 +377,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">22</span>
+          <span class="site-state-item-count">23</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
