@@ -179,10 +179,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2021-01-10 15:10:29 / Modified: 16:31:48" itemprop="dateCreated datePublished" datetime="2021-01-10T15:10:29+08:00">2021-01-10</time>
+              <time title="Created: 2021-01-10 15:10:29" itemprop="dateCreated datePublished" datetime="2021-01-10T15:10:29+08:00">2021-01-10</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-16 18:12:28" itemprop="dateModified" datetime="2021-01-16T18:12:28+08:00">2021-01-16</time>
+              </span>
 
           
 
@@ -274,6 +280,128 @@
 <p>怎么hook呢？ <em>objc_setAssociatedObject</em> 为C方法，只能派 <a href="https://github.com/facebook/fishhook" target="_blank" rel="noopener">fishhook</a> 上场了。  </p>
 <p>FBRetainCycleDetector 中对应的源码为：</p>
 <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// FBAssociationManager.m</span></span><br><span class="line">+ (<span class="keyword">void</span>)hook</span><br><span class="line">&#123;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> _INTERNAL_RCD_ENABLED</span></span><br><span class="line">  std::lock_guard&lt;std::mutex&gt; l(*FB::AssociationManager::hookMutex);</span><br><span class="line">  rcd_rebind_symbols((<span class="keyword">struct</span> rcd_rebinding[<span class="number">2</span>])&#123;</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="string">"objc_setAssociatedObject"</span>,</span><br><span class="line">      (<span class="keyword">void</span> *)FB::AssociationManager::fb_objc_setAssociatedObject,</span><br><span class="line">      (<span class="keyword">void</span> **)&amp;FB::AssociationManager::fb_orig_objc_setAssociatedObject</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="string">"objc_removeAssociatedObjects"</span>,</span><br><span class="line">      (<span class="keyword">void</span> *)FB::AssociationManager::fb_objc_removeAssociatedObjects,</span><br><span class="line">      (<span class="keyword">void</span> **)&amp;FB::AssociationManager::fb_orig_objc_removeAssociatedObjects</span><br><span class="line">    &#125;&#125;, <span class="number">2</span>);</span><br><span class="line">  FB::AssociationManager::hookTaken = <span class="literal">true</span>;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span> <span class="comment">//_INTERNAL_RCD_ENABLED</span></span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>FBRetainCycleDetector 将OC对象划分为3类，分别为：</p>
+<ul>
+<li>FBObjectiveCObject</li>
+<li>FBObjectiveCNSCFTimer</li>
+<li>FBObjectiveCBlock</li>
+</ul>
+<p>本文通过研究 <code>FBObjectiveCObject</code> 的源码，介绍如何获取 <code>NSObject</code> 的所有强引用对象；<br>接下来的文章会继续研究 <code>FBObjectiveCNSCFTimer</code> 和 <code>FBObjectiveCBlock</code> 的源码，介绍如何获取 <code>NSTimer</code> 和 <code>Block</code> 的所有强引用对象。  </p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://blog.jerrychu.top/2021/01/10/%E8%8E%B7%E5%8F%96OC%E5%AF%B9%E8%B1%A1%E7%9A%84%E6%89%80%E6%9C%89%E5%BC%BA%E5%BC%95%E7%94%A8%E5%AF%B9%E8%B1%A12/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="JerryChu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="++">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/01/10/%E8%8E%B7%E5%8F%96OC%E5%AF%B9%E8%B1%A1%E7%9A%84%E6%89%80%E6%9C%89%E5%BC%BA%E5%BC%95%E7%94%A8%E5%AF%B9%E8%B1%A12/" class="post-title-link" itemprop="url">获取OC对象的所有强引用对象（二）</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-01-10 15:10:29" itemprop="dateCreated datePublished" datetime="2021-01-10T15:10:29+08:00">2021-01-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-16 18:13:16" itemprop="dateModified" datetime="2021-01-16T18:13:16+08:00">2021-01-16</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><a href="https://blog.jerrychu.top/2021/01/10/%E8%8E%B7%E5%8F%96OC%E5%AF%B9%E8%B1%A1%E7%9A%84%E6%89%80%E6%9C%89%E5%BC%BA%E5%BC%95%E7%94%A8%E5%AF%B9%E8%B1%A1/">上一篇文章</a> 介绍了如何获取普通OC对象（<code>FBObjectiveCObject</code>）的所有强引用对象。本文继续介绍如何获取一种特殊OC对象 – <code>NSTimer</code> 的所有强引用对象。</p>
+<p>在 <a href="https://github.com/facebook/FBRetainCycleDetector" target="_blank" rel="noopener">FBRetainCycleDetector</a> 的源码中，<code>NSTimer</code> 对应的类为 <code>FBObjectiveCNSCFTimer</code>。</p>
+<blockquote>
+<p>FBRetainCycleDetector 源码地址： <a href="https://github.com/facebook/FBRetainCycleDetector" target="_blank" rel="noopener">https://github.com/facebook/FBRetainCycleDetector</a></p>
+</blockquote>
+<h2 id="NSTimer对象"><a href="#NSTimer对象" class="headerlink" title="NSTimer对象"></a>NSTimer对象</h2><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> Specialization of FBObjectiveCObject for NSTimer.</span></span><br><span class="line"><span class="comment"> Standard methods that FBObjectiveCObject uses will not fetch us all objects retained by NSTimer.</span></span><br><span class="line"><span class="comment"> One good example is target of NSTimer.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">FBObjectiveCNSCFTimer</span> : <span class="title">FBObjectiveCObject</span></span></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<p>从类声明中可以看到，<code>FBObjectiveCNSCFTimer</code> 继承自上一篇文章提到的普通OC对象 <code>FBObjectiveCObject</code> ，这也很好理解，在 Foundation 框架中，<code>NSTimer</code> 也是继承自 <code>NSObject</code> 的。</p>
+<p>关于 <code>NSTimer</code> ，相信大家都知道它会强引用 <em>target</em> 。但是 <code>NSTimer</code> 并没有提供获取 <em>target</em> 的方法，我们该如何在运行时获取其引用的具体 <em>target</em> 对象呢？</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">+ (<span class="built_in">NSTimer</span> *)timerWithTimeInterval:(<span class="built_in">NSTimeInterval</span>)ti target:(<span class="keyword">id</span>)aTarget selector:(SEL)aSelector userInfo:(<span class="keyword">nullable</span> <span class="keyword">id</span>)userInfo repeats:(<span class="built_in">BOOL</span>)yesOrNo;</span><br><span class="line"></span><br><span class="line">+ (<span class="built_in">NSTimer</span> *)scheduledTimerWithTimeInterval:(<span class="built_in">NSTimeInterval</span>)ti target:(<span class="keyword">id</span>)aTarget selector:(SEL)aSelector userInfo:(<span class="keyword">nullable</span> <span class="keyword">id</span>)userInfo repeats:(<span class="built_in">BOOL</span>)yesOrNo;</span><br></pre></td></tr></table></figure>
+
+<h2 id="获取-target"><a href="#获取-target" class="headerlink" title="获取 target"></a>获取 <em>target</em></h2><p><code>NSTimer</code> 没有直接提供获取 <em>target</em> 的方法，但是我们可以通过 <code>CFRunloop</code> 曲线救国。<br><em>CFRunloop.h</em> 中提供了一个获取 <code>NSTimer</code> 执行上下文的方法。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">CF_EXPORT</span> <span class="keyword">void</span> <span class="built_in">CFRunLoopObserverGetContext</span>(<span class="built_in">CFRunLoopObserverRef</span> observer, <span class="built_in">CFRunLoopObserverContext</span> *context);</span><br></pre></td></tr></table></figure>
+
+<h3 id="CFRunLoopTimerContext-结构体"><a href="#CFRunLoopTimerContext-结构体" class="headerlink" title="CFRunLoopTimerContext 结构体"></a>CFRunLoopTimerContext 结构体</h3><p>通过上下文（ <em>context</em> ）我们能获取哪些信息呢？继续看 <code>CFRunLoopObserverContext</code> 的定义。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> &#123;</span><br><span class="line">    <span class="built_in">CFIndex</span>	version;</span><br><span class="line">    <span class="keyword">void</span> *	info;</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">void</span> *(*<span class="keyword">retain</span>)(<span class="keyword">const</span> <span class="keyword">void</span> *info);</span><br><span class="line">    <span class="keyword">void</span>	(*release)(<span class="keyword">const</span> <span class="keyword">void</span> *info);</span><br><span class="line">    <span class="built_in">CFStringRef</span>	(*copyDescription)(<span class="keyword">const</span> <span class="keyword">void</span> *info);</span><br><span class="line">&#125; <span class="built_in">CFRunLoopTimerContext</span>;</span><br></pre></td></tr></table></figure>
+
+<p>初步看起来好像并没有什么可用的信息。我们来挨个字段研究下。</p>
+<ul>
+<li><em>version</em> 没啥可说的，就是个版本标识。 </li>
+<li><em>info</em> 是一个隐藏了具体类型的指针，按苹果的代码风格，估计里面藏了什么秘密！这个 <em>info</em> 字段就是下面的 <em>retain</em> 、 <em>release</em> 、 <em>copyDescription</em> 字段中的参数。</li>
+<li><em>retain</em> 是一个函数指针，用于对 <em>info</em> 执行 retain 操作。</li>
+<li><em>relase</em> 是一个函数指针，用于对 <em>info</em> 执行 release 操作。</li>
+<li><em>copyDescription</em> 是一个函数指针，用于生成一个字符串描述。</li>
+</ul>
+<p><em>version</em> 和其他几个函数指针没什么提供不了什么有效信息，我们还是得从 <em>info</em> 字段入手。<br>先看下 <em>info</em> 字段的文档。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">An arbitrary pointer to program-defined data, which can be associated with the message port at creation time. This pointer is passed to all the callbacks defined in the context.</span><br></pre></td></tr></table></figure>
+
+<p>能看出 <em>info</em> 字段里确实存储着程序设置进去的数据，但是还是没说具体类型！OC Runtime 代码也没有找到蛛丝马迹。只能直接相信 FBRetainCycleDetector 的源码了。</p>
+<h3 id="FBNSCFTimerInfoStruct-结构体"><a href="#FBNSCFTimerInfoStruct-结构体" class="headerlink" title="_FBNSCFTimerInfoStruct 结构体"></a>_FBNSCFTimerInfoStruct 结构体</h3><p>FBRetainCycleDetector 源码里把 <em>info</em> 定义为如下的结构体。（<br>不知道 FBRetainCycleDetector 是从哪里获取的信息，可能是 猜测 + 运行时验证 得到的吧。）</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> &#123;</span><br><span class="line">  <span class="keyword">long</span> _unknown; <span class="comment">// This is always 1</span></span><br><span class="line">  <span class="keyword">id</span> target;</span><br><span class="line">  SEL selector;</span><br><span class="line">  <span class="built_in">NSDictionary</span> *userInfo;</span><br><span class="line">&#125; _FBNSCFTimerInfoStruct;</span><br></pre></td></tr></table></figure>
+
+<p>经过一番折腾，终于能拿到具体的 <em>target</em> 了！</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">_FBNSCFTimerInfoStruct infoStruct = *(_FBNSCFTimerInfoStruct *)(context.info);</span><br><span class="line"><span class="keyword">if</span> (infoStruct.target) &#123;</span><br><span class="line">  FBObjectiveCGraphElement *element = FBWrapObjectGraphElementWithContext(<span class="keyword">self</span>, infoStruct.target, <span class="keyword">self</span>.configuration, @[<span class="string">@"target"</span>]);</span><br><span class="line">  <span class="keyword">if</span> (element) &#123;</span><br><span class="line">    [retained addObject:element];</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="获取-userInfo"><a href="#获取-userInfo" class="headerlink" title="获取 userInfo"></a>获取 <em>userInfo</em></h2><p>除了 <em>target</em> 之外，还有一个字段被我们忽略了 – <em>userInfo</em> 字段。<code>NSTimer</code> 不仅会持有 <em>target</em> ，同时也会持有 <em>userInfo</em> 对象。<br>所以，我们要把 <em>userInfo</em> 也加入到被引用对象列表中。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (infoStruct.userInfo) &#123;</span><br><span class="line">  FBObjectiveCGraphElement *element = FBWrapObjectGraphElementWithContext(<span class="keyword">self</span>, infoStruct.userInfo, <span class="keyword">self</span>.configuration, @[<span class="string">@"userInfo"</span>]);</span><br><span class="line">  <span class="keyword">if</span> (element) &#123;</span><br><span class="line">    [retained addObject:element];</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="汇总"><a href="#汇总" class="headerlink" title="汇总"></a>汇总</h2><p><code>NSTimer</code> 对象的所有强引用对象，除了继承父类 <code>NSObject</code> 的所有强引用对象之外，还包括 <em>target</em> 和 <em>userInfo</em> 对象。  </p>
+<p>FBRetainCycleDetector 中 <code>FBObjectiveCNSCFTimer</code> 的源码也比较简洁，直接上全部代码：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="built_in">NSSet</span> *)allRetainedObjects</span><br><span class="line">&#123;</span><br><span class="line">  <span class="comment">// Let's retain our timer</span></span><br><span class="line">  __attribute__((objc_precise_lifetime)) <span class="built_in">NSTimer</span> *timer = <span class="keyword">self</span>.object;</span><br><span class="line">  <span class="keyword">if</span> (!timer) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">nil</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 1. 添加作为普通OC对象的所有强引用对象，见 *FBObjectiveCObject.m*</span></span><br><span class="line">  <span class="built_in">NSMutableSet</span> *retained = [[<span class="keyword">super</span> allRetainedObjects] mutableCopy];</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 获取timer执行上下文</span></span><br><span class="line">  <span class="built_in">CFRunLoopTimerContext</span> context;</span><br><span class="line">  <span class="built_in">CFRunLoopTimerGetContext</span>((<span class="built_in">CFRunLoopTimerRef</span>)timer, &amp;context);</span><br><span class="line">  <span class="comment">// If it has a retain function, let's assume it retains strongly</span></span><br><span class="line">  <span class="keyword">if</span> (context.info &amp;&amp; context.retain) &#123;</span><br><span class="line">    _FBNSCFTimerInfoStruct infoStruct = *(_FBNSCFTimerInfoStruct *)(context.info);</span><br><span class="line">    <span class="comment">// 2. 添加持有的 *target* 对象</span></span><br><span class="line">    <span class="keyword">if</span> (infoStruct.target) &#123;</span><br><span class="line">      FBObjectiveCGraphElement *element = FBWrapObjectGraphElementWithContext(<span class="keyword">self</span>, infoStruct.target, <span class="keyword">self</span>.configuration, @[<span class="string">@"target"</span>]);</span><br><span class="line">      <span class="keyword">if</span> (element) &#123;</span><br><span class="line">        [retained addObject:element];</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 3. 添加持有的 *userInfo* 对象</span></span><br><span class="line">    <span class="keyword">if</span> (infoStruct.userInfo) &#123;</span><br><span class="line">      FBObjectiveCGraphElement *element = FBWrapObjectGraphElementWithContext(<span class="keyword">self</span>, infoStruct.userInfo, <span class="keyword">self</span>.configuration, @[<span class="string">@"userInfo"</span>]);</span><br><span class="line">      <span class="keyword">if</span> (element) &#123;</span><br><span class="line">        [retained addObject:element];</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> retained;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>FBRetainCycleDetector 将OC对象划分为3类，分别为：</p>
+<ul>
+<li>FBObjectiveCObject</li>
+<li>FBObjectiveCNSCFTimer</li>
+<li>FBObjectiveCBlock</li>
+</ul>
+<p><a href="https://blog.jerrychu.top/2021/01/10/%E8%8E%B7%E5%8F%96OC%E5%AF%B9%E8%B1%A1%E7%9A%84%E6%89%80%E6%9C%89%E5%BC%BA%E5%BC%95%E7%94%A8%E5%AF%B9%E8%B1%A1/">上一篇文章</a> 研究了 <code>FBObjectiveCObject</code> 的源码，介绍了如何获取 <code>NSObject</code> 的所有强引用对象；<br>本文通过研究 <code>FBObjectiveCNSCFTimer</code> 的源码，介绍了如何获取 <code>NSTimer</code> 的所有强引用对象。<br>最后一篇文章会继续研究 <code>FBObjectiveCBlock</code> 的源码，探索如何获取 <code>Block</code> 的所有强引用对象。</p>
+
       
     </div>
 
@@ -2795,7 +2923,7 @@ dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">24</span>
+          <span class="site-state-item-count">25</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
