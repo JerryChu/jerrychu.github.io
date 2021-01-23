@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.jerrychu.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="上一篇文章 介绍了如何获取 NSTimer（FBObjectiveCNSCFTimer）的所有强引用对象。本文继续介绍如何获取一种特殊OC对象 – Block 的所有强引用对象。 在 FBRetainCycleDetector 的源码中，Block 对应的类为 FBObjectiveCBlock。  FBRetainCycleDetector 源码地址： https:&#x2F;&#x2F;github.com&#x2F;fa">
+<meta property="og:type" content="article">
+<meta property="og:title" content="获取OC对象的所有强引用对象（三）">
+<meta property="og:url" content="http://blog.jerrychu.top/2021/01/23/%E8%8E%B7%E5%8F%96OC%E5%AF%B9%E8%B1%A1%E7%9A%84%E6%89%80%E6%9C%89%E5%BC%BA%E5%BC%95%E7%94%A8%E5%AF%B9%E8%B1%A13/index.html">
+<meta property="og:site_name" content="++">
+<meta property="og:description" content="上一篇文章 介绍了如何获取 NSTimer（FBObjectiveCNSCFTimer）的所有强引用对象。本文继续介绍如何获取一种特殊OC对象 – Block 的所有强引用对象。 在 FBRetainCycleDetector 的源码中，Block 对应的类为 FBObjectiveCBlock。  FBRetainCycleDetector 源码地址： https:&#x2F;&#x2F;github.com&#x2F;fa">
+<meta property="article:published_time" content="2021-01-23T08:14:26.000Z">
+<meta property="article:modified_time" content="2021-01-23T10:38:50.755Z">
+<meta property="article:author" content="JerryChu">
+<meta property="article:tag" content="iOS">
+<meta property="article:tag" content="Performance">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://blog.jerrychu.top/2021/01/23/%E8%8E%B7%E5%8F%96OC%E5%AF%B9%E8%B1%A1%E7%9A%84%E6%89%80%E6%9C%89%E5%BC%BA%E5%BC%95%E7%94%A8%E5%AF%B9%E8%B1%A13/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>获取OC对象的所有强引用对象（三） | ++</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">++</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="home                          //首页 fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="archive          //归档 fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="tags                     //标签 fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="user                   //关于 fa-fw"></i>About</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/jerrychu" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://blog.jerrychu.top/2021/01/23/%E8%8E%B7%E5%8F%96OC%E5%AF%B9%E8%B1%A1%E7%9A%84%E6%89%80%E6%9C%89%E5%BC%BA%E5%BC%95%E7%94%A8%E5%AF%B9%E8%B1%A13/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="JerryChu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="++">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          获取OC对象的所有强引用对象（三）
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-01-23 16:14:26 / Modified: 18:38:50" itemprop="dateCreated datePublished" datetime="2021-01-23T16:14:26+08:00">2021-01-23</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><a href="https://blog.jerrychu.top/2021/01/16/%E8%8E%B7%E5%8F%96OC%E5%AF%B9%E8%B1%A1%E7%9A%84%E6%89%80%E6%9C%89%E5%BC%BA%E5%BC%95%E7%94%A8%E5%AF%B9%E8%B1%A12/">上一篇文章</a> 介绍了如何获取 NSTimer（<code>FBObjectiveCNSCFTimer</code>）的所有强引用对象。本文继续介绍如何获取一种特殊OC对象 – <code>Block</code> 的所有强引用对象。</p>
+<p>在 <a href="https://github.com/facebook/FBRetainCycleDetector" target="_blank" rel="noopener">FBRetainCycleDetector</a> 的源码中，<code>Block</code> 对应的类为 <code>FBObjectiveCBlock</code>。</p>
+<blockquote>
+<p>FBRetainCycleDetector 源码地址： <a href="https://github.com/facebook/FBRetainCycleDetector" target="_blank" rel="noopener">https://github.com/facebook/FBRetainCycleDetector</a></p>
+</blockquote>
+<h2 id="Block-基础"><a href="#Block-基础" class="headerlink" title="Block 基础"></a>Block 基础</h2><p>OC 的 Block 其实也是一个结构体，结构如下：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> BlockLiteral &#123;</span><br><span class="line">  <span class="keyword">void</span> *isa;  <span class="comment">// initialized to &amp;_NSConcreteStackBlock or &amp;_NSConcreteGlobalBlock</span></span><br><span class="line">  <span class="keyword">int</span> flags;</span><br><span class="line">  <span class="keyword">int</span> reserved;</span><br><span class="line">  <span class="keyword">void</span> (*invoke)(<span class="keyword">void</span> *, ...);</span><br><span class="line">  <span class="keyword">struct</span> BlockDescriptor *descriptor;</span><br><span class="line">  <span class="comment">// imported variables</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>其中，<em>isa</em> 这个字段大家应该都很熟悉，和 <code>objc_class</code> 结构体里的 <em>isa</em> 一样，都是指向具体的类。Block 结构体对应的类可能是以下三种中的任意一种，大家可以自行了解，本文不再继续展开介绍。</p>
+<ul>
+<li>__NSGlobalBlock</li>
+<li>__NSMallocBlock</li>
+<li>__NSStackBlock</li>
+</ul>
+<p>FBRetainCycleDetector 源码中 Block 对象对应的类为 <code>FBObjectiveCBlock</code> 。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> Object Graph element representing block.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">FBObjectiveCBlock</span> : <span class="title">FBObjectiveCGraphElement</span></span></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="如何判断一个对象是-Block"><a href="#如何判断一个对象是-Block" class="headerlink" title="如何判断一个对象是 Block"></a>如何判断一个对象是 Block</h2><p>如果是普通的OC对象，我们可以直接用 <em>[objc class]</em> 获取其类型。 Block 对象能不能也通过这种方式来判断呢？当然是可以的，Block 对象是一种特殊的 <strong>OC 对象</strong> ，再怎么特殊，它也是一个OC对象，普通OC对象能做的事情，它也能做。 </p>
+<p>问题的关键是，OC Runtime 并没有直接暴露出所谓的 <em>Block 类</em> 。上面提到过，一个 Block 可能是 <code>__NSGlobalBlock</code>，<code>__NSMallocBlock</code>，<code>__NSStackBlock</code> 中的任意一种，但是这三个类都没有在OCRuntime 中直接暴露。</p>
+<h3 id="Block-的运行时类型"><a href="#Block-的运行时类型" class="headerlink" title="Block 的运行时类型"></a>Block 的运行时类型</h3><p>所以，我们首先要找到一个 Block 对象在运行时到底是什么类。  </p>
+<p>FBRetainCycleDetector 通过创建一个 <em>testBlock</em> 并不断向上查找其 <em>superclass</em> ，来获取 Block 对象在运行时的 “基类”。 </p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> Class _BlockClass() &#123;</span><br><span class="line">  <span class="keyword">static</span> <span class="built_in">dispatch_once_t</span> onceToken;</span><br><span class="line">  <span class="keyword">static</span> Class blockClass;</span><br><span class="line">  <span class="built_in">dispatch_once</span>(&amp;onceToken, ^&#123;</span><br><span class="line">    <span class="keyword">void</span> (^testBlock)() = [^&#123;&#125; <span class="keyword">copy</span>];</span><br><span class="line">    blockClass = [testBlock <span class="keyword">class</span>];</span><br><span class="line">    <span class="keyword">while</span>(class_getSuperclass(blockClass) &amp;&amp; class_getSuperclass(blockClass) != [<span class="built_in">NSObject</span> <span class="keyword">class</span>]) &#123;</span><br><span class="line">      blockClass = class_getSuperclass(blockClass);</span><br><span class="line">    &#125;</span><br><span class="line">    [testBlock release];</span><br><span class="line">  &#125;);</span><br><span class="line">  <span class="keyword">return</span> blockClass;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意： <em>_BlockClass</em> 方法在查找 <em>superclass</em> 时，如果找到了 <code>NSObject</code>，就直接终止查找过程。否则找到的基类就都成了 <code>NSObect</code>。</p>
+</blockquote>
+<p>实际运行起来，大家会发现这个方法的返回值为 <code>NSBlock</code>。其声明如下： </p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">NSBlock</span> : <span class="title">NSObject</span> &lt;<span class="title">NSCopying</span>&gt;</span></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<p>这再次印证了我们上面说过的，“Block 对象是一种特殊的OC对象”。Block 对象都继承自 <code>NSBlock</code> ，<code>NSBlock</code> 又是 <code>NSObject</code> 的子类。 </p>
+<h3 id="Block-类型判断"><a href="#Block-类型判断" class="headerlink" title="Block 类型判断"></a>Block 类型判断</h3><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">BOOL</span> FBObjectIsBlock(<span class="keyword">void</span> *object) &#123;</span><br><span class="line">  Class blockClass = _BlockClass();</span><br><span class="line">  </span><br><span class="line">  Class candidate = object_getClass((__bridge <span class="keyword">id</span>)object);</span><br><span class="line">  <span class="keyword">return</span> [candidate isSubclassOfClass:blockClass];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段代码就很简单了，直接判断当前对象的 Class 是不是 <code>NSBlock</code> 类的 subclass 即可。</p>
+<h2 id="获取-Block-的强引用对象"><a href="#获取-Block-的强引用对象" class="headerlink" title="获取 Block 的强引用对象"></a>获取 Block 的强引用对象</h2><p>再回头看 Block 结构体的最后，有一行注释：</p>
+<blockquote>
+<p>// imported variables</p>
+</blockquote>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> BlockLiteral &#123;</span><br><span class="line">  <span class="keyword">void</span> *isa;  <span class="comment">// initialized to &amp;_NSConcreteStackBlock or &amp;_NSConcreteGlobalBlock</span></span><br><span class="line">  <span class="keyword">int</span> flags;</span><br><span class="line">  <span class="keyword">int</span> reserved;</span><br><span class="line">  <span class="keyword">void</span> (*invoke)(<span class="keyword">void</span> *, ...);</span><br><span class="line">  <span class="keyword">struct</span> BlockDescriptor *descriptor;</span><br><span class="line">  <span class="comment">// imported variables</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>这代表这 Block 引用的对象会存放在 Block 结构体的最下方。<br>似乎这里是一个突破口，直接遍历 <em>imported variables</em> 是不是就可以拿到所有的强引用对象了呢？</p>
+<p>在 <a href="https://blog.jerrychu.top/2021/01/10/%E8%8E%B7%E5%8F%96OC%E5%AF%B9%E8%B1%A1%E7%9A%84%E6%89%80%E6%9C%89%E5%BC%BA%E5%BC%95%E7%94%A8%E5%AF%B9%E8%B1%A1/">普通OC对象的所有强引用对象</a> 一文中，我们提到引用对象分为 <strong>强引用对象</strong> 和 <strong>弱引用对象</strong> ，对于 Block 来说也是一样，既有强应用对象也有弱引用对象。   </p>
+<p>对于普通OC对象，我们可以通过 <em>class_getIvarLayout</em> 来区分强弱引用对象，但是 Block 对象并没有直接提供 <em>class_getIvarLayout</em> 方法，所以我们需要换一种方式获取 <em>ivarLayout</em> 。</p>
+<h3 id="dispose-helper"><a href="#dispose-helper" class="headerlink" title="dispose_helper"></a>dispose_helper</h3><p>继续看 Block 结构体，其有一个 <code>BlockDescriptor</code> 结构体，结构如下：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> BlockDescriptor &#123;</span><br><span class="line">	<span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">int</span> reserved;                <span class="comment">// NULL</span></span><br><span class="line">	<span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">int</span> size;</span><br><span class="line">	<span class="comment">// optional helper functions</span></span><br><span class="line">	<span class="keyword">void</span> (*copy_helper)(<span class="keyword">void</span> *dst, <span class="keyword">void</span> *src); <span class="comment">// IFF (1&lt;&lt;25)</span></span><br><span class="line">	<span class="keyword">void</span> (*dispose_helper)(<span class="keyword">void</span> *src);         <span class="comment">// IFF (1&lt;&lt;25)</span></span><br><span class="line">	<span class="keyword">const</span> <span class="keyword">char</span> *signature;                     <span class="comment">// IFF (1&lt;&lt;30)</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>其中，<em>size</em> 字段表示 Block 持有的所有对象的大小，通过这个字段我们能拿到 Block 持有的对象总数（包括强引用和弱引用）。</p>
+<p>在这个结构体中还有两个函数指针， <em>copy_helper</em> 和 <em>dispose_helper</em> 。 <em>copy_helper</em> 用于 Block 的拷贝，而  <em>dispose_helper</em> 用于 Block 的析构。<br>Block 在析构时会调用 <em>dispose_helper</em> ，对所有强引用对象发送 <em>release</em> 消息，以销毁强引用对象。弱引用对象此时自然不会收到 <em>release</em> 消息。</p>
+<p>FBRetainCycleDetector 正是利用这个原理，来获取 Block 的所有强引用对象。</p>
+<h3 id="发送-接收-release-消息"><a href="#发送-接收-release-消息" class="headerlink" title="发送/接收 release 消息"></a>发送/接收 release 消息</h3><p>Block 在析构时会调用 <em>dispose_helper</em> ，对所有强引用对象发送 <em>release</em> 消息。那么我们只需要手动触发一次 <em>dispose_helper</em> 方法，看看哪些对象收到了 <em>release</em> 消息，这些对象就是被强引用的对象了。  </p>
+<p>问题来了，怎么知道哪个对象执行了 <em>release</em> 方法呢？难道要把所有对象的 <em>release</em> 方法都 hook 掉？这样肯定是不现实的。而且，我们只是想知道哪些对象被强引用了，并不想把这些对象真正销毁掉。如果真销毁掉了，整个 Block 肯定乱成一锅粥了😂。  </p>
+<p>因此，我们要创建一个 <em>虚假的对象</em> ，用来接收 <em>release</em> 消息。在 FBRetainCycleDetector 的源码中，<code>FBBlockStrongRelationDetector</code> 就是这个 <em>虚假的对象</em> 。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">FBBlockStrongRelationDetector</span></span></span><br><span class="line">- (<span class="keyword">oneway</span> <span class="keyword">void</span>)release &#123;</span><br><span class="line">  _<span class="keyword">strong</span> = <span class="literal">YES</span>;</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="keyword">oneway</span> <span class="keyword">void</span>)trueRelease &#123;</span><br><span class="line">  [<span class="keyword">super</span> release];</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<p><code>FBBlockStrongRelationDetector</code> 对象在接收到 <em>release</em> 消息时，只是将 <em>_strong</em> 标记为 <code>YES</code>，真正的销毁是在 <em>trueRelease</em> 方法中完成的。</p>
+<h3 id="收集强引用对象"><a href="#收集强引用对象" class="headerlink" title="收集强引用对象"></a>收集强引用对象</h3><p>通过上面的分析，我们已经能够：</p>
+<ul>
+<li>通过解析 Block 结构体数据和 <code>BlockDescriptor</code> 结构体的 <em>size</em> 字段，获取到所有引用对象列表。</li>
+<li>通过手动执行 <code>BlockDescriptor</code> 结构体的 <em>dispose_helper</em> ，获取所有强引用对象在对象列表中的位置。</li>
+</ul>
+<p>那最后一步就很明显，也很简单了：</p>
+<ul>
+<li>收集所有强引用对象。</li>
+</ul>
+<p>其实，查找 Block 强引用对象和查找普通OC对象的强引用对象，在思想上还是非常相似的。都需要先获得所有对象列表，再筛选出强引用对象。只不过普通OC对象筛选强引用对象非常方便，可以直接获取到 <em>ivarLayout</em> ，Block 对象要麻烦很多。 </p>
+<h3 id="源码解读"><a href="#源码解读" class="headerlink" title="源码解读"></a>源码解读</h3><p><code>FBObjectiveCBlock</code> 类中提供了如何获取 Block 对象的所有强引用对象的源码：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="built_in">NSSet</span> *)allRetainedObjects &#123;</span><br><span class="line">  <span class="comment">// 1. 添加作为普通OC对象的所有强引用对象，见 *FBObjectiveCObject.m*</span></span><br><span class="line">  <span class="built_in">NSMutableArray</span> *results = [[[<span class="keyword">super</span> allRetainedObjects] allObjects] mutableCopy];</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Grab a strong reference to the object, otherwise it can crash while doing</span></span><br><span class="line">  <span class="comment">// nasty stuff on deallocation</span></span><br><span class="line">  __attribute__((objc_precise_lifetime)) <span class="keyword">id</span> anObject = <span class="keyword">self</span>.object;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 2. 获取所有 Block 强引用的对象</span></span><br><span class="line">  <span class="keyword">void</span> *blockObjectReference = (__bridge <span class="keyword">void</span> *)anObject;</span><br><span class="line">  <span class="built_in">NSArray</span> *allRetainedReferences = FBGetBlockStrongReferences(blockObjectReference);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">id</span> object <span class="keyword">in</span> allRetainedReferences) &#123;</span><br><span class="line">    FBObjectiveCGraphElement *element = FBWrapObjectGraphElement(<span class="keyword">self</span>, object, <span class="keyword">self</span>.configuration);</span><br><span class="line">    <span class="keyword">if</span> (element) &#123;</span><br><span class="line">      [results addObject:element];</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> [<span class="built_in">NSSet</span> setWithArray:results];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中， <em>FBGetBlockStrongReferences</em> 方法的源码在 <em>FBBlockStrongLayout.m</em> 中。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 有删减</span></span><br><span class="line"><span class="built_in">NSArray</span> *FBGetBlockStrongReferences(<span class="keyword">void</span> *block) &#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">  <span class="built_in">NSMutableArray</span> *results = [<span class="built_in">NSMutableArray</span> new];</span><br><span class="line">  <span class="comment">// 确定引用对象中哪些为强引用</span></span><br><span class="line">  <span class="keyword">void</span> **blockReference = block;</span><br><span class="line">  <span class="built_in">NSIndexSet</span> *strongLayout = _GetBlockStrongLayout(block);</span><br><span class="line">  [strongLayout enumerateIndexesUsingBlock:^(<span class="built_in">NSUInteger</span> idx, <span class="built_in">BOOL</span> *stop) &#123;</span><br><span class="line">    <span class="keyword">void</span> **reference = &amp;blockReference[idx];</span><br><span class="line">    <span class="keyword">if</span> (reference &amp;&amp; (*reference)) &#123;</span><br><span class="line">      <span class="keyword">id</span> object = (<span class="keyword">id</span>)(*reference);</span><br><span class="line">      <span class="keyword">if</span> (object) &#123;</span><br><span class="line">        [results addObject:object];</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;];</span><br><span class="line">  <span class="keyword">return</span> [results autorelease];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> <span class="built_in">NSIndexSet</span> *_GetBlockStrongLayout(<span class="keyword">void</span> *block) &#123;</span><br><span class="line">  <span class="keyword">struct</span> BlockLiteral *blockLiteral = block; </span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">  <span class="comment">// 获取 dispose_helper 函数指针</span></span><br><span class="line">  <span class="keyword">void</span> (*dispose_helper)(<span class="keyword">void</span> *src) = blockLiteral-&gt;descriptor-&gt;dispose_helper;</span><br><span class="line">  <span class="comment">// 计算引用对象个数</span></span><br><span class="line">  <span class="keyword">const</span> size_t ptrSize = <span class="keyword">sizeof</span>(<span class="keyword">void</span> *);</span><br><span class="line">  <span class="keyword">const</span> size_t elements = (blockLiteral-&gt;descriptor-&gt;size + ptrSize - <span class="number">1</span>) / ptrSize;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 创建“虚假的对象”，用于接收 release 消息</span></span><br><span class="line">  <span class="keyword">void</span> *obj[elements];</span><br><span class="line">  <span class="keyword">void</span> *detectors[elements];</span><br><span class="line">  <span class="keyword">for</span> (size_t i = <span class="number">0</span>; i &lt; elements; ++i) &#123;</span><br><span class="line">    FBBlockStrongRelationDetector *detector = [FBBlockStrongRelationDetector new];</span><br><span class="line">    obj[i] = detectors[i] = detector;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 执行 dispose_helper 方法，触发强引用对象所在的索引位置的 FBBlockStrongRelationDetector 执行 release</span></span><br><span class="line">  <span class="keyword">@autoreleasepool</span> &#123;</span><br><span class="line">    dispose_helper(obj);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 收集强引用对象所在的索引</span></span><br><span class="line">  <span class="built_in">NSMutableIndexSet</span> *layout = [<span class="built_in">NSMutableIndexSet</span> indexSet];</span><br><span class="line">  <span class="keyword">for</span> (size_t i = <span class="number">0</span>; i &lt; elements; ++i) &#123;</span><br><span class="line">    FBBlockStrongRelationDetector *detector = (FBBlockStrongRelationDetector *)(detectors[i]);</span><br><span class="line">    <span class="keyword">if</span> (detector.isStrong) &#123;</span><br><span class="line">      [layout addIndex:i];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// Destroy detectors</span></span><br><span class="line">    [detector trueRelease];</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> layout;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>FBRetainCycleDetector 将OC对象划分为3类，分别为：</p>
+<ul>
+<li>FBObjectiveCObject</li>
+<li>FBObjectiveCNSCFTimer</li>
+<li>FBObjectiveCBlock</li>
+</ul>
+<p>本系列的三篇文章分别介绍了对这3类对象如何获取其所有强引用对象。汇总起来，就是 FBRetainCycleDetector 查找OC对象的所有强引用对象的基本原理。知道每个OC对象的所有强引用对象后，就能够生成每一个对象的引用关系图，继续按图索骥，就能够检测到是否存在循环引用链。  </p>
+<p><a href="https://github.com/facebook/FBRetainCycleDetector" target="_blank" rel="noopener">FBRetainCycleDetector</a> 是一个非常优秀的开源项目，尤其适合用来学习 OC Runtime 知识，了解 OC 对象在运行时的结构，顺便掌握一些 “黑科技” ，强烈建议大家阅读其源码。</p>
+<p>前两篇文章链接：</p>
+<ul>
+<li><a href="https://blog.jerrychu.top/2021/01/10/%E8%8E%B7%E5%8F%96OC%E5%AF%B9%E8%B1%A1%E7%9A%84%E6%89%80%E6%9C%89%E5%BC%BA%E5%BC%95%E7%94%A8%E5%AF%B9%E8%B1%A1/">获取普通OC对象的所有强引用对象</a> </li>
+<li><a href="https://blog.jerrychu.top/2021/01/16/%E8%8E%B7%E5%8F%96OC%E5%AF%B9%E8%B1%A1%E7%9A%84%E6%89%80%E6%9C%89%E5%BC%BA%E5%BC%95%E7%94%A8%E5%AF%B9%E8%B1%A12/">获取Timer对象的所有强引用对象</a></li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://draveness.me/block-retain-object/" target="_blank" rel="noopener">https://draveness.me/block-retain-object/</a></li>
+<li><a href="https://github.com/facebook/FBRetainCycleDetector" target="_blank" rel="noopener">https://github.com/facebook/FBRetainCycleDetector</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/iOS/" rel="tag"># iOS</a>
+              <a href="/tags/Performance/" rel="tag"># Performance</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/16/%E8%8E%B7%E5%8F%96OC%E5%AF%B9%E8%B1%A1%E7%9A%84%E6%89%80%E6%9C%89%E5%BC%BA%E5%BC%95%E7%94%A8%E5%AF%B9%E8%B1%A12/" rel="prev" title="获取OC对象的所有强引用对象（二）">
+      <i class="fa fa-chevron-left"></i> 获取OC对象的所有强引用对象（二）
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Block-基础"><span class="nav-number">1.</span> <span class="nav-text">Block 基础</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何判断一个对象是-Block"><span class="nav-number">2.</span> <span class="nav-text">如何判断一个对象是 Block</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Block-的运行时类型"><span class="nav-number">2.1.</span> <span class="nav-text">Block 的运行时类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Block-类型判断"><span class="nav-number">2.2.</span> <span class="nav-text">Block 类型判断</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#获取-Block-的强引用对象"><span class="nav-number">3.</span> <span class="nav-text">获取 Block 的强引用对象</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#dispose-helper"><span class="nav-number">3.1.</span> <span class="nav-text">dispose_helper</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#发送-接收-release-消息"><span class="nav-number">3.2.</span> <span class="nav-text">发送&#x2F;接收 release 消息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#收集强引用对象"><span class="nav-number">3.3.</span> <span class="nav-text">收集强引用对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#源码解读"><span class="nav-number">3.4.</span> <span class="nav-text">源码解读</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">JerryChu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">26</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">JerryChu</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
