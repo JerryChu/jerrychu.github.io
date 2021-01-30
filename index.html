@@ -156,6 +156,97 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://blog.jerrychu.top/2021/01/30/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%A3%80%E6%B5%8B%E5%B7%A5%E5%85%B7-JCLeaksFinder/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="JerryChu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="++">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/01/30/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%A3%80%E6%B5%8B%E5%B7%A5%E5%85%B7-JCLeaksFinder/" class="post-title-link" itemprop="url">内存泄漏检测工具 - JCLeaksFinder</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-01-30 16:01:36 / Modified: 17:08:25" itemprop="dateCreated datePublished" datetime="2021-01-30T16:01:36+08:00">2021-01-30</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>在 <a href="https://blog.jerrychu.top/2020/12/05/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%A3%80%E6%B5%8B%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/">如何优雅地检测内存泄漏</a> 一文中，我们介绍了如何在 iOS 中快速高效地检测并修复内存泄漏，再回顾一下要点：</p>
+<ul>
+<li>使用 MLeaksFinder 等工具找到内存泄漏对象</li>
+<li>使用 FBRetainCycleDetector 获取循环引用链 </li>
+<li>（对于被全局对象引用的场景）获取全局对象引用链</li>
+</ul>
+<h2 id="JCLeaksFinder"><a href="#JCLeaksFinder" class="headerlink" title="JCLeaksFinder"></a>JCLeaksFinder</h2><p>为了方便大家使用，我把上述功能进行了统一封装，开源了 <a href="https://github.com/JerryChu/JCLeaksFinder" target="_blank" rel="noopener">JCLeaksFinder</a> 项目。<code>JCLeaksFinder</code> 基于 <a href="https://github.com/Tencent/MLeaksFinder" target="_blank" rel="noopener">MLeaksFinder</a> 和 <a href="https://github.com/facebook/FBRetainCycleDetector" target="_blank" rel="noopener">FBRetainCycleDetector</a>。</p>
+<ul>
+<li>MLeaksFinder 负责找到内存泄漏对象。</li>
+<li>FBRetainCycleDetector 负责输出循环引用链。</li>
+<li><code>JCGlobalRetainDetector</code> 负责输出全局对象引用链。</li>
+</ul>
+<h2 id="特性"><a href="#特性" class="headerlink" title="特性"></a>特性</h2><p>作为一款 iOS 内存泄漏检测工具，<code>JCLeaksFinder</code> 主要有以下特性：</p>
+<ul>
+<li>支持检测ViewController/View内存泄漏</li>
+<li>支持添加自定义白名单</li>
+<li>支持自动输出循环引用链</li>
+<li>支持自动输出全局对象引用链（自研）</li>
+<li>优化接口，使用更方便</li>
+</ul>
+<h2 id="检测流程"><a href="#检测流程" class="headerlink" title="检测流程"></a>检测流程</h2><ol>
+<li>在页面退出时触发 MLeaksFinder 检测内存泄漏对象。如果有内存泄漏对象，继续下一步，否则直接跳转到第 <strong>5</strong> 步。</li>
+<li>使用 FBRetainCycleDetector 检测泄漏对象是否存在循环引用链。如果不存在，继续下一步，否则跳转到第 <strong>4</strong> 步。</li>
+<li>使用 JCGlobalRetainDetector 检测泄漏对象是否被全局对象引用。如果是，继续下一步，否则跳转到第 <strong>5</strong> 步。</li>
+<li>将引用信息回传给业务层，业务层可自定义提示形式。</li>
+<li>结束检测。</li>
+</ol>
+<p>在上述的检测流程中，如果检测到了内存泄漏对象，可能会遇到以下问题：</p>
+<ul>
+<li>该对象是允许不被释放的。此时可添加检测白名单，避免继续检测出该对象。</li>
+<li>该对象并没有输出任何循环引用链或者全局对象引用链信息。此时可使用 Xcode Memeory Graph 继续定位具体原因。</li>
+</ul>
+<p>更多信息请前往 <a href="https://github.com/JerryChu/JCLeaksFinder" target="_blank" rel="noopener">Github查看项目源码</a>。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="http://blog.jerrychu.top/2021/01/23/%E8%8E%B7%E5%8F%96OC%E5%AF%B9%E8%B1%A1%E7%9A%84%E6%89%80%E6%9C%89%E5%BC%BA%E5%BC%95%E7%94%A8%E5%AF%B9%E8%B1%A13/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -3062,7 +3153,7 @@ dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">26</span>
+          <span class="site-state-item-count">27</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
