@@ -156,6 +156,174 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://blog.jerrychu.top/2021/08/15/React%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%88%E4%B8%80%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="JerryChu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="++">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/08/15/React%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%88%E4%B8%80%EF%BC%89/" class="post-title-link" itemprop="url">React探索之组件构建及处理流程</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-08-15 23:16:42 / Modified: 23:41:47" itemprop="dateCreated datePublished" datetime="2021-08-15T23:16:42+08:00">2021-08-15</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="开发环境"><a href="#开发环境" class="headerlink" title="开发环境"></a>开发环境</h2><p>使用 <em>create-react-app</em> 创建 demo 项目。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">╰─○ npx create-react-app react-demo</span><br><span class="line"></span><br><span class="line">npx: 67 安装成功，用时 10.485 秒</span><br><span class="line"></span><br><span class="line">Creating a new React app in /Users/chujiayi/StudyStation/React/react-demo.</span><br><span class="line"></span><br><span class="line">Installing packages. This might take a couple of minutes.</span><br><span class="line">Installing react, react-dom, and react-scripts with cra-template...</span><br><span class="line"></span><br><span class="line">yarn add v1.22.10</span><br><span class="line">[1/4] 🔍  Resolving packages...</span><br><span class="line">[2/4] 🚚  Fetching packages...</span><br><span class="line">[3/4] 🔗  Linking dependencies...</span><br><span class="line">warning "react-scripts &gt; @typescript-eslint/eslint-plugin &gt; tsutils@3.20.0" has unmet peer dependency "typescript@&gt;=2.8.0 || &gt;= 3.2.0-dev || &gt;= 3.3.0-dev || &gt;= 3.4.0-dev || &gt;= 3.5.0-dev || &gt;= 3.6.0-dev || &gt;= 3.6.0-beta || &gt;= 3.7.0-dev || &gt;= 3.7.0-beta".</span><br><span class="line">[4/4] 🔨  Building fresh packages...</span><br><span class="line">success Saved lockfile.</span><br><span class="line">success Saved 7 new dependencies.</span><br><span class="line">info Direct dependencies</span><br><span class="line">├─ cra-template@1.1.2</span><br><span class="line">├─ react-dom@17.0.2</span><br><span class="line">├─ react-scripts@4.0.3</span><br><span class="line">└─ react@17.0.2</span><br><span class="line">info All dependencies</span><br><span class="line">├─ cra-template@1.1.2</span><br><span class="line">├─ immer@8.0.1</span><br><span class="line">├─ react-dev-utils@11.0.4</span><br><span class="line">├─ react-dom@17.0.2</span><br><span class="line">├─ react-scripts@4.0.3</span><br><span class="line">├─ react@17.0.2</span><br><span class="line">└─ scheduler@0.20.2</span><br><span class="line">✨  Done in 162.25s.</span><br></pre></td></tr></table></figure>
+
+<p>项目结构如下图所示：</p>
+<p><img src="https://docimg10.docs.qq.com/image/vUpJxrhEocjhV1uo3OH2UA.png?w=2268&h=916" alt="https://docimg10.docs.qq.com/image/vUpJxrhEocjhV1uo3OH2UA.png?w=2268&amp;h=916"></p>
+<p>执行start 命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">yarn start</span><br><span class="line">// 源码：node_modules/react-scripts/scripts/start.js</span><br></pre></td></tr></table></figure>
+
+<h2 id="ReactDOM-render-方法"><a href="#ReactDOM-render-方法" class="headerlink" title="ReactDOM.render 方法"></a>ReactDOM.render 方法</h2><h3 id="方法声明"><a href="#方法声明" class="headerlink" title="方法声明"></a>方法声明</h3><p>查看项目入口文件 <em>index.js*，我们发现里面有一个 *render</em> 方法，这也是整个 React 组件渲染的入口方法。我们就从这个方法开始，一步一步去看 React 的整个工作流程。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ReactDOM.render(</span><br><span class="line">  &lt;React.StrictMode&gt;</span><br><span class="line">    &lt;App /&gt;</span><br><span class="line">  &lt;<span class="regexp">/React.StrictMode&gt;,</span></span><br><span class="line"><span class="regexp">  document.getElementById('root')</span></span><br><span class="line"><span class="regexp">);</span></span><br></pre></td></tr></table></figure>
+
+<p>查看 ReactDOM <em>**<em>源码，</em>render</em> 方法的声明为：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">render</span>(<span class="params">element, container, callback</span>) </span>&#123; ... &#125;</span><br></pre></td></tr></table></figure>
+
+<p><em>render</em> 方法第一个参数为 <em>element*，对应要渲染的 *ReactElement</em> 对象；第二个参数为 <em>container</em>，对应要挂载的DOM节点；第三个参数为 <em>callback</em>，对应渲染完成后的回调。  </p>
+<p>其中后两个参数比较直观，我们传入的是 <em>root</em> 节点和空的回调函数。但是第一个 <em>element</em> 参数，我们传入的明明是一段 JSX 代码，怎么就变成一个 <em>ReactElement</em> 对象了呢。  </p>
+<h3 id="ReactElement-创建"><a href="#ReactElement-创建" class="headerlink" title="ReactElement 创建"></a>ReactElement 创建</h3><p>了解 React 的同学都知道，浏览器并不认识 JSX 代码，所以在运行之前需要被编译为普通的 JS 代码，这一步会在打包过程中完成。</p>
+<p><em>index.js</em> 中的这段代码，会被编译为如下 JS 代码：</p>
+<p><img src="https://docimg8.docs.qq.com/image/K6NyLMHm1lMATHLzVXXhew.png?w=2888&h=432" alt="https://docimg8.docs.qq.com/image/K6NyLMHm1lMATHLzVXXhew.png?w=2888&amp;h=432"></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render( <span class="comment">/*#__PURE__*/</span><span class="built_in">Object</span>(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_5__[<span class="string">"jsxDEV"</span>])(react__WEBPACK_IMPORTED_MODULE_0___default.a.StrictMode, &#123;</span><br><span class="line">  children: <span class="comment">/*#__PURE__*/</span><span class="built_in">Object</span>(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_5__[<span class="string">"jsxDEV"</span>])(_App__WEBPACK_IMPORTED_MODULE_3__[<span class="string">"default"</span>], &#123;&#125;, <span class="keyword">void</span> <span class="number">0</span>, <span class="literal">false</span>, &#123;</span><br><span class="line">    fileName: _jsxFileName,</span><br><span class="line">    lineNumber: <span class="number">9</span>,</span><br><span class="line">    columnNumber: <span class="number">5</span></span><br><span class="line">  &#125;, <span class="literal">undefined</span>)</span><br><span class="line">&#125;, <span class="keyword">void</span> <span class="number">0</span>, <span class="literal">false</span>, &#123;</span><br><span class="line">  fileName: _jsxFileName,</span><br><span class="line">  lineNumber: <span class="number">8</span>,</span><br><span class="line">  columnNumber: <span class="number">3</span></span><br><span class="line">&#125;, <span class="literal">undefined</span>), <span class="built_in">document</span>.getElementById(<span class="string">'root'</span>));</span><br></pre></td></tr></table></figure>
+
+<p>看着可能有些复杂，我们可以精简为如下代码。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">render(jsxDEV(<span class="built_in">Symbol</span>(react.strict_mode, &#123;<span class="attr">children</span>: jsxDEV(App, &#123;&#125;, <span class="literal">undefined</span>, source, <span class="literal">undefined</span>)&#125;, <span class="literal">undefined</span>, source, <span class="literal">undefined</span>), <span class="built_in">document</span>.getElementById(<span class="string">'root'</span>));</span><br></pre></td></tr></table></figure>
+
+<p>还是看不清楚？我们把嵌套逻辑拆出来一行一行看下。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建 appElement，对应 &lt;App /&gt;</span></span><br><span class="line"><span class="keyword">const</span> appElement = jsxDEV(App, &#123;&#125;, <span class="literal">undefined</span>, source, <span class="literal">undefined</span>);</span><br><span class="line"><span class="comment">// 对应 &lt;React.StrictMode&gt;，包含一个child元素（appElement）</span></span><br><span class="line"><span class="keyword">const</span> strictModeElement = jsxDEV(<span class="built_in">Symbol</span>(react.strict_mode), &#123;<span class="attr">children</span>: appElement&#125;, <span class="literal">undefined</span>, source, <span class="literal">undefined</span>);</span><br><span class="line"><span class="comment">// 渲染 strictModeElement 并挂载到 root 节点</span></span><br><span class="line">render(strictModeElement, <span class="built_in">document</span>.getElementById(<span class="string">'root'</span>));</span><br></pre></td></tr></table></figure>
+
+<p>其中有一个 <em>jsxDEV</em> 方法，其作用为将 <em>JSX</em> 代码转换为 DOMElement 对象。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">jsxDEV</span>(<span class="params">type, config, maybeKey, source, self</span>);</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>React 17 提供了新的 <em>jsx</em> 方法，用于进行 JSX 转换，开发模式下该方法名为 <em>jsxDEV</em> 。 旧版本的 JSX 转换方法为 <em>React.createElement</em>，这个方法大家应该很熟悉了。<br>为什么 React 会提供一个新的 JSX 转换方法，可参考 <a href="https://reactjs.org/blog/2020/09/22/introducing-the-new-jsx-transform.html。" target="_blank" rel="noopener">https://reactjs.org/blog/2020/09/22/introducing-the-new-jsx-transform.html。</a></p>
+</blockquote>
+<p>经过上面的分析，我们知道  <em>index.js</em> 中的 <em>render</em> 方法最终会被转换为如下形式：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 渲染 strictModeElement 并挂载到 root 节点</span></span><br><span class="line"><span class="comment">// strictModeElement 包含一个子节点 appElement</span></span><br><span class="line">render(strictModeElement, <span class="built_in">document</span>.getElementById(<span class="string">'root'</span>));</span><br></pre></td></tr></table></figure>
+
+<h2 id="FiberNode-创建"><a href="#FiberNode-创建" class="headerlink" title="FiberNode 创建"></a>FiberNode 创建</h2><h3 id="workRootSync-循环"><a href="#workRootSync-循环" class="headerlink" title="workRootSync 循环"></a>workRootSync 循环</h3><p><em>render</em> 方法的第一步，就是创建一个 root 节点（姑且称之为 <em>rootFiberNode</em>）。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">renderRootSync</span>(<span class="params">root, lanes</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">  <span class="keyword">if</span> (workInProgressRoot !== root || workInProgressRootRenderLanes !== lanes) &#123;</span><br><span class="line">    <span class="comment">// 创建 root 节点</span></span><br><span class="line">    prepareFreshStack(root, lanes);</span><br><span class="line">    startWorkOnPendingInteractions(root, lanes);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">do</span> &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="comment">// 循环创建子节点</span></span><br><span class="line">      workLoopSync();</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (thrownValue) &#123;</span><br><span class="line">      handleError(root, thrownValue);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">while</span> (<span class="literal">true</span>);</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在 <em>renderRootSync</em> 方法中，除了创建 <em>rootFiberNode</em> 外，还有非常重要的一个方法 <em>workLoopSync</em>，该方法的作用是循环创建 childern **FiberNode。</p>
+<p><em>workLoopSync</em> 方法的源码非常简单，就是循环处理 <em>workInProgress</em> 对象。<em>workInProgress</em>是个全局对象，React 就是通过不断更新该对象，实现对所有子节点的处理。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">workLoopSync</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="comment">// Already timed out, so perform work without checking if we need to yield.</span></span><br><span class="line">  <span class="keyword">while</span> (workInProgress !== <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'perform unit: '</span>, workInProgress);</span><br><span class="line">    performUnitOfWork(workInProgress);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="performUnitOfWork"><a href="#performUnitOfWork" class="headerlink" title="performUnitOfWork"></a>performUnitOfWork</h3><p><em>performUnitOfWork</em> 里具体做了什么事情呢？我们一步步往下看。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">performUnitOfWork</span>(<span class="params">unitOfWork</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">  <span class="comment">// 记录下一个要处理的节点</span></span><br><span class="line">  <span class="keyword">var</span> next;</span><br><span class="line">  <span class="keyword">if</span> ((unitOfWork.mode &amp; ProfileMode) !== NoMode) &#123;</span><br><span class="line">    startProfilerTimer(unitOfWork);</span><br><span class="line">    next = beginWork$<span class="number">1</span>(current, unitOfWork, subtreeRenderLanes);</span><br><span class="line">    stopProfilerTimerIfRunningAndRecordDelta(unitOfWork, <span class="literal">true</span>);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    next = beginWork$<span class="number">1</span>(current, unitOfWork, subtreeRenderLanes);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">  <span class="keyword">if</span> (next === <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="comment">// 没有next，表示处理完成</span></span><br><span class="line">    <span class="comment">// 注意并不是完成了整个处理流程，只是完成了当前的子流程，具体逻辑后面分析 completeUnitOfWork 时会详细介绍</span></span><br><span class="line">    completeUnitOfWork(unitOfWork);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// 将下一个要处理的节点赋值给 workInProgress，使得 workLoopSync 可以继续循环执行</span></span><br><span class="line">    workInProgress = next;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><em>beginWork$1*方法内部会调用 *beginWork</em> 方法，<em>beginWork</em> 方法代码很长，我们只截取重点部分。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">beginWork</span>(<span class="params">current, workInProgress, renderLanes</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">switch</span> (workInProgress.tag) &#123;</span><br><span class="line">    <span class="keyword">case</span> IndeterminateComponent:</span><br><span class="line">      <span class="comment">// &lt;App /&gt; 对应的 fiberNode 会走到这里</span></span><br><span class="line">      <span class="keyword">return</span> mountIndeterminateComponent(current, workInProgress, workInProgress.type, renderLanes);</span><br><span class="line">    <span class="keyword">case</span> HostRoot:</span><br><span class="line">      <span class="comment">// root 节点（FiberNode） 会走到这里，并返回child，也就是 &lt;React.StrictMode /&gt; 对应的 fiberNode</span></span><br><span class="line">      <span class="keyword">return</span> updateHostRoot(current, workInProgress, renderLanes);</span><br><span class="line">    <span class="keyword">case</span> Mode:</span><br><span class="line">      <span class="comment">// &lt;React.StrictMode /&gt; 对应的 fiberNode 会走到这里，并返回child，也就是 &lt;App /&gt; 对应的 fiberNode</span></span><br><span class="line">      <span class="keyword">return</span> updateMode(current, workInProgress, renderLanes);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>该方法主要工作流程为：</p>
+<ol>
+<li>对 <em>rootFiberNode</em> 执行 <em>updateHostRoot</em> 方法，处理 <em>rootFiberNode<em>，并生成 &lt;React.StrictMode /&gt; 对应的 fiberNode（姑且称之为 *strictModeFiberNode</em>）。此时全局对象 <em>workInProgress</em>被赋值为 <em>strictModeFiberNode</em>，继续 *workRootSync</em> 循环。</li>
+<li>对 <em>strictModeFiberNode</em> 执行 <em>updateMode</em> 方法，处理 <em>strictModeFiberNode</em> ，并生成 <App /> 对应的 fiberNode（姑且称之为 <em>appFiberNode<em>）。此时全局对象 *workInProgress</em>被赋值为 <em>appFiberNode</em>，继续 *workRootSync</em> 循环。</li>
+<li>对 <em>appFiberNode</em> 执行 <em>mountInterminateComponent</em> 方法，处理 <em>appFiberNode<em>，并生成… 等下！</em>appFiberNode</em> 的子节点是什么？好像还没创建过？</li>
+</ol>
+<p><em>appFiberNode</em> 的子节点确实还没有创建，但是先不着急，我们先看下目前的 Element Tree：</p>
+<p><img src="https://docimg4.docs.qq.com/image/2Ov1TkSfXurXii2tRx-KXQ.png?w=516&h=430" alt="https://docimg4.docs.qq.com/image/2Ov1TkSfXurXii2tRx-KXQ.png?w=516&amp;h=430"></p>
+<p>同时，每个 Element 都会有对应的 FiberNode，相应的也就形成了一个 FiberNode Tree。</p>
+<p>为了能更直观地体现其工作流程，我们可以分别在 <em>workLoopSync*和 *jsxDEV</em> 方法内部添加调试日志，然后刷新页面。</p>
+<p><img src="https://docimg8.docs.qq.com/image/kWEoLfQFeSrBXTnITrYIaw.png?w=2270&h=716" alt="https://docimg8.docs.qq.com/image/kWEoLfQFeSrBXTnITrYIaw.png?w=2270&amp;h=716"></p>
+<p>最上面两条 <em>jsxDev</em>方法的日志，对应于前面提到的 JSX 转换逻辑。</p>
+<ol>
+<li>创建 <App /> 对应的 ReactElement。</li>
+<li>创建 &lt;React.StrictMode&gt; 对应的 ReactElement。</li>
+</ol>
+<p>接下来的日志对应 FiberNode 的创建和处理流程。</p>
+<ol>
+<li>处理 <em>rootFiberNode</em></li>
+<li>处理 <em>strictModeFiberNode</em></li>
+<li>处理 <em>appFiberNode</em></li>
+</ol>
+<h2 id="App-Element-Tree-构建"><a href="#App-Element-Tree-构建" class="headerlink" title="App Element Tree 构建"></a>App Element Tree 构建</h2><p>接下来我们继续看上面遗留的问题，App 组件内部的 Element Tree 是如何被创建的。</p>
+<h2 id="创建-App-组件"><a href="#创建-App-组件" class="headerlink" title="创建 App 组件"></a>创建 App 组件</h2><p>在上面的 <em>switch…case…</em> 逻辑中，对 <em>appFiberNode</em> 会执行  <em>mountInterminateComponent</em> 方法，<em>mountInterminateComponent</em> 会调用 <em>renderWithHooks</em> 方法完成 <App /> 组件的创建。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">renderWithHooks</span>(<span class="params">current, workInProgress, Component, props, secondArg, nextRenderLanes</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">  <span class="comment">// 创建 Component</span></span><br><span class="line">  <span class="keyword">var</span> children = Component(props, secondArg);</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">  <span class="keyword">return</span> children;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中的 Component 参数就是用于创建组件的方法，此例中即为 <em>App</em> 方法，也就是项目中 <em>App.js</em> 里的这个方法。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">App</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    &lt;div className=<span class="string">"App"</span>&gt;</span><br><span class="line">      &lt;header className=<span class="string">"App-header"</span>&gt;</span><br><span class="line">        &lt;img src=&#123;logo&#125; className=<span class="string">"App-logo"</span> alt=<span class="string">"logo"</span> /&gt;</span><br><span class="line">        &lt;p&gt;</span><br><span class="line">          Edit &lt;code&gt;src/App.js&lt;<span class="regexp">/code&gt; and save to reload.</span></span><br><span class="line"><span class="regexp">        &lt;/</span>p&gt;</span><br><span class="line">        &lt;a</span><br><span class="line">          className=<span class="string">"App-link"</span></span><br><span class="line">          href=<span class="string">"https://reactjs.org"</span></span><br><span class="line">          target=<span class="string">"_blank"</span></span><br><span class="line">          rel=<span class="string">"noopener noreferrer"</span></span><br><span class="line">        &gt;</span><br><span class="line">          Learn React</span><br><span class="line">        &lt;<span class="regexp">/a&gt;</span></span><br><span class="line"><span class="regexp">      &lt;/</span>header&gt;</span><br><span class="line">    &lt;<span class="regexp">/div&gt;</span></span><br><span class="line"><span class="regexp">  );</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p><em>App</em> 方法内部返回的又是一段 JSX 代码，我们很容易就联想到前问提到的 <em>jsx</em> 和 <em>jsxDEV</em> 方法。<em>App</em> 方法返回值即为该组件对应的 <em>ReactElement</em> 对象。</p>
+<h3 id="Element-Tree-构建"><a href="#Element-Tree-构建" class="headerlink" title="Element Tree 构建"></a>Element Tree 构建</h3><p><em>App</em> 方法执行后，当前的 Element Tree 如下图所示。</p>
+<p><img src="https://docimg10.docs.qq.com/image/uTm-MSNAavuHII7r-DZ6GA.png?w=786&h=906" alt="https://docimg10.docs.qq.com/image/uTm-MSNAavuHII7r-DZ6GA.png?w=786&amp;h=906"></p>
+<p>继续看 <em>workLoopSync*和 *jsxDEV</em> 方法内部的调试日志，输出结果就很清晰了。</p>
+<p><img src="https://docimg7.docs.qq.com/image/-2ikcJqfJzfRQlPTrqeGDg.png?w=2300&h=1122" alt="https://docimg7.docs.qq.com/image/-2ikcJqfJzfRQlPTrqeGDg.png?w=2300&amp;h=1122"></p>
+<p>整体执行流程如下：</p>
+<ol>
+<li>创建 App 组件对应的 Element</li>
+<li>创建 React.StrictMode 组件对应的 Element</li>
+<li>处理 root FiberNode</li>
+<li>处理 React.StrictMode 对应的 FiberNode</li>
+<li>处理 App 对应的 FiberNode</li>
+<li>依次创建 App 内部的组件对应的 Element</li>
+<li>依次处理 App 内部组件对应的 FiberNode</li>
+</ol>
+<h3 id="Element-Tree-处理顺序"><a href="#Element-Tree-处理顺序" class="headerlink" title="Element Tree 处理顺序"></a><strong>Element Tree 处理顺序</strong></h3><p>我们详细看上面的日志的话，会发现 App 内部的处理流程为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">div -&gt; header -&gt; img -&gt; p -&gt; text -&gt; code -&gt; text -&gt; a</span><br></pre></td></tr></table></figure>
+
+<p>对应着 Element Tree：</p>
+<p><img src="https://docimg10.docs.qq.com/image/uTm-MSNAavuHII7r-DZ6GA.png?w=786&h=906" alt="https://docimg10.docs.qq.com/image/uTm-MSNAavuHII7r-DZ6GA.png?w=786&amp;h=906"></p>
+<p>可以看出，对 Element Tree 进行处理时，首先采用深度优先算法，找到最底层的元素；</p>
+<ol>
+<li>深度优先，直到最底层的节点。</li>
+<li>最底层的节点没有子节点，继续找最底层节点的兄弟（sibling）节点。</li>
+<li>找到兄弟节点，继续第1步；否则结束。</li>
+</ol>
+<p>这也就能解释我们在 <strong>performUnitOfWork</strong> 一节中提到 <em>performUnitOfWork</em> 方法时，遗留了一个问题：<em>completeUnitOfWork</em> 只是完成了当前的子流程，而不是整体流程。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">performUnitOfWork</span>(<span class="params">unitOfWork</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">  <span class="keyword">if</span> (next === <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="comment">// 没有next，表示处理完成</span></span><br><span class="line">    <span class="comment">// 注意并不是完成了整个处理流程，只是完成了当前的子流程，具体逻辑后面分析 completeUnitOfWork 时会详细介绍</span></span><br><span class="line">    completeUnitOfWork(unitOfWork);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// 将下一个要处理的节点赋值给 workInProgress，使得 workLoopSync 可以继续循环执行</span></span><br><span class="line">    workInProgress = next;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>执行到 <em>completeUnitOfWork</em> 时，表示当前最底层的节点已经找到，没有子节点了。<em>completeUnitOfWork</em> 方法内部会将全部变量 <em>workInProgress</em> 赋值为其兄弟节点，也就是上面流程中的第2步。</p>
+<p>因此，<em>completeUnitOfWork</em> 只是结束了当前子树的深度遍历流程，并没有完成整体 Element Tree 的处理流程。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文重点介绍了 React 中组件的构建及处理流程，以 <em>ReactDOM.render</em> 方法为切入点，分别介绍了 ReactElement 的创建、FiberNode 的创建以及 Element Tree 的处理流程等。很多细节问题并没有做过多介绍，后面的文章会有进一步的说明。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="http://blog.jerrychu.top/2021/01/30/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%A3%80%E6%B5%8B%E5%B7%A5%E5%85%B7-JCLeaksFinder/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -181,7 +349,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2021-01-30 16:01:36 / Modified: 17:08:25" itemprop="dateCreated datePublished" datetime="2021-01-30T16:01:36+08:00">2021-01-30</time>
+              <time title="Created: 2021-01-30 16:01:36 / Modified: 22:17:44" itemprop="dateCreated datePublished" datetime="2021-01-30T16:01:36+08:00">2021-01-30</time>
             </span>
 
           
@@ -195,13 +363,13 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>在 <a href="https://blog.jerrychu.top/2020/12/05/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%A3%80%E6%B5%8B%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/">如何优雅地检测内存泄漏</a> 一文中，我们介绍了如何在 iOS 中快速高效地检测并修复内存泄漏，再回顾一下要点：</p>
+          <p><a href="https://blog.jerrychu.top/2020/12/05/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%A3%80%E6%B5%8B%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/">如何优雅地检测内存泄漏</a> 一文介绍了如何在 iOS 中快速高效地检测并修复内存泄漏，要点如下：</p>
 <ul>
 <li>使用 MLeaksFinder 等工具找到内存泄漏对象</li>
 <li>使用 FBRetainCycleDetector 获取循环引用链 </li>
 <li>（对于被全局对象引用的场景）获取全局对象引用链</li>
 </ul>
-<h2 id="JCLeaksFinder"><a href="#JCLeaksFinder" class="headerlink" title="JCLeaksFinder"></a>JCLeaksFinder</h2><p>为了方便大家使用，我把上述功能进行了统一封装，开源了 <a href="https://github.com/JerryChu/JCLeaksFinder" target="_blank" rel="noopener">JCLeaksFinder</a> 项目。<code>JCLeaksFinder</code> 基于 <a href="https://github.com/Tencent/MLeaksFinder" target="_blank" rel="noopener">MLeaksFinder</a> 和 <a href="https://github.com/facebook/FBRetainCycleDetector" target="_blank" rel="noopener">FBRetainCycleDetector</a>。</p>
+<h2 id="JCLeaksFinder"><a href="#JCLeaksFinder" class="headerlink" title="JCLeaksFinder"></a>JCLeaksFinder</h2><p>为了方便使用，我把上述功能进行了统一封装，开源了 <a href="https://github.com/JerryChu/JCLeaksFinder" target="_blank" rel="noopener">JCLeaksFinder</a> 项目。<code>JCLeaksFinder</code> 基于 <a href="https://github.com/Tencent/MLeaksFinder" target="_blank" rel="noopener">MLeaksFinder</a> 和 <a href="https://github.com/facebook/FBRetainCycleDetector" target="_blank" rel="noopener">FBRetainCycleDetector</a>。</p>
 <ul>
 <li>MLeaksFinder 负责找到内存泄漏对象。</li>
 <li>FBRetainCycleDetector 负责输出循环引用链。</li>
@@ -1044,7 +1212,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2020/12/05/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%A3%80%E6%B5%8B%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" class="post-title-link" itemprop="url">内存泄漏检测最佳实践（一）</a>
+            <a href="/2020/12/05/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%A3%80%E6%B5%8B%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" class="post-title-link" itemprop="url">如何优雅地检测内存泄漏</a>
         </h2>
 
         <div class="post-meta">
@@ -1053,10 +1221,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2020-12-05 19:12:53 / Modified: 21:41:47" itemprop="dateCreated datePublished" datetime="2020-12-05T19:12:53+08:00">2020-12-05</time>
+              <time title="Created: 2020-12-05 19:12:53" itemprop="dateCreated datePublished" datetime="2020-12-05T19:12:53+08:00">2020-12-05</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-30 22:17:49" itemprop="dateModified" datetime="2021-01-30T22:17:49+08:00">2021-01-30</time>
+              </span>
 
           
 
@@ -1134,7 +1308,7 @@
 
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文介绍了如何通过自动化工具进行页面级别的内存泄漏检测，并输出详细的循环引用和全局对象引用信息，方便开发者快速高效地发现并修复内存泄漏问题。  </p>
 <p>值得注意的是，内存泄漏的自动化检测必然存在<code>False Positive</code>，也就是把不是内存泄漏的场景判定是内存泄漏。因为对象无论是被循环引用还是被全局对象引用，只要符合预期（对象还<strong>有用</strong>），那么就不应该被判定为内存泄漏。内存泄漏自动检测工具一般都会提供白名单机制，用于忽略不应该被判定为内存泄漏的场景。</p>
-<p>本文是 <strong>内存泄漏检测最佳实践</strong> 的第一篇，后续会继续记录更多的内存泄漏检测实践，欢迎关注！</p>
+<p>iOS 内存泄漏检测工具已经<a href="https://github.com/JerryChu/JCLeaksFinder" target="_blank" rel="noopener">在Github开源</a>，欢迎关注！</p>
 
       
     </div>
@@ -3153,14 +3327,14 @@ dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">27</span>
+          <span class="site-state-item-count">28</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-count">20</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>

@@ -20,14 +20,14 @@
     var CONFIG = {"hostname":"blog.jerrychu.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="在 如何优雅地检测内存泄漏 一文中，我们介绍了如何在 iOS 中快速高效地检测并修复内存泄漏，再回顾一下要点：  使用 MLeaksFinder 等工具找到内存泄漏对象 使用 FBRetainCycleDetector 获取循环引用链  （对于被全局对象引用的场景）获取全局对象引用链  JCLeaksFinder为了方便大家使用，我把上述功能进行了统一封装，开源了 JCLeaksFinder 项目">
+  <meta name="description" content="如何优雅地检测内存泄漏 一文介绍了如何在 iOS 中快速高效地检测并修复内存泄漏，要点如下：  使用 MLeaksFinder 等工具找到内存泄漏对象 使用 FBRetainCycleDetector 获取循环引用链  （对于被全局对象引用的场景）获取全局对象引用链  JCLeaksFinder为了方便使用，我把上述功能进行了统一封装，开源了 JCLeaksFinder 项目。JCLeaksFin">
 <meta property="og:type" content="article">
 <meta property="og:title" content="内存泄漏检测工具 - JCLeaksFinder">
 <meta property="og:url" content="http://blog.jerrychu.top/2021/01/30/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%A3%80%E6%B5%8B%E5%B7%A5%E5%85%B7-JCLeaksFinder/index.html">
 <meta property="og:site_name" content="++">
-<meta property="og:description" content="在 如何优雅地检测内存泄漏 一文中，我们介绍了如何在 iOS 中快速高效地检测并修复内存泄漏，再回顾一下要点：  使用 MLeaksFinder 等工具找到内存泄漏对象 使用 FBRetainCycleDetector 获取循环引用链  （对于被全局对象引用的场景）获取全局对象引用链  JCLeaksFinder为了方便大家使用，我把上述功能进行了统一封装，开源了 JCLeaksFinder 项目">
+<meta property="og:description" content="如何优雅地检测内存泄漏 一文介绍了如何在 iOS 中快速高效地检测并修复内存泄漏，要点如下：  使用 MLeaksFinder 等工具找到内存泄漏对象 使用 FBRetainCycleDetector 获取循环引用链  （对于被全局对象引用的场景）获取全局对象引用链  JCLeaksFinder为了方便使用，我把上述功能进行了统一封装，开源了 JCLeaksFinder 项目。JCLeaksFin">
 <meta property="article:published_time" content="2021-01-30T08:01:36.000Z">
-<meta property="article:modified_time" content="2021-01-30T09:08:25.896Z">
+<meta property="article:modified_time" content="2021-01-30T14:17:44.686Z">
 <meta property="article:author" content="JerryChu">
 <meta property="article:tag" content="iOS">
 <meta property="article:tag" content="Performance">
@@ -187,7 +187,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2021-01-30 16:01:36 / Modified: 17:08:25" itemprop="dateCreated datePublished" datetime="2021-01-30T16:01:36+08:00">2021-01-30</time>
+              <time title="Created: 2021-01-30 16:01:36 / Modified: 22:17:44" itemprop="dateCreated datePublished" datetime="2021-01-30T16:01:36+08:00">2021-01-30</time>
             </span>
 
           
@@ -201,13 +201,13 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>在 <a href="https://blog.jerrychu.top/2020/12/05/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%A3%80%E6%B5%8B%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/">如何优雅地检测内存泄漏</a> 一文中，我们介绍了如何在 iOS 中快速高效地检测并修复内存泄漏，再回顾一下要点：</p>
+        <p><a href="https://blog.jerrychu.top/2020/12/05/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%A3%80%E6%B5%8B%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/">如何优雅地检测内存泄漏</a> 一文介绍了如何在 iOS 中快速高效地检测并修复内存泄漏，要点如下：</p>
 <ul>
 <li>使用 MLeaksFinder 等工具找到内存泄漏对象</li>
 <li>使用 FBRetainCycleDetector 获取循环引用链 </li>
 <li>（对于被全局对象引用的场景）获取全局对象引用链</li>
 </ul>
-<h2 id="JCLeaksFinder"><a href="#JCLeaksFinder" class="headerlink" title="JCLeaksFinder"></a>JCLeaksFinder</h2><p>为了方便大家使用，我把上述功能进行了统一封装，开源了 <a href="https://github.com/JerryChu/JCLeaksFinder" target="_blank" rel="noopener">JCLeaksFinder</a> 项目。<code>JCLeaksFinder</code> 基于 <a href="https://github.com/Tencent/MLeaksFinder" target="_blank" rel="noopener">MLeaksFinder</a> 和 <a href="https://github.com/facebook/FBRetainCycleDetector" target="_blank" rel="noopener">FBRetainCycleDetector</a>。</p>
+<h2 id="JCLeaksFinder"><a href="#JCLeaksFinder" class="headerlink" title="JCLeaksFinder"></a>JCLeaksFinder</h2><p>为了方便使用，我把上述功能进行了统一封装，开源了 <a href="https://github.com/JerryChu/JCLeaksFinder" target="_blank" rel="noopener">JCLeaksFinder</a> 项目。<code>JCLeaksFinder</code> 基于 <a href="https://github.com/Tencent/MLeaksFinder" target="_blank" rel="noopener">MLeaksFinder</a> 和 <a href="https://github.com/facebook/FBRetainCycleDetector" target="_blank" rel="noopener">FBRetainCycleDetector</a>。</p>
 <ul>
 <li>MLeaksFinder 负责找到内存泄漏对象。</li>
 <li>FBRetainCycleDetector 负责输出循环引用链。</li>
@@ -256,7 +256,10 @@
     <a href="/2021/01/23/%E8%8E%B7%E5%8F%96OC%E5%AF%B9%E8%B1%A1%E7%9A%84%E6%89%80%E6%9C%89%E5%BC%BA%E5%BC%95%E7%94%A8%E5%AF%B9%E8%B1%A13/" rel="prev" title="获取OC对象的所有强引用对象（三）">
       <i class="fa fa-chevron-left"></i> 获取OC对象的所有强引用对象（三）
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2021/08/15/React%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%88%E4%B8%80%EF%BC%89/" rel="next" title="React探索之组件构建及处理流程">
+      React探索之组件构建及处理流程 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -329,14 +332,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">27</span>
+          <span class="site-state-item-count">28</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-count">20</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
