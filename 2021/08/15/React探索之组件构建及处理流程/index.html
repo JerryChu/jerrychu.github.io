@@ -26,21 +26,21 @@
 <meta property="og:url" content="http://blog.jerrychu.top/2021/08/15/React%E6%8E%A2%E7%B4%A2%E4%B9%8B%E7%BB%84%E4%BB%B6%E6%9E%84%E5%BB%BA%E5%8F%8A%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B/index.html">
 <meta property="og:site_name" content="++">
 <meta property="og:description" content="开发环境使用 create-react-app 创建 demo 项目。 12345678910111213141516171819202122232425262728293031╰─○ npx create-react-app react-demonpx: 67 安装成功，用时 10.485 秒Creating a new React app in &#x2F;Users&#x2F;chujiayi&#x2F;StudySta">
-<meta property="og:image" content="https://docimg10.docs.qq.com/image/vUpJxrhEocjhV1uo3OH2UA.png?w=2268&h=916">
-<meta property="og:image" content="http://blog.jerrychu.top/images/main.chunk.js.png">
-<meta property="og:image" content="https://docimg4.docs.qq.com/image/2Ov1TkSfXurXii2tRx-KXQ.png?w=516&h=430">
-<meta property="og:image" content="https://docimg8.docs.qq.com/image/kWEoLfQFeSrBXTnITrYIaw.png?w=2270&h=716">
-<meta property="og:image" content="https://docimg10.docs.qq.com/image/uTm-MSNAavuHII7r-DZ6GA.png?w=786&h=906">
-<meta property="og:image" content="https://docimg7.docs.qq.com/image/-2ikcJqfJzfRQlPTrqeGDg.png?w=2300&h=1122">
+<meta property="og:image" content="http://blog.jerrychu.top/images/react0/folder.png">
+<meta property="og:image" content="http://blog.jerrychu.top/images/react0/js.png">
+<meta property="og:image" content="http://blog.jerrychu.top/images/react0/tree0.png">
+<meta property="og:image" content="http://blog.jerrychu.top/images/react0/log0.png">
+<meta property="og:image" content="http://blog.jerrychu.top/images/react0/tree1.png">
+<meta property="og:image" content="http://blog.jerrychu.top/images/react0/log1.png">
 <meta property="og:image" content="https://docimg10.docs.qq.com/image/uTm-MSNAavuHII7r-DZ6GA.png?w=786&h=906">
 <meta property="article:published_time" content="2021-08-15T15:16:42.000Z">
-<meta property="article:modified_time" content="2021-08-16T11:16:41.153Z">
+<meta property="article:modified_time" content="2021-08-16T11:26:06.003Z">
 <meta property="article:author" content="JerryChu">
 <meta property="article:tag" content="React">
 <meta property="article:tag" content="前端">
 <meta property="article:tag" content="源码">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://docimg10.docs.qq.com/image/vUpJxrhEocjhV1uo3OH2UA.png?w=2268&h=916">
+<meta name="twitter:image" content="http://blog.jerrychu.top/images/react0/folder.png">
 
 <link rel="canonical" href="http://blog.jerrychu.top/2021/08/15/React%E6%8E%A2%E7%B4%A2%E4%B9%8B%E7%BB%84%E4%BB%B6%E6%9E%84%E5%BB%BA%E5%8F%8A%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B/">
 
@@ -202,7 +202,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-08-16 19:16:41" itemprop="dateModified" datetime="2021-08-16T19:16:41+08:00">2021-08-16</time>
+                <time title="Modified: 2021-08-16 19:26:06" itemprop="dateModified" datetime="2021-08-16T19:26:06+08:00">2021-08-16</time>
               </span>
 
           
@@ -220,7 +220,7 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">╰─○ npx create-react-app react-demo</span><br><span class="line"></span><br><span class="line">npx: 67 安装成功，用时 10.485 秒</span><br><span class="line"></span><br><span class="line">Creating a new React app in /Users/chujiayi/StudyStation/React/react-demo.</span><br><span class="line"></span><br><span class="line">Installing packages. This might take a couple of minutes.</span><br><span class="line">Installing react, react-dom, and react-scripts with cra-template...</span><br><span class="line"></span><br><span class="line">yarn add v1.22.10</span><br><span class="line">[1/4] 🔍  Resolving packages...</span><br><span class="line">[2/4] 🚚  Fetching packages...</span><br><span class="line">[3/4] 🔗  Linking dependencies...</span><br><span class="line">warning "react-scripts &gt; @typescript-eslint/eslint-plugin &gt; tsutils@3.20.0" has unmet peer dependency "typescript@&gt;=2.8.0 || &gt;= 3.2.0-dev || &gt;= 3.3.0-dev || &gt;= 3.4.0-dev || &gt;= 3.5.0-dev || &gt;= 3.6.0-dev || &gt;= 3.6.0-beta || &gt;= 3.7.0-dev || &gt;= 3.7.0-beta".</span><br><span class="line">[4/4] 🔨  Building fresh packages...</span><br><span class="line">success Saved lockfile.</span><br><span class="line">success Saved 7 new dependencies.</span><br><span class="line">info Direct dependencies</span><br><span class="line">├─ cra-template@1.1.2</span><br><span class="line">├─ react-dom@17.0.2</span><br><span class="line">├─ react-scripts@4.0.3</span><br><span class="line">└─ react@17.0.2</span><br><span class="line">info All dependencies</span><br><span class="line">├─ cra-template@1.1.2</span><br><span class="line">├─ immer@8.0.1</span><br><span class="line">├─ react-dev-utils@11.0.4</span><br><span class="line">├─ react-dom@17.0.2</span><br><span class="line">├─ react-scripts@4.0.3</span><br><span class="line">├─ react@17.0.2</span><br><span class="line">└─ scheduler@0.20.2</span><br><span class="line">✨  Done in 162.25s.</span><br></pre></td></tr></table></figure>
 
 <p>项目结构如下图所示：</p>
-<p><img src="https://docimg10.docs.qq.com/image/vUpJxrhEocjhV1uo3OH2UA.png?w=2268&h=916" alt="https://docimg10.docs.qq.com/image/vUpJxrhEocjhV1uo3OH2UA.png?w=2268&amp;h=916"></p>
+<p><img src="/images/react0/folder.png" alt="js代码"></p>
 <p>执行start 命令：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">yarn start</span><br><span class="line">// 源码：node_modules/react-scripts/scripts/start.js</span><br></pre></td></tr></table></figure>
 
@@ -234,7 +234,7 @@
 <p>其中后两个参数比较直观，我们传入的是 <em>root</em> 节点和空的回调函数。但是第一个 <em>element</em> 参数，我们传入的明明是一段 JSX 代码，怎么就变成一个 <em>ReactElement</em> 对象了呢。  </p>
 <h3 id="ReactElement-创建"><a href="#ReactElement-创建" class="headerlink" title="ReactElement 创建"></a>ReactElement 创建</h3><p>了解 React 的同学都知道，浏览器并不认识 JSX 代码，所以在运行之前需要被编译为普通的 JS 代码，这一步会在打包过程中完成。</p>
 <p><em>index.js</em> 中的这段代码，会被编译为如下 JS 代码：</p>
-<p><img src="/images/main.chunk.js.png" alt="main.chunk.js"></p>
+<p><img src="/images/react0/js.png" alt="js代码"></p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render( <span class="comment">/*#__PURE__*/</span><span class="built_in">Object</span>(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_5__[<span class="string">"jsxDEV"</span>])(react__WEBPACK_IMPORTED_MODULE_0___default.a.StrictMode, &#123;</span><br><span class="line">  children: <span class="comment">/*#__PURE__*/</span><span class="built_in">Object</span>(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_5__[<span class="string">"jsxDEV"</span>])(_App__WEBPACK_IMPORTED_MODULE_3__[<span class="string">"default"</span>], &#123;&#125;, <span class="keyword">void</span> <span class="number">0</span>, <span class="literal">false</span>, &#123;</span><br><span class="line">    fileName: _jsxFileName,</span><br><span class="line">    lineNumber: <span class="number">9</span>,</span><br><span class="line">    columnNumber: <span class="number">5</span></span><br><span class="line">  &#125;, <span class="literal">undefined</span>)</span><br><span class="line">&#125;, <span class="keyword">void</span> <span class="number">0</span>, <span class="literal">false</span>, &#123;</span><br><span class="line">  fileName: _jsxFileName,</span><br><span class="line">  lineNumber: <span class="number">8</span>,</span><br><span class="line">  columnNumber: <span class="number">3</span></span><br><span class="line">&#125;, <span class="literal">undefined</span>), <span class="built_in">document</span>.getElementById(<span class="string">'root'</span>));</span><br></pre></td></tr></table></figure>
 
 <p>看着可能有些复杂，我们可以精简为如下代码。</p>
@@ -272,10 +272,10 @@
 <li>对 <em>appFiberNode</em> 执行 <em>mountInterminateComponent</em> 方法，处理 <em>appFiberNode<em>，并生成… 等下！</em>appFiberNode</em> 的子节点是什么？好像还没创建过？</li>
 </ol>
 <p><em>appFiberNode</em> 的子节点确实还没有创建，但是先不着急，我们先看下目前的 Element Tree：</p>
-<p><img src="https://docimg4.docs.qq.com/image/2Ov1TkSfXurXii2tRx-KXQ.png?w=516&h=430" alt="https://docimg4.docs.qq.com/image/2Ov1TkSfXurXii2tRx-KXQ.png?w=516&amp;h=430"></p>
+<p><img src="/images/react0/tree0.png" alt="Element Tree"></p>
 <p>同时，每个 Element 都会有对应的 FiberNode，相应的也就形成了一个 FiberNode Tree。</p>
 <p>为了能更直观地体现其工作流程，我们可以分别在 <em>workLoopSync*和 *jsxDEV</em> 方法内部添加调试日志，然后刷新页面。</p>
-<p><img src="https://docimg8.docs.qq.com/image/kWEoLfQFeSrBXTnITrYIaw.png?w=2270&h=716" alt="https://docimg8.docs.qq.com/image/kWEoLfQFeSrBXTnITrYIaw.png?w=2270&amp;h=716"></p>
+<p><img src="/images/react0/log0.png" alt="日志"></p>
 <p>最上面两条 <em>jsxDev</em>方法的日志，对应于前面提到的 JSX 转换逻辑。</p>
 <ol>
 <li>创建 <App /> 对应的 ReactElement。</li>
@@ -296,9 +296,9 @@
 
 <p><em>App</em> 方法内部返回的又是一段 JSX 代码，我们很容易就联想到前问提到的 <em>jsx</em> 和 <em>jsxDEV</em> 方法。<em>App</em> 方法返回值即为该组件对应的 <em>ReactElement</em> 对象。</p>
 <h3 id="Element-Tree-构建"><a href="#Element-Tree-构建" class="headerlink" title="Element Tree 构建"></a>Element Tree 构建</h3><p><em>App</em> 方法执行后，当前的 Element Tree 如下图所示。</p>
-<p><img src="https://docimg10.docs.qq.com/image/uTm-MSNAavuHII7r-DZ6GA.png?w=786&h=906" alt="https://docimg10.docs.qq.com/image/uTm-MSNAavuHII7r-DZ6GA.png?w=786&amp;h=906"></p>
+<p><img src="/images/react0/tree1.png" alt="Element Tree"></p>
 <p>继续看 <em>workLoopSync*和 *jsxDEV</em> 方法内部的调试日志，输出结果就很清晰了。</p>
-<p><img src="https://docimg7.docs.qq.com/image/-2ikcJqfJzfRQlPTrqeGDg.png?w=2300&h=1122" alt="https://docimg7.docs.qq.com/image/-2ikcJqfJzfRQlPTrqeGDg.png?w=2300&amp;h=1122"></p>
+<p><img src="/images/react0/log1.png" alt="日志"></p>
 <p>整体执行流程如下：</p>
 <ol>
 <li>创建 App 组件对应的 Element</li>
