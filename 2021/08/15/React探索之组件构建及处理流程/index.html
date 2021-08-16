@@ -23,18 +23,18 @@
   <meta name="description" content="开发环境使用 create-react-app 创建 demo 项目。 12345678910111213141516171819202122232425262728293031╰─○ npx create-react-app react-demonpx: 67 安装成功，用时 10.485 秒Creating a new React app in &#x2F;Users&#x2F;chujiayi&#x2F;StudySta">
 <meta property="og:type" content="article">
 <meta property="og:title" content="React探索之组件构建及处理流程">
-<meta property="og:url" content="http://blog.jerrychu.top/2021/08/15/React%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%88%E4%B8%80%EF%BC%89/index.html">
+<meta property="og:url" content="http://blog.jerrychu.top/2021/08/15/React%E6%8E%A2%E7%B4%A2%E4%B9%8B%E7%BB%84%E4%BB%B6%E6%9E%84%E5%BB%BA%E5%8F%8A%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B/index.html">
 <meta property="og:site_name" content="++">
 <meta property="og:description" content="开发环境使用 create-react-app 创建 demo 项目。 12345678910111213141516171819202122232425262728293031╰─○ npx create-react-app react-demonpx: 67 安装成功，用时 10.485 秒Creating a new React app in &#x2F;Users&#x2F;chujiayi&#x2F;StudySta">
 <meta property="og:image" content="https://docimg10.docs.qq.com/image/vUpJxrhEocjhV1uo3OH2UA.png?w=2268&h=916">
-<meta property="og:image" content="https://docimg8.docs.qq.com/image/K6NyLMHm1lMATHLzVXXhew.png?w=2888&h=432">
+<meta property="og:image" content="http://blog.jerrychu.top/images/main.chunk.js.png">
 <meta property="og:image" content="https://docimg4.docs.qq.com/image/2Ov1TkSfXurXii2tRx-KXQ.png?w=516&h=430">
 <meta property="og:image" content="https://docimg8.docs.qq.com/image/kWEoLfQFeSrBXTnITrYIaw.png?w=2270&h=716">
 <meta property="og:image" content="https://docimg10.docs.qq.com/image/uTm-MSNAavuHII7r-DZ6GA.png?w=786&h=906">
 <meta property="og:image" content="https://docimg7.docs.qq.com/image/-2ikcJqfJzfRQlPTrqeGDg.png?w=2300&h=1122">
 <meta property="og:image" content="https://docimg10.docs.qq.com/image/uTm-MSNAavuHII7r-DZ6GA.png?w=786&h=906">
 <meta property="article:published_time" content="2021-08-15T15:16:42.000Z">
-<meta property="article:modified_time" content="2021-08-15T15:41:47.748Z">
+<meta property="article:modified_time" content="2021-08-16T11:16:41.153Z">
 <meta property="article:author" content="JerryChu">
 <meta property="article:tag" content="React">
 <meta property="article:tag" content="前端">
@@ -42,7 +42,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://docimg10.docs.qq.com/image/vUpJxrhEocjhV1uo3OH2UA.png?w=2268&h=916">
 
-<link rel="canonical" href="http://blog.jerrychu.top/2021/08/15/React%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%88%E4%B8%80%EF%BC%89/">
+<link rel="canonical" href="http://blog.jerrychu.top/2021/08/15/React%E6%8E%A2%E7%B4%A2%E4%B9%8B%E7%BB%84%E4%BB%B6%E6%9E%84%E5%BB%BA%E5%8F%8A%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B/">
 
 
 <script id="page-configurations">
@@ -172,7 +172,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="http://blog.jerrychu.top/2021/08/15/React%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%EF%BC%88%E4%B8%80%EF%BC%89/">
+    <link itemprop="mainEntityOfPage" href="http://blog.jerrychu.top/2021/08/15/React%E6%8E%A2%E7%B4%A2%E4%B9%8B%E7%BB%84%E4%BB%B6%E6%9E%84%E5%BB%BA%E5%8F%8A%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -194,10 +194,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2021-08-15 23:16:42 / Modified: 23:41:47" itemprop="dateCreated datePublished" datetime="2021-08-15T23:16:42+08:00">2021-08-15</time>
+              <time title="Created: 2021-08-15 23:16:42" itemprop="dateCreated datePublished" datetime="2021-08-15T23:16:42+08:00">2021-08-15</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-08-16 19:16:41" itemprop="dateModified" datetime="2021-08-16T19:16:41+08:00">2021-08-16</time>
+              </span>
 
           
 
@@ -228,7 +234,7 @@
 <p>其中后两个参数比较直观，我们传入的是 <em>root</em> 节点和空的回调函数。但是第一个 <em>element</em> 参数，我们传入的明明是一段 JSX 代码，怎么就变成一个 <em>ReactElement</em> 对象了呢。  </p>
 <h3 id="ReactElement-创建"><a href="#ReactElement-创建" class="headerlink" title="ReactElement 创建"></a>ReactElement 创建</h3><p>了解 React 的同学都知道，浏览器并不认识 JSX 代码，所以在运行之前需要被编译为普通的 JS 代码，这一步会在打包过程中完成。</p>
 <p><em>index.js</em> 中的这段代码，会被编译为如下 JS 代码：</p>
-<p><img src="https://docimg8.docs.qq.com/image/K6NyLMHm1lMATHLzVXXhew.png?w=2888&h=432" alt="https://docimg8.docs.qq.com/image/K6NyLMHm1lMATHLzVXXhew.png?w=2888&amp;h=432"></p>
+<p><img src="/images/main.chunk.js.png" alt="main.chunk.js"></p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render( <span class="comment">/*#__PURE__*/</span><span class="built_in">Object</span>(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_5__[<span class="string">"jsxDEV"</span>])(react__WEBPACK_IMPORTED_MODULE_0___default.a.StrictMode, &#123;</span><br><span class="line">  children: <span class="comment">/*#__PURE__*/</span><span class="built_in">Object</span>(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_5__[<span class="string">"jsxDEV"</span>])(_App__WEBPACK_IMPORTED_MODULE_3__[<span class="string">"default"</span>], &#123;&#125;, <span class="keyword">void</span> <span class="number">0</span>, <span class="literal">false</span>, &#123;</span><br><span class="line">    fileName: _jsxFileName,</span><br><span class="line">    lineNumber: <span class="number">9</span>,</span><br><span class="line">    columnNumber: <span class="number">5</span></span><br><span class="line">  &#125;, <span class="literal">undefined</span>)</span><br><span class="line">&#125;, <span class="keyword">void</span> <span class="number">0</span>, <span class="literal">false</span>, &#123;</span><br><span class="line">  fileName: _jsxFileName,</span><br><span class="line">  lineNumber: <span class="number">8</span>,</span><br><span class="line">  columnNumber: <span class="number">3</span></span><br><span class="line">&#125;, <span class="literal">undefined</span>), <span class="built_in">document</span>.getElementById(<span class="string">'root'</span>));</span><br></pre></td></tr></table></figure>
 
 <p>看着可能有些复杂，我们可以精简为如下代码。</p>
