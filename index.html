@@ -156,6 +156,157 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://blog.jerrychu.top/2021/08/22/React%E6%8E%A2%E7%B4%A2%E4%B9%8BFiberRootNode/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="JerryChu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="++">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/08/22/React%E6%8E%A2%E7%B4%A2%E4%B9%8BFiberRootNode/" class="post-title-link" itemprop="url">React探索之FiberRootNode</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-08-22 18:45:02 / Modified: 18:49:19" itemprop="dateCreated datePublished" datetime="2021-08-22T18:45:02+08:00">2021-08-22</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <blockquote>
+<p>本文是 <a href="https://blog.jerrychu.top/tags/React/">React探索</a> 系列的第二篇文章。</p>
+</blockquote>
+<p><a href="https://blog.jerrychu.top/2021/08/15/React%E6%8E%A2%E7%B4%A2%E4%B9%8B%E7%BB%84%E4%BB%B6%E6%9E%84%E5%BB%BA%E5%8F%8A%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B/">上一篇文章</a> 总整体上介绍了 React 组件构建及处理流程，对部分细节并没有进行深入的分析。本文重点分析 React 的 <em>render</em> 阶段比较重要的几个概念，便于后续理解 React 的源码。</p>
+<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>我们还是从入口函数 <em>render</em> 看起。</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">render</span>(<span class="params">element, container, callback</span>) </span>&#123;</span><br><span class="line">	<span class="comment">// ...</span></span><br><span class="line">  <span class="keyword">return</span> legacyRenderSubtreeIntoContainer(<span class="literal">null</span>, element, container, <span class="literal">false</span>, callback);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">legacyRenderSubtreeIntoContainer</span>(<span class="params">parentComponent, children, container, forceHydrate, callback</span>) </span>&#123;</span><br><span class="line">	<span class="comment">// ...</span></span><br><span class="line">  <span class="keyword">var</span> root = container._reactRootContainer;</span><br><span class="line">  <span class="keyword">var</span> fiberRoot;</span><br><span class="line">	<span class="keyword">if</span> (!root) &#123;</span><br><span class="line">		<span class="comment">// Initial mount</span></span><br><span class="line">		root = container._reactRootContainer = legacyCreateRootFromDOMContainer(container, forceHydrate);</span><br><span class="line">		fiberRoot = root._internalRoot;</span><br><span class="line">		<span class="comment">// ...       </span></span><br><span class="line">		<span class="comment">// Initial mount should not be batched.</span></span><br><span class="line">    unbatchedUpdates(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">			updateContainer(children, fiberRoot, parentComponent, callback);</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		fiberRoot = root._internalRoot;</span><br><span class="line">		<span class="comment">// Update</span></span><br><span class="line">    updateContainer(children, fiberRoot, parentComponent, callback);</span><br><span class="line">  &#125;</span><br><span class="line">	<span class="keyword">return</span> getPublicRootInstance(fiberRoot);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在 <em>legacyRenderSubtreeIntoContainer</em> 中出现了如下几个变量，我在第一次看源码时有些摸不到头脑，产生了深深的疑问。</p>
+<ul>
+<li><em>root</em> 和 <em>fiberRoot</em> 的关系是什么？</li>
+<li><em>fiberRoot</em> 的作用是什么？</li>
+<li><em>container._reactRootContainer</em> 的作用是什么？</li>
+</ul>
+<p>接下来我们就继续深入源码，逐个解决上面的问题。</p>
+<h2 id="RootFiberNode"><a href="#RootFiberNode" class="headerlink" title="RootFiberNode"></a>RootFiberNode</h2><p> 首先我们来看 root 变量。</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">root = container._reactRootContainer = legacyCreateRootFromDOMContainer(container, forceHydrate);</span><br></pre></td></tr></table></figure>
+
+<p>这行代码做了两件事：</p>
+<ol>
+<li>调用 <em>legacyCreateRootFromDOMContainer</em> 方法，该方法最终返回一个 <code>FiberRootNode</code> 对象。</li>
+<li>将 <em>root</em> 与 <em>container._reactRootContainer</em> 复制为同一个对象。</li>
+</ol>
+<h3 id="legacyCreateRootFromDOMContainer"><a href="#legacyCreateRootFromDOMContainer" class="headerlink" title="legacyCreateRootFromDOMContainer"></a>legacyCreateRootFromDOMContainer</h3><p>继续看 <em>legacyCreateRootFromDOMContainer</em> 方法的源码。</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">legacyCreateRootFromDOMContainer</span>(<span class="params">container, forceHydrate</span>) </span>&#123;  </span><br><span class="line">  <span class="keyword">var</span> shouldHydrate = forceHydrate || shouldHydrateDueToLegacyHeuristic(container); <span class="comment">// First clear any existing content.</span></span><br><span class="line">	<span class="comment">// ..</span></span><br><span class="line">  <span class="keyword">return</span> createLegacyRoot(container, shouldHydrate ? &#123;</span><br><span class="line">	  hydrate: <span class="literal">true</span></span><br><span class="line">	&#125; : <span class="literal">undefined</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>先不用管 <em>hydrate</em> 相关的变量（涉及到服务端渲染），我们继续看 <em>createLegacyRoot</em> 方法。</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">createLegacyRoot</span>(<span class="params">container, options</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> ReactDOMBlockingRoot(container, LegacyRoot, options);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">ReactDOMBlockingRoot</span>(<span class="params">container, tag, options</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">this</span>._internalRoot = createRootImpl(container, tag, options);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><em>createLegacyRoot</em> 内部调用了 <em>createRootImpl</em> 方法，并将 <em>createRootImpl</em> 的返回值赋值给了 <code>ReactDOMBlockingRoot</code> 对象的 <em>_internalRoot</em> 变量。 </p>
+<p>注意，这个 <code>ReactDOMBlockingRoot</code> 对象就是最终的返回值，也就是最开始的 <em>root</em> 和 <em>container._reactRootContainer</em>。</p>
+<h3 id="createRootImpl"><a href="#createRootImpl" class="headerlink" title="createRootImpl"></a>createRootImpl</h3><p>继续看 <em>createRootImpl</em> 到底创建了什么。</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">createRootImpl</span>(<span class="params">container, tag, options</span>) </span>&#123;</span><br><span class="line">	<span class="comment">// ...</span></span><br><span class="line">  <span class="keyword">var</span> root = createContainer(container, tag, hydrate);</span><br><span class="line">	<span class="comment">// ...</span></span><br><span class="line">  <span class="keyword">return</span> root;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>继续看 <em>createContainer</em>。</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">createContainer</span>(<span class="params">containerInfo, tag, hydrate, hydrationCallbacks</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> createFiberRoot(containerInfo, tag, hydrate);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">createFiberRoot</span>(<span class="params">containerInfo, tag, hydrate, hydrationCallbacks</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">var</span> root = <span class="keyword">new</span> FiberRootNode(containerInfo, tag, hydrate);</span><br><span class="line">	<span class="comment">// stateNode is any.</span></span><br><span class="line">  <span class="keyword">var</span> uninitializedFiber = createHostRootFiber(tag);</span><br><span class="line">  root.current = uninitializedFiber;</span><br><span class="line">  uninitializedFiber.stateNode = root;</span><br><span class="line">  initializeUpdateQueue(uninitializedFiber);</span><br><span class="line">  <span class="keyword">return</span> root;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><em>createContainer</em> 最终通过调用 <em>createFiberRoot</em> 方法创建了一个 <code>FiberRootNode</code> 对象，对应上面代码中的 <em>root</em> 变量。</p>
+<p>此外，<em>root.current</em> 指向了一个 <em>createHostRootFiber</em> 创建的对象，该对象是一个 <code>FiberNode</code> 对象。</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">createHostRootFiber</span>(<span class="params">tag</span>) </span>&#123;</span><br><span class="line">	<span class="comment">// ...	</span></span><br><span class="line">	<span class="keyword">return</span> createFiber(HostRoot, <span class="literal">null</span>, <span class="literal">null</span>, mode);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> createFiber = <span class="function"><span class="keyword">function</span> (<span class="params">tag, pendingProps, key, mode</span>) </span>&#123;</span><br><span class="line">	<span class="comment">// $FlowFixMe: the shapes are exact here but Flow doesn't like constructors</span></span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> FiberNode(tag, pendingProps, key, mode);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>是不是已经有点乱了？ <code>FiberRootNode</code> 和 <code>FiberNode</code> 名字怎么这么像，是不是有啥继承关系？</p>
+<p>实际并没有关系，大家去看这两个类的定义，会发现是两个完全不同的数据结构。</p>
+<p>其中 FiberNode <a href="https://blog.jerrychu.top/2021/08/15/React%E6%8E%A2%E7%B4%A2%E4%B9%8B%E7%BB%84%E4%BB%B6%E6%9E%84%E5%BB%BA%E5%8F%8A%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B/">上一篇文章</a>  已经介绍了，每个 React Element 都会生成一个对应的 FiberNode 对象，最终我们可以得到的是一个 FiberNode 树。</p>
+<h2 id="FiberRootNode"><a href="#FiberRootNode" class="headerlink" title="FiberRootNode"></a>FiberRootNode</h2><p>那 <code>FiberRootNode</code> 又是什么呢？我们先看一下其具体定义。</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">FiberRootNode</span>(<span class="params">containerInfo, tag, hydrate</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">this</span>.tag = tag;</span><br><span class="line">	<span class="comment">// 指向 DOMElement</span></span><br><span class="line">	<span class="keyword">this</span>.containerInfo = containerInfo;</span><br><span class="line">	<span class="keyword">this</span>.pendingChildren = <span class="literal">null</span>;</span><br><span class="line">	<span class="comment">// 指向 FiberNode</span></span><br><span class="line">	<span class="keyword">this</span>.current = <span class="literal">null</span>;</span><br><span class="line">	<span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>再结合 <em>createContainer</em> 方法。</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">createContainer</span>(<span class="params">containerInfo, tag, hydrate, hydrationCallbacks</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> createFiberRoot(containerInfo, tag, hydrate);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">createFiberRoot</span>(<span class="params">containerInfo, tag, hydrate, hydrationCallbacks</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">var</span> root = <span class="keyword">new</span> FiberRootNode(containerInfo, tag, hydrate);</span><br><span class="line">	<span class="comment">// stateNode is any.</span></span><br><span class="line">  <span class="keyword">var</span> uninitializedFiber = createHostRootFiber(tag);</span><br><span class="line">  root.current = uninitializedFiber;</span><br><span class="line">  uninitializedFiber.stateNode = root;</span><br><span class="line">  initializeUpdateQueue(uninitializedFiber);</span><br><span class="line">  <span class="keyword">return</span> root;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中，创建 <code>FiberRootNode</code> 对象（<em>root*）时，传入的 *containerInfo</em> 指向 root DOMElement；在 <em>createFiberRoot</em> 中，该 <code>FiberRootNode</code> 对象的 <em>current</em> 属性又被赋值为刚创建的 <code>FiberNode</code> 对象（<em>uninitializedFiber</em>），而这个 <code>FiberNode</code> 对象其实就是将要构建的整个 FiberNode Tree 的根节点（当前为首次构建流程）。</p>
+<p>因此 <code>FiberRootNode</code> 对象的 <em>containerInfo</em> 指向了 root DOMElement，<em>current</em> 指向了 root FiberNode，我们大致可以猜出 <code>FiberRootNode</code> 表示的是一个全局根节点。</p>
+<blockquote>
+<p><code>FiberRootNode</code> 和 <code>FiberNode</code> ，不知道 React 为啥起了这样两个容易混淆的名字😂。</p>
+</blockquote>
+<h2 id="关系梳理"><a href="#关系梳理" class="headerlink" title="关系梳理"></a>关系梳理</h2><p>再回到开头的代码：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">root = container._reactRootContainer = legacyCreateRootFromDOMContainer(container, forceHydrate);</span><br><span class="line">fiberRoot = root._internalRoot;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><em>legacyCreateRootFromDOMContainer</em> 返回一个 <code>ReactDOMBlockingRoot</code> 对象（<em>root</em>）</li>
+<li><em>root</em> 的 <em>_internalRoot</em> 属性指向 <em>fiberRoot</em>。</li>
+<li>DOMElement （<em>container*）的 *_reactRootContainer</em> 对象指向 <em>root</em>。</li>
+<li><em>fiberRoot</em> 的 <em>current</em> 属性指向 *<em>FiberNode Tree 的根节点 *rootFiberNode</em>。</li>
+<li><em>fiberRoot</em> 的 <em>containerInfo</em> 属性指向 <em>container</em>。</li>
+</ul>
+<blockquote>
+<p><em>fiberRoot</em> 是 <code>FiberRootNode</code> 的实例，<em>rootFiberNode</em> 是 <code>FiberNode</code> 的实例，表示 FiberNode Tree 的根节点。</p>
+</blockquote>
+<p>为了描述得更清晰，我画了个关系图。</p>
+<p><img src="/images/react1/relation.png" alt="关系图"></p>
+<blockquote>
+<p><em>rootFiberNode</em> 也有 <em>stateNode</em> 属性指向 <em>fiberRoot</em>，图中未标出。）</p>
+</blockquote>
+<p>其中的 <em>rootFiberNode</em> 对象，其实就是 <a href="https://blog.jerrychu.top/2021/08/15/React%E6%8E%A2%E7%B4%A2%E4%B9%8B%E7%BB%84%E4%BB%B6%E6%9E%84%E5%BB%BA%E5%8F%8A%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B/">上一篇文章</a> 中 Element Tree 的 Root 节点对应的 <code>FiberNode</code>，即 FiberNode Tree 的根节点。</p>
+<p><img src="https://blog.jerrychu.top/images/react0/tree1.png" alt="https://blog.jerrychu.top/images/react0/tree1.png"></p>
+<p>大家可能会有疑问，已经有了 <em>rootFiberNode</em> 了，为什么还需要一个 <em>fiberRoot</em> 呢？</p>
+<p>因为 <em>fiberRootNode</em> 是整个应用的根节点，而 <em>rootFiberNode</em> 是组件树的根节点。</p>
+<p><em>ReactDOM.render</em> 是可以被多次调用的，每次调用会渲染不同的组件树，对应不同的<em>rootFiberNode</em>。但是整个应用的根节点只有一个，即 <em>fiberRoot</em>。</p>
+<p>实际上 <em>fiberRoot</em> 的 <em>current</em> 属性指向的节点并不是固定不变的，<em>current</em> 始终指向当前 FiberNode Tree 的根节点。这就涉及到 FiberNode Tree 的更新流程，后面的文章会继续做深入的介绍。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>现在我们可以回答文章开始提到的三个问题了。</p>
+<ul>
+<li><em>root</em> 和 <em>fiberRoot</em> 的关系是什么？</li>
+</ul>
+<p>直接看这个关系图。</p>
+<p><img src="/images/react1/relation.png" alt="关系图"></p>
+<ul>
+<li><p><em>fiberRoot</em> 的作用是什么？</p>
+<p><em>fiberRoot</em> 是整个应用的根节点， <em>rootFiberNode</em>是组件树的根节点。</p>
+</li>
+<li><p><em>container._reactRootContainer</em> 的作用是什么？</p>
+</li>
+</ul>
+<p>通过 <em>container</em> 可以直接访问到当前的 <em>fiberRoot</em> 和 <em>rootFiberNode</em>。</p>
+<p><img src="/images/react1/console.png" alt="变量打印"></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="http://blog.jerrychu.top/2021/08/15/React%E6%8E%A2%E7%B4%A2%E4%B9%8B%E7%BB%84%E4%BB%B6%E6%9E%84%E5%BB%BA%E5%8F%8A%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -3333,7 +3484,7 @@ dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">28</span>
+          <span class="site-state-item-count">29</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
