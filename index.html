@@ -156,6 +156,93 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://blog.jerrychu.top/2023/02/11/%E5%A4%A7%E5%89%8D%E7%AB%AF%E6%8A%80%E6%9C%AF%E6%A0%88%E9%9A%8F%E6%83%B3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="JerryChu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="++">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/02/11/%E5%A4%A7%E5%89%8D%E7%AB%AF%E6%8A%80%E6%9C%AF%E6%A0%88%E9%9A%8F%E6%83%B3/" class="post-title-link" itemprop="url">大前端技术栈随想</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-02-11 21:16:03 / Modified: 22:56:49" itemprop="dateCreated datePublished" datetime="2023-02-11T21:16:03+08:00">2023-02-11</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>本人做过很长时间的客户端开发，最近两年又开始带前端团队做 Web 开发和客户端跨平台开发方向，在工作中经常被问起客户端与前端的技术选型问题。之前有些零散的想法，一直没有汇总记录下来，现在是时候梳理下了。随着阅历的增加，有些想法可能还会发生变化。本文只是随想，不成体系。</p>
+<h2 id="客户端-vs-前端"><a href="#客户端-vs-前端" class="headerlink" title="客户端 vs 前端"></a>客户端 vs 前端</h2><p>抛开具体技术栈不谈，单纯对比 “客户端”（APP）和 “前端”（H5、小程序等）</p>
+<h3 id="从产品角度"><a href="#从产品角度" class="headerlink" title="从产品角度"></a>从产品角度</h3><ul>
+<li>客户端是一个操作系统之上看得见的“实体”，属于一等公民；H5或小程序等前端页面是在“寄生”在 APP 上的“二级公民”。  </li>
+<li>前端页面产品功能受限于“宿主”提供的能力，存在不确定性（如获取不到底层能力，被微信封禁等）。</li>
+<li>整体上客户端能够提供的用户体验更好，能够给产品带来的上限更高。</li>
+</ul>
+<p>产品上客户端的上限更高。</p>
+<h3 id="从工程角度"><a href="#从工程角度" class="headerlink" title="从工程角度"></a>从工程角度</h3><ul>
+<li>客户端工程更简单，IDE 本身集成了很多能力，工程上相对闭环稳定，开发者可以专注于业务开发。</li>
+<li>前端工程更自由灵活，复杂的配置可以通过现有的脚手架工具解决，开发者在此基础上可以实现各类自定义能力。</li>
+</ul>
+<p>工程上前端的上限更高。</p>
+<h3 id="从技术角度"><a href="#从技术角度" class="headerlink" title="从技术角度"></a>从技术角度</h3><ul>
+<li>客户端更锻炼开发者的技术深度，基于操作系统底层原理优化启动性能、内存、帧率的工作相信每位客户端开发者都或多或少参与过。</li>
+<li>前端更锻炼开发者的技术广度，前端开发者生态相当丰富，各类工具、框架层出不穷，经常让开发者感觉“学不动了”。</li>
+<li>客户端开发者相对来说更有“产品sense”（仅基于本人观察的情况），上升通道更广阔。</li>
+<li>前端技术空间更广阔，前端、服务端、跨平台（客户端）都能覆盖，全栈开发很香。</li>
+</ul>
+<p>技术上客户端和前端各有千秋。（技术没有上下限的区别，“人”才有）</p>
+<h2 id="Native-vs-RN-vs-Web"><a href="#Native-vs-RN-vs-Web" class="headerlink" title="Native vs RN vs Web"></a>Native vs RN vs Web</h2><p>技术栈没有孰优孰劣，脱离业务谈技术选型都是耍流氓。这里不再赘述Native、RN和Web的对比，主要谈些个人的心得体会：</p>
+<p><b>如果团队同时具备客户端和前端技术栈的人才，一定要坚定不移走大前端之路。</b> APP 主体与核心模块使用 Native 技术栈，非核心模块使用 RN 等跨平台技术栈或 Web 技术栈。</p>
+<p>用前端技术栈（HTML/JS/CSS）写客户端，优点是效率的提升，一套代码双端甚至三端运行，无需受版本限制随时发布。客户端虽然有 hotfix 能力，但是 hotfix 主要用来修复 bug，并不能作为功能开发的常规选项来用。跨平台的主要问题在于性能，性能的核心问题是首屏时间，这些都可以通过技术手段来优化。</p>
+<p>之所以强烈推荐大前端技术栈，是因为除了跨平台和动态化带来的效率提升外，大前端可以为项目带来更深层次的进化：</p>
+<ol>
+<li>体验一致性：双端一致性一直是客户端开发的一个痛点，跨平台技术栈可以较好地保证一致的用户体验。</li>
+<li>项目架构升级：支持跨平台业务需要 Native 工程架构有更清晰的模块依赖和分层设计，业务会自然驱动客户端整体架构优化。</li>
+<li>技术素养：提升团队技术广度，储备大前端全栈人才，人才到用时方恨少。</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="http://blog.jerrychu.top/2021/08/30/%E5%9B%BE%E8%A7%A3JS%E5%8E%9F%E5%9E%8B%E7%BB%A7%E6%89%BF/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -3582,14 +3669,14 @@ dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">30</span>
+          <span class="site-state-item-count">31</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-count">22</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -3616,7 +3703,7 @@ dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2023</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
