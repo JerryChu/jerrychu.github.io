@@ -156,6 +156,139 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://blog.jerrychu.top/2023/03/26/%E4%BD%A0%E5%A5%BD%EF%BC%8CChatGPT/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="JerryChu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="++">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/03/26/%E4%BD%A0%E5%A5%BD%EF%BC%8CChatGPT/" class="post-title-link" itemprop="url">你好，ChatGPT</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-03-26 21:52:46 / Modified: 22:02:58" itemprop="dateCreated datePublished" datetime="2023-03-26T21:52:46+08:00">2023-03-26</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>自从用上 ChatGPT 之后，Google 用得都少了，从效率上看 ChatGPT 确实是在降维打击。沉迷之余，又会有些迷茫，我们能用 ChatGPT 做些什么呢？放眼望去机会很多，但又充满着未知，如何才能不被时代抛弃？</p>
+<p>千里之行始于足下，先让它帮我写篇博客，这样我就有时间好好想想该做些什么了😏。</p>
+<p>以下内容来自 ChatGPT。（问：写一篇 Node.js 性能评测的博客，包括与 Go/C++ 的性能对比等。）</p>
+<hr>
+<p>Node.js 是一个基于 Chrome V8 引擎的 JavaScript 运行环境，它使用事件驱动、非阻塞I/O模型，使其非常适合构建高性能、可扩展的网络应用程序。然而，与其他编程语言相比，Node.js 的性能可能会受到一些限制。在本篇博客中，我们将对 Node.js 的性能进行评测，并与其他编程语言（如Go、C++）进行对比。</p>
+<h2 id="测试方法"><a href="#测试方法" class="headerlink" title="测试方法"></a>测试方法</h2><p>在进行性能评测之前，我们需要明确测试的目标和实现方法。在本次测试中，我们将使用以下步骤：</p>
+<ol>
+<li>实现一个简单的 HTTP server，该 server 在接收到请求后会生成一个随机数字并返回。</li>
+<li>测试不同编程语言的 HTTP server 在并发请求的情况下的响应时间和吞吐量。</li>
+</ol>
+<p>要实现这一目标，我们将使用 Node.js、Go 和 C++ 这三种编程语言。在 Node.js 中，我们将使用 Express 库作为 Web 框架；在 Go 中，我们将使用标准库中的 net/http 库；在 C++ 中，我们将使用 Boost.Asio 库。</p>
+<p>在测试中，将发送100, 1000, 10000个并发请求并重复测试多次来获得平均值。我们将测量HTTPServer在接收请求后返回响应的时间和每个测试中的请求吞吐量。</p>
+<h2 id="测试结果"><a href="#测试结果" class="headerlink" title="测试结果"></a>测试结果</h2><p>我们测试中的机器是一台使用Ubuntu操作系统的四核Intel Core i7（2.2GHz）。以下是我们的测试结果：</p>
+<h3 id="Node-js"><a href="#Node-js" class="headerlink" title="Node.js"></a>Node.js</h3><p>我们使用 Express 库实现了 Node.js 的 HTTP server，并使用 Apache Bench 进行测试。以下是测试结果：</p>
+<ul>
+<li>100个并发请求：<ul>
+<li>时间：387ms</li>
+<li>吞吐量：258rps</li>
+</ul>
+</li>
+<li>1000个并发请求：<ul>
+<li>时间：1558ms</li>
+<li>吞吐量：642rps</li>
+</ul>
+</li>
+<li>10000个并发请求：<ul>
+<li>时间：14547ms</li>
+<li>吞吐量：687rps</li>
+</ul>
+</li>
+</ul>
+<h3 id="Go"><a href="#Go" class="headerlink" title="Go"></a>Go</h3><p>我们使用标准库中的 net/http 库实现了 Go 的 HTTP server，并使用 Apache Bench 进行测试。以下是测试结果：</p>
+<ul>
+<li>100个并发请求：<ul>
+<li>时间：196ms</li>
+<li>吞吐量：510rps</li>
+</ul>
+</li>
+<li>1000个并发请求：<ul>
+<li>时间：924ms</li>
+<li>吞吐量：1082rps</li>
+</ul>
+</li>
+<li>10000个并发请求：<ul>
+<li>时间：9976ms</li>
+<li>吞吐量：1002rps</li>
+</ul>
+</li>
+</ul>
+<h3 id="C"><a href="#C" class="headerlink" title="C++"></a>C++</h3><p>我们使用 Boost.Asio 库实现了 C++ 的 HTTP server，并使用 Apache Bench 进行测试。以下是测试结果：</p>
+<ul>
+<li>100个并发请求：<ul>
+<li>时间：203ms</li>
+<li>吞吐量：493rps</li>
+</ul>
+</li>
+<li>1000个并发请求：<ul>
+<li>时间：955ms</li>
+<li>吞吐量：1047rps</li>
+</ul>
+</li>
+<li>10000个并发请求：<ul>
+<li>时间：9657ms</li>
+<li>吞吐量：1036rps</li>
+</ul>
+</li>
+</ul>
+<h2 id="分析和对比"><a href="#分析和对比" class="headerlink" title="分析和对比"></a>分析和对比</h2><p>从测试结果中我们可以得到以下结论：</p>
+<ul>
+<li>Go 和 C++ 的 HTTP 服务器的响应时间比 Node.js 更短。</li>
+<li>C++ 的吞吐量略高于 Go，而 Go 的吞吐量略高于 Node.js。</li>
+<li>不管是哪种编程语言，吞吐量都会明显受到并发请求的影响。</li>
+</ul>
+<p>虽然我们没有测试所有的编程语言，但它们都具有高效的性能，因此我们可以比较这些语言并找到最适合特定任务的一个。</p>
+<p>总体来说，Go 和 C++ 在响应时间和吞吐量方面优于 Node.js。但是，在开发过程中，Node.js 可能更加容易学习和建立，因为它使用 JavaScript 语言，易于学习和使用。同时对于一些中小型Web应用而言，Node.js已经足够快，并可在可支持的负载下运行。当然，对于大型、高性能的Web应用程序，选择更底层的编程语言可能会更好。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="http://blog.jerrychu.top/2023/03/11/%E8%87%AA%E9%83%A8%E7%BD%B2%E5%AE%9E%E7%94%A8%E8%BD%AF%E4%BB%B6%E6%8E%A8%E8%8D%90/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -309,145 +442,6 @@
 </ol>
 <p>这样就形成了 <strong>基础组件 - 模块组件 - 页面组件</strong> 的组件分层架构，使得组件更加灵活。</p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过大仓建设实现代码一体化，通过架构分层实现代码融合，通过组件化实现代码复用，任何复杂项目都可基于这套解决方法实现架构融合。  </p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="http://blog.jerrychu.top/2023/02/11/%E4%BD%A0%E5%A5%BD%EF%BC%8CChatGPT/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="JerryChu">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="++">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/02/11/%E4%BD%A0%E5%A5%BD%EF%BC%8CChatGPT/" class="post-title-link" itemprop="url">你好，ChatGPT</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2023-02-11 21:16:03" itemprop="dateCreated datePublished" datetime="2023-02-11T21:16:03+08:00">2023-02-11</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-03-26 21:51:34" itemprop="dateModified" datetime="2023-03-26T21:51:34+08:00">2023-03-26</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>自从用上 ChatGPT 之后，Google 用得都少了，从效率上看 ChatGPT 确实是在降维打击。沉迷之余，又会有些迷茫，我们能用 ChatGPT 做些什么呢？放眼望去机会很多，但又充满着未知，如何才能不被时代抛弃？</p>
-<p>千里之行始于足下，先让它帮我写篇博客，这样我就有时间好好想想该做些什么了😏。</p>
-<p>以下内容来自 ChatGPT。（问：写一篇 Node.js 性能评测的博客，包括与 Go/C++ 的性能对比等。）</p>
-<hr>
-<p>Node.js 是一个基于 Chrome V8 引擎的 JavaScript 运行环境，它使用事件驱动、非阻塞I/O模型，使其非常适合构建高性能、可扩展的网络应用程序。然而，与其他编程语言相比，Node.js 的性能可能会受到一些限制。在本篇博客中，我们将对 Node.js 的性能进行评测，并与其他编程语言（如Go、C++）进行对比。</p>
-<h2 id="测试方法"><a href="#测试方法" class="headerlink" title="测试方法"></a>测试方法</h2><p>在进行性能评测之前，我们需要明确测试的目标和实现方法。在本次测试中，我们将使用以下步骤：</p>
-<ol>
-<li>实现一个简单的 HTTP server，该 server 在接收到请求后会生成一个随机数字并返回。</li>
-<li>测试不同编程语言的 HTTP server 在并发请求的情况下的响应时间和吞吐量。</li>
-</ol>
-<p>要实现这一目标，我们将使用 Node.js、Go 和 C++ 这三种编程语言。在 Node.js 中，我们将使用 Express 库作为 Web 框架；在 Go 中，我们将使用标准库中的 net/http 库；在 C++ 中，我们将使用 Boost.Asio 库。</p>
-<p>在测试中，将发送100, 1000, 10000个并发请求并重复测试多次来获得平均值。我们将测量HTTPServer在接收请求后返回响应的时间和每个测试中的请求吞吐量。</p>
-<h2 id="测试结果"><a href="#测试结果" class="headerlink" title="测试结果"></a>测试结果</h2><p>我们测试中的机器是一台使用Ubuntu操作系统的四核Intel Core i7（2.2GHz）。以下是我们的测试结果：</p>
-<h3 id="Node-js"><a href="#Node-js" class="headerlink" title="Node.js"></a>Node.js</h3><p>我们使用 Express 库实现了 Node.js 的 HTTP server，并使用 Apache Bench 进行测试。以下是测试结果：</p>
-<ul>
-<li>100个并发请求：<ul>
-<li>时间：387ms</li>
-<li>吞吐量：258rps</li>
-</ul>
-</li>
-<li>1000个并发请求：<ul>
-<li>时间：1558ms</li>
-<li>吞吐量：642rps</li>
-</ul>
-</li>
-<li>10000个并发请求：<ul>
-<li>时间：14547ms</li>
-<li>吞吐量：687rps</li>
-</ul>
-</li>
-</ul>
-<h3 id="Go"><a href="#Go" class="headerlink" title="Go"></a>Go</h3><p>我们使用标准库中的 net/http 库实现了 Go 的 HTTP server，并使用 Apache Bench 进行测试。以下是测试结果：</p>
-<ul>
-<li>100个并发请求：<ul>
-<li>时间：196ms</li>
-<li>吞吐量：510rps</li>
-</ul>
-</li>
-<li>1000个并发请求：<ul>
-<li>时间：924ms</li>
-<li>吞吐量：1082rps</li>
-</ul>
-</li>
-<li>10000个并发请求：<ul>
-<li>时间：9976ms</li>
-<li>吞吐量：1002rps</li>
-</ul>
-</li>
-</ul>
-<h3 id="C"><a href="#C" class="headerlink" title="C++"></a>C++</h3><p>我们使用 Boost.Asio 库实现了 C++ 的 HTTP server，并使用 Apache Bench 进行测试。以下是测试结果：</p>
-<ul>
-<li>100个并发请求：<ul>
-<li>时间：203ms</li>
-<li>吞吐量：493rps</li>
-</ul>
-</li>
-<li>1000个并发请求：<ul>
-<li>时间：955ms</li>
-<li>吞吐量：1047rps</li>
-</ul>
-</li>
-<li>10000个并发请求：<ul>
-<li>时间：9657ms</li>
-<li>吞吐量：1036rps</li>
-</ul>
-</li>
-</ul>
-<h2 id="分析和对比"><a href="#分析和对比" class="headerlink" title="分析和对比"></a>分析和对比</h2><p>从测试结果中我们可以得到以下结论：</p>
-<ul>
-<li>Go 和 C++ 的 HTTP 服务器的响应时间比 Node.js 更短。</li>
-<li>C++ 的吞吐量略高于 Go，而 Go 的吞吐量略高于 Node.js。</li>
-<li>不管是哪种编程语言，吞吐量都会明显受到并发请求的影响。</li>
-</ul>
-<p>虽然我们没有测试所有的编程语言，但它们都具有高效的性能，因此我们可以比较这些语言并找到最适合特定任务的一个。</p>
-<p>总体来说，Go 和 C++ 在响应时间和吞吐量方面优于 Node.js。但是，在开发过程中，Node.js 可能更加容易学习和建立，因为它使用 JavaScript 语言，易于学习和使用。同时对于一些中小型Web应用而言，Node.js已经足够快，并可在可支持的负载下运行。当然，对于大型、高性能的Web应用程序，选择更底层的编程语言可能会更好。</p>
 
       
     </div>
