@@ -156,6 +156,78 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://blog.jerrychu.top/2023/06/03/%E4%B8%80%E4%B8%AA%E4%BC%98%E9%9B%85%E7%9A%84TS%E5%85%A8%E6%A0%88%E9%A1%B9%E7%9B%AE%E6%A8%A1%E7%89%88/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="JerryChu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="++">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/06/03/%E4%B8%80%E4%B8%AA%E4%BC%98%E9%9B%85%E7%9A%84TS%E5%85%A8%E6%A0%88%E9%A1%B9%E7%9B%AE%E6%A8%A1%E7%89%88/" class="post-title-link" itemprop="url">一个优雅的TS全栈项目模版</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-06-03 21:27:05 / Modified: 21:56:38" itemprop="dateCreated datePublished" datetime="2023-06-03T21:27:05+08:00">2023-06-03</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="如何实现一个优雅的TS全栈项目？"><a href="#如何实现一个优雅的TS全栈项目？" class="headerlink" title="如何实现一个优雅的TS全栈项目？"></a>如何实现一个优雅的TS全栈项目？</h3><ul>
+<li>大仓管理，前后端代码同源</li>
+<li>前后端共用数据模型/协议，基础代码充分复用</li>
+<li>架构灵活易扩展，无额外心智负担</li>
+<li>代码简洁，目录清晰</li>
+</ul>
+<h3 id="Talk-is-cheap-Show-me-the-code"><a href="#Talk-is-cheap-Show-me-the-code" class="headerlink" title="Talk is cheap. Show me the code."></a>Talk is cheap. Show me the code.</h3><p>👉 <a href="https://github.com/JerryChu/ts-fullstack" target="_blank" rel="noopener">https://github.com/JerryChu/ts-fullstack</a></p>
+<h3 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h3><p><a href="https://github.com/JerryChu/ts-fullstack" target="_blank" rel="noopener">ts-fullstack</a> 为 TS 全栈项目模版代码，仅作为参考，<strong>请勿直接使用</strong>。</p>
+<p>该项目提供了全栈项目中 <strong>高效管理前后端代码</strong> 的解决方案，重点在<strong>整体工程架构</strong>及<strong>前后端代码复用</strong>，对前端与后端代码逻辑细节不必深究。</p>
+<h4 id="模版项目目录结构"><a href="#模版项目目录结构" class="headerlink" title="模版项目目录结构"></a>模版项目目录结构</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">- apps  </span><br><span class="line">    |- server        # 服务端代码（基于Koa）</span><br><span class="line">    |- web           # 前端代码（基于Vue）</span><br><span class="line">- packages</span><br><span class="line">    |- tsconfig      # ts 配置</span><br><span class="line">    |- shared-model  # 前后端共用数据定义</span><br><span class="line">    |- ...           # 其他可复用代码/配置</span><br><span class="line">- turbo.json         # turbo 配置</span><br><span class="line">- ...</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>备注：前端代码为了方便暂时直接使用 JS 编写。</p>
+</blockquote>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="http://blog.jerrychu.top/2023/03/26/%E4%BD%A0%E5%A5%BD%EF%BC%8CChatGPT/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -3974,14 +4046,14 @@ dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">34</span>
+          <span class="site-state-item-count">35</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-count">27</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>

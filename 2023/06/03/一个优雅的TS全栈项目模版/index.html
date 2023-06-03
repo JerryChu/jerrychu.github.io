@@ -20,14 +20,21 @@
     var CONFIG = {"hostname":"blog.jerrychu.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta property="og:type" content="website">
-<meta property="og:title" content="++">
-<meta property="og:url" content="http://blog.jerrychu.top/archives/2023/03/index.html">
+  <meta name="description" content="如何实现一个优雅的TS全栈项目？ 大仓管理，前后端代码同源 前后端共用数据模型&#x2F;协议，基础代码充分复用 架构灵活易扩展，无额外心智负担 代码简洁，目录清晰  Talk is cheap. Show me the code.👉 https:&#x2F;&#x2F;github.com&#x2F;JerryChu&#x2F;ts-fullstack 说明ts-fullstack 为 TS 全栈项目模版代码，仅作为参考，请勿直接使用。 该项">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一个优雅的TS全栈项目模版">
+<meta property="og:url" content="http://blog.jerrychu.top/2023/06/03/%E4%B8%80%E4%B8%AA%E4%BC%98%E9%9B%85%E7%9A%84TS%E5%85%A8%E6%A0%88%E9%A1%B9%E7%9B%AE%E6%A8%A1%E7%89%88/index.html">
 <meta property="og:site_name" content="++">
+<meta property="og:description" content="如何实现一个优雅的TS全栈项目？ 大仓管理，前后端代码同源 前后端共用数据模型&#x2F;协议，基础代码充分复用 架构灵活易扩展，无额外心智负担 代码简洁，目录清晰  Talk is cheap. Show me the code.👉 https:&#x2F;&#x2F;github.com&#x2F;JerryChu&#x2F;ts-fullstack 说明ts-fullstack 为 TS 全栈项目模版代码，仅作为参考，请勿直接使用。 该项">
+<meta property="article:published_time" content="2023-06-03T13:27:05.000Z">
+<meta property="article:modified_time" content="2023-06-03T13:56:38.852Z">
 <meta property="article:author" content="JerryChu">
+<meta property="article:tag" content="JavaScript">
+<meta property="article:tag" content="TypeScript">
+<meta property="article:tag" content="全栈">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://blog.jerrychu.top/archives/2023/03/">
+<link rel="canonical" href="http://blog.jerrychu.top/2023/06/03/%E4%B8%80%E4%B8%AA%E4%BC%98%E9%9B%85%E7%9A%84TS%E5%85%A8%E6%A0%88%E9%A1%B9%E7%9B%AE%E6%A8%A1%E7%89%88/">
 
 
 <script id="page-configurations">
@@ -35,12 +42,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : false,
+    isPost : true,
     lang   : 'zh-Hans'
   };
 </script>
 
-  <title>Archive | ++</title>
+  <title>一个优雅的TS全栈项目模版 | ++</title>
   
 
 
@@ -150,71 +157,95 @@
         <div class="content-wrap">
           
 
-          <div class="content archive">
+          <div class="content post posts-expand">
             
 
+    
   
   
-  
-  <div class="post-block">
-    <div class="posts-collapse">
-      <div class="collection-title">
-        
-        <span class="collection-header">OK! 35 posts in total. Keep on posting.</span>
-      </div>
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://blog.jerrychu.top/2023/06/03/%E4%B8%80%E4%B8%AA%E4%BC%98%E9%9B%85%E7%9A%84TS%E5%85%A8%E6%A0%88%E9%A1%B9%E7%9B%AE%E6%A8%A1%E7%89%88/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="JerryChu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="++">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          一个优雅的TS全栈项目模版
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-06-03 21:27:05 / Modified: 21:56:38" itemprop="dateCreated datePublished" datetime="2023-06-03T21:27:05+08:00">2023-06-03</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-    <div class="collection-year">
-      <span class="collection-header">2023</span>
-    </div>
+        <h3 id="如何实现一个优雅的TS全栈项目？"><a href="#如何实现一个优雅的TS全栈项目？" class="headerlink" title="如何实现一个优雅的TS全栈项目？"></a>如何实现一个优雅的TS全栈项目？</h3><ul>
+<li>大仓管理，前后端代码同源</li>
+<li>前后端共用数据模型/协议，基础代码充分复用</li>
+<li>架构灵活易扩展，无额外心智负担</li>
+<li>代码简洁，目录清晰</li>
+</ul>
+<h3 id="Talk-is-cheap-Show-me-the-code"><a href="#Talk-is-cheap-Show-me-the-code" class="headerlink" title="Talk is cheap. Show me the code."></a>Talk is cheap. Show me the code.</h3><p>👉 <a href="https://github.com/JerryChu/ts-fullstack" target="_blank" rel="noopener">https://github.com/JerryChu/ts-fullstack</a></p>
+<h3 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h3><p><a href="https://github.com/JerryChu/ts-fullstack" target="_blank" rel="noopener">ts-fullstack</a> 为 TS 全栈项目模版代码，仅作为参考，<strong>请勿直接使用</strong>。</p>
+<p>该项目提供了全栈项目中 <strong>高效管理前后端代码</strong> 的解决方案，重点在<strong>整体工程架构</strong>及<strong>前后端代码复用</strong>，对前端与后端代码逻辑细节不必深究。</p>
+<h4 id="模版项目目录结构"><a href="#模版项目目录结构" class="headerlink" title="模版项目目录结构"></a>模版项目目录结构</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">- apps  </span><br><span class="line">    |- server        # 服务端代码（基于Koa）</span><br><span class="line">    |- web           # 前端代码（基于Vue）</span><br><span class="line">- packages</span><br><span class="line">    |- tsconfig      # ts 配置</span><br><span class="line">    |- shared-model  # 前后端共用数据定义</span><br><span class="line">    |- ...           # 其他可复用代码/配置</span><br><span class="line">- turbo.json         # turbo 配置</span><br><span class="line">- ...</span><br></pre></td></tr></table></figure>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2023-03-26T21:52:46+08:00"
-              content="2023-03-26">
-          03-26
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2023/03/26/%E4%BD%A0%E5%A5%BD%EF%BC%8CChatGPT/" itemprop="url">
-            <span itemprop="name">你好，ChatGPT</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2023-03-11T22:12:30+08:00"
-              content="2023-03-11">
-          03-11
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2023/03/11/%E8%87%AA%E9%83%A8%E7%BD%B2%E5%AE%9E%E7%94%A8%E8%BD%AF%E4%BB%B6%E6%8E%A8%E8%8D%90/" itemprop="url">
-            <span itemprop="name">自部署实用软件推荐</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
+<blockquote>
+<p>备注：前端代码为了方便暂时直接使用 JS 编写。</p>
+</blockquote>
 
     </div>
-  </div>
-  
-  
-  
 
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+              <a href="/tags/TypeScript/" rel="tag"># TypeScript</a>
+              <a href="/tags/%E5%85%A8%E6%A0%88/" rel="tag"># 全栈</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/03/26/%E4%BD%A0%E5%A5%BD%EF%BC%8CChatGPT/" rel="prev" title="你好，ChatGPT">
+      <i class="fa fa-chevron-left"></i> 你好，ChatGPT
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
   
 
 
@@ -267,6 +298,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#如何实现一个优雅的TS全栈项目？"><span class="nav-number">1.</span> <span class="nav-text">如何实现一个优雅的TS全栈项目？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Talk-is-cheap-Show-me-the-code"><span class="nav-number">2.</span> <span class="nav-text">Talk is cheap. Show me the code.</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#说明"><span class="nav-number">3.</span> <span class="nav-text">说明</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#模版项目目录结构"><span class="nav-number">3.1.</span> <span class="nav-text">模版项目目录结构</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
